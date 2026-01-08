@@ -27,8 +27,8 @@ body{margin:0;font-family:-apple-system,system-ui;background:#111;color:#eee}
  z-index:25;padding:12px
 }
 #charList button{
- width:100%;padding:10px;margin-bottom:8px;
- border-radius:12px;background:#222;color:#eee;border:1px solid #333
+ width:100%;padding:12px;margin-bottom:8px;
+ border-radius:14px;background:#222;color:#eee;border:1px solid #333
 }
 
 canvas#map{
@@ -45,7 +45,6 @@ canvas#map{
 }
 .bottomDock button{flex:1;padding:12px;border-radius:14px}
 
-/* Collision editor */
 .collisionEditor{
  position:fixed;inset:0;z-index:50;
  background:#0d0d0d;display:flex;flex-direction:column
@@ -54,9 +53,7 @@ canvas#map{
  display:flex;justify-content:space-between;align-items:center;
  padding:12px;background:#1e1e1e;border-bottom:1px solid #333
 }
-#collisionCanvas{
- flex:1;background:#000;touch-action:none
-}
+#collisionCanvas{flex:1;background:#000;touch-action:none}
 .editorHint{
  padding:10px;font-size:13px;color:#aaa;text-align:center
 }
