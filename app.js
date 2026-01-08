@@ -196,12 +196,15 @@ buildPalette();
 
 // ===== MODE menu wiring (iOS-safe) =====
 function closeAllPanels(){
+  stopCollisionInput();
   palettePanel.classList.add('hidden');
   charsPanel.classList.add('hidden');
   collisionPanel.classList.add('hidden');
   hud.classList.add('hidden');
 }
 modeBtn.addEventListener('click', (e)=>{
+  // If collision canvas captured a pointer, release it so MODE always works
+  stopCollisionInput();
   e.stopPropagation();
   modeMenu.classList.toggle('hidden');
 });
@@ -210,6 +213,7 @@ document.addEventListener('click', ()=> modeMenu.classList.add('hidden'));
 modeMenu.querySelectorAll('button').forEach(btn=>{
   btn.addEventListener('click', async ()=>{
     const m = btn.dataset.mode;
+    stopCollisionInput();
     modeMenu.classList.add('hidden');
 
     if(m === 'terrain'){
@@ -665,6 +669,7 @@ charSelect.addEventListener('change', async ()=>{
 });
 
 doneCollision.onclick = async ()=>{
+  stopCollisionInput();
   // Save changes already applied to characterLibrary objects
   await saveProject();
   collisionPanel.classList.add('hidden'); // exits collision mode
@@ -764,6 +769,7 @@ collisionCanvas.addEventListener('pointerdown', (e)=>{
   const dy = p.y - st.anchor.y;
   if(Math.hypot(dx,dy) <= 10){
     drag = { active:true, kind:'anchor', startX:p.x, startY:p.y };
+    activePointerId = e.pointerId;
     collisionCanvas.setPointerCapture(e.pointerId);
     return;
   }
@@ -773,7 +779,8 @@ collisionCanvas.addEventListener('pointerdown', (e)=>{
   for(const name of handleNames){
     if(pointIn(p, st.handles[name])){
       drag = { active:true, kind:name, startX:p.x, startY:p.y };
-      collisionCanvas.setPointerCapture(e.pointerId);
+      activePointerId = e.pointerId;
+    collisionCanvas.setPointerCapture(e.pointerId);
       return;
     }
   }
@@ -785,6 +792,7 @@ collisionCanvas.addEventListener('pointerdown', (e)=>{
   const boxH = ch.collision.h*st.scale;
   if(p.x>=boxX && p.x<=boxX+boxW && p.y>=boxY && p.y<=boxY+boxH){
     drag = { active:true, kind:'move', startX:p.x, startY:p.y };
+    activePointerId = e.pointerId;
     collisionCanvas.setPointerCapture(e.pointerId);
   }
 });
@@ -848,3 +856,20 @@ collisionCanvas.addEventListener('pointerup', ()=>{ drag.active=false; drag.kind
 collisionCanvas.addEventListener('pointercancel', ()=>{ drag.active=false; drag.kind=null; });
 
 function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+
+// ===== Input safety (iOS): prevent canvas from trapping taps =====
+let activePointerId = null;
+function releaseCanvasPointer(){
+  try{
+    if(activePointerId !== null){
+      collisionCanvas.releasePointerCapture(activePointerId);
+    }
+  }catch(_e){}
+  activePointerId = null;
+  drag.active = false; drag.kind = null;
+}
+function stopCollisionInput(){
+  releaseCanvasPointer();
+  // nothing else needed because listeners remain, but drag is reset and capture released
+}
