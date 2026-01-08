@@ -16,31 +16,25 @@
 <div id="modeMenu" class="modeMenu hidden">
   <button data-mode="terrain">Terrain</button>
   <button data-mode="characters">Characters</button>
+  <button data-mode="collision">Collision & Anchor</button>
   <button data-mode="playtest">Playtest</button>
 </div>
 
 <section id="palettePanel" class="panel hidden"></section>
+<section id="charsPanel" class="panel hidden"></section>
 
-<section id="charsPanel" class="panel hidden">
+<canvas id="map"></canvas>
+
+<!-- Integrated collision panel -->
+<div id="collisionPanel" class="collisionPanel hidden">
   <div class="panelHeader">
-    <strong>Characters</strong>
-  </div>
-  <div id="charList"></div>
-  <div class="hint">Tap a character to edit collision & anchor.</div>
-</section>
-
-<div id="collisionEditor" class="collisionEditor hidden">
-  <div class="editorHeader">
     <strong>Collision & Anchor</strong>
+    <select id="charSelect"></select>
     <button id="closeCollision">Done</button>
   </div>
   <canvas id="collisionCanvas"></canvas>
-  <div class="editorHint">
-    Drag green box = collision • Red dot = anchor (feet)
-  </div>
+  <div class="panelHint">Green = collision • Red = anchor (feet)</div>
 </div>
-
-<canvas id="map"></canvas>
 
 <div class="bottomDock">
   <button id="saveBtn">💾 Save</button>
