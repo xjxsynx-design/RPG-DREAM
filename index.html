@@ -20,7 +20,26 @@
 </div>
 
 <section id="palettePanel" class="panel hidden"></section>
-<section id="charsPanel" class="panel hidden"></section>
+
+<section id="charsPanel" class="panel hidden">
+  <div class="panelHeader">
+    <strong>Characters</strong>
+  </div>
+  <div id="charList"></div>
+  <div class="hint">Tap a character to edit collision & anchor.</div>
+</section>
+
+<!-- Collision Editor -->
+<div id="collisionEditor" class="collisionEditor hidden">
+  <div class="editorHeader">
+    <strong>Collision & Anchor</strong>
+    <button id="closeCollision">Done</button>
+  </div>
+  <canvas id="collisionCanvas"></canvas>
+  <div class="editorHint">
+    Drag the box to resize collision. Red dot = anchor (feet).
+  </div>
+</div>
 
 <canvas id="map"></canvas>
 
