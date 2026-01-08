@@ -10,15 +10,18 @@
 <body>
 <header>
   <h1>RPG World Builder</h1>
+  <button id="paletteToggle">Palette</button>
 </header>
-<main>
-  <aside id="palette"></aside>
-  <canvas id="map" width="960" height="640"></canvas>
-</main>
+
+<div id="palettePanel" class="hidden"></div>
+
+<canvas id="map"></canvas>
+
 <footer>
   <button id="saveBtn">Save</button>
   <button id="exportBtn">Export .mk</button>
 </footer>
+
 <script src="app.js"></script>
 </body>
 </html>
