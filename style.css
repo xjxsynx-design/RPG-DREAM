@@ -1,0 +1,7 @@
+body{margin:0;font-family:sans-serif;background:#111;color:#eee}
+header,footer{padding:8px;background:#222}
+main{display:flex}
+#palette{width:120px;background:#1a1a1a;padding:4px;overflow-y:auto}
+.tile{width:48px;height:48px;border:1px solid #333;margin:2px;touch-action:none}
+canvas{background:#000;touch-action:none}
+button{margin-right:6px}
