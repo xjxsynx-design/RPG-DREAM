@@ -1,13 +1,16 @@
 const TILE=48;
+const TAP_THRESHOLD = 6;
+
 const map=document.getElementById('map');
 const ctx=map.getContext('2d');
 const palette=document.getElementById('palettePanel');
 const toggle=document.getElementById('paletteToggle');
 
-let camX=0,camY=0,drag=false,lastX=0,lastY=0;
-const cols=80,rows=80;
+let camX=0,camY=0;
+let startX=0,startY=0;
+let moved=false;
 
-// grid stores TILE IDS (not colors)
+const cols=80,rows=80;
 let grid=Array.from({length:rows},()=>Array.from({length:cols},()=>null));
 
 function resize(){
@@ -18,7 +21,6 @@ function resize(){
 addEventListener('resize',resize);
 resize();
 
-// biome tiles with IDs + colors
 const tiles=[
  {id:'grassland',color:'#4caf50'},
  {id:'plains',color:'#7cb342'},
@@ -30,12 +32,10 @@ const tiles=[
 
 let current=null;
 
-// build palette
 tiles.forEach(t=>{
   const d=document.createElement('div');
   d.className='tile';
   d.style.background=t.color;
-  d.title=t.id;
   d.onclick=()=>{
     document.querySelectorAll('.tile').forEach(x=>x.classList.remove('selected'));
     d.classList.add('selected');
@@ -46,34 +46,34 @@ tiles.forEach(t=>{
 
 toggle.onclick=()=>palette.classList.toggle('hidden');
 
-// pan logic
 map.addEventListener('pointerdown',e=>{
-  drag=true;
-  lastX=e.clientX;
-  lastY=e.clientY;
+  startX=e.clientX;
+  startY=e.clientY;
+  moved=false;
 });
 
 map.addEventListener('pointermove',e=>{
-  if(drag){
-    camX+=lastX-e.clientX;
-    camY+=lastY-e.clientY;
-    lastX=e.clientX;
-    lastY=e.clientY;
+  const dx=Math.abs(e.clientX-startX);
+  const dy=Math.abs(e.clientY-startY);
+  if(dx>TAP_THRESHOLD||dy>TAP_THRESHOLD){
+    moved=true;
+    camX+=startX-e.clientX;
+    camY+=startY-e.clientY;
+    startX=e.clientX;
+    startY=e.clientY;
     draw();
   }
 });
 
-map.addEventListener('pointerup',()=>drag=false);
-
-// single-tap paint
-map.addEventListener('click',e=>{
-  if(drag || !current) return;
-  const r=map.getBoundingClientRect();
-  const x=Math.floor((e.clientX+camX-r.left)/TILE);
-  const y=Math.floor((e.clientY+camY-r.top)/TILE);
-  if(x>=0&&y>=0&&x<cols&&y<rows){
-    grid[y][x]=current.id;
-    draw();
+map.addEventListener('pointerup',e=>{
+  if(!moved && current){
+    const r=map.getBoundingClientRect();
+    const x=Math.floor((e.clientX+camX-r.left)/TILE);
+    const y=Math.floor((e.clientY+camY-r.top)/TILE);
+    if(x>=0&&y>=0&&x<cols&&y<rows){
+      grid[y][x]=current.id;
+      draw();
+    }
   }
 });
 
