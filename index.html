@@ -1,95 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>RPG World Builder</title>
-  <link rel="stylesheet" href="style.css"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>RPG World Builder</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+
 <header class="topbar">
   <div class="title">RPG World Builder</div>
-  <button id="modeBtn" aria-haspopup="true" aria-expanded="false">MODE ▾</button>
+  <button id="modeBtn">MODE ▾</button>
 </header>
 
 <div id="modeMenu" class="modeMenu hidden">
   <button data-mode="terrain">Terrain</button>
   <button data-mode="characters">Characters</button>
   <button data-mode="collision">Collision & Anchor</button>
-  <button data-mode="playtest">Playtest</button>
 </div>
-
-<section id="palettePanel" class="panel hidden" aria-label="Palette"></section>
-
-<section id="charsPanel" class="panel hidden" aria-label="Characters">
-  <div class="panelHeader">
-    <div class="panelTitle">Characters</div>
-    <button id="closeChars">Done</button>
-  </div>
-
-  <div class="card">
-    <div class="row">
-      <button id="addCharBtn" class="primary">Add Character</button>
-      <button id="placeCharBtn">Place Mode: Off</button>
-    </div>
-    <div class="hint">Add characters by uploading frames. Turn on Place Mode and tap the map to place.</div>
-  </div>
-
-  <div class="card">
-    <div class="panelTitle">Library</div>
-    <div id="charList" class="list"></div>
-  </div>
-
-  <div id="modalBackdrop" class="backdrop hidden"></div>
-  <div id="charModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Add Character">
-    <div class="modalHeader">
-      <div class="modalTitle">Add Character</div>
-      <button id="closeModal">✕</button>
-    </div>
-    <div class="modalBody">
-      <label class="field"><span>Name</span><input id="charName" placeholder="e.g., Hero"/></label>
-      <div class="hint">Upload frames (unlimited). Order = animation order.</div>
-      <div class="grid2">
-        <label class="field"><span>North</span><input id="northFiles" type="file" accept="image/*" multiple/></label>
-        <label class="field"><span>South</span><input id="southFiles" type="file" accept="image/*" multiple/></label>
-        <label class="field"><span>West</span><input id="westFiles" type="file" accept="image/*" multiple/></label>
-        <label class="field"><span>East</span><input id="eastFiles" type="file" accept="image/*" multiple/></label>
-      </div>
-      <label class="field"><span>FPS</span><input id="charFps" type="number" min="1" max="24" value="8"/></label>
-      <div class="row"><button id="createChar" class="primary">Create</button></div>
-    </div>
-  </div>
-</section>
 
 <canvas id="map"></canvas>
 
-<!-- Playtest HUD -->
-<div id="hud" class="hidden">
-  <div id="modeBadge">PLAYTEST</div>
-  <div id="dpad" aria-label="D-pad">
-    <button class="dpad-btn" data-dir="north">▲</button>
-    <div class="dpad-mid">
-      <button class="dpad-btn" data-dir="west">◀</button>
-      <button class="dpad-btn" data-dir="south">▼</button>
-      <button class="dpad-btn" data-dir="east">▶</button>
-    </div>
-  </div>
-</div>
-
-<!-- Collision panel -->
-<div id="collisionPanel" class="collisionPanel hidden" aria-label="Collision and Anchor Editor">
+<!-- Collision Panel (DOM-based, no canvas) -->
+<div id="collisionPanel" class="collisionPanel hidden">
   <div class="collisionHeader">
-    <div class="collisionTitle">Collision & Anchor</div>
-    <select id="charSelect" aria-label="Select character"></select>
-    <button id="doneCollision">Done</button>
+    <strong>Collision & Anchor</strong>
+    <select id="charSelect"></select>
+    <button id="doneBtn">Done</button>
   </div>
-  <canvas id="collisionCanvas"></canvas>
-  <div class="collisionHint">Drag green box corners to resize • Drag red dot to move anchor</div>
-</div>
 
-<div class="bottomDock">
-  <button id="saveBtn">💾 Save</button>
-  <button id="exportBtn">⬇ Export .mk</button>
+  <div id="editorStage">
+    <img id="spritePreview" draggable="false"/>
+    <div id="collisionBox"></div>
+    <div id="anchorDot"></div>
+  </div>
+
+  <div class="hint">Drag green box = collision • Drag red dot = anchor</div>
 </div>
 
 <script src="app.js"></script>
