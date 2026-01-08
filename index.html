@@ -2,18 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>RPG World Builder</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header>
-  <h1>RPG World Builder</h1>
-  <button id="paletteToggle">Palette</button>
+  <div class="title">RPG World Builder</div>
+  <div class="topBtns">
+    <button id="paletteToggle">Palette</button>
+    <button id="charsToggle">Characters</button>
+    <button id="playtestToggle">Playtest</button>
+  </div>
 </header>
 
-<div id="palettePanel" class="hidden"></div>
+<section id="palettePanel" class="panel hidden" aria-label="Palette"></section>
+
+<section id="charsPanel" class="panel hidden" aria-label="Characters">
+  <div class="panelHeader">
+    <div class="panelTitle">Characters</div>
+    <button id="closeChars">Done</button>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button id="addCharBtn" class="primary">Add Character</button>
+      <button id="placeCharBtn">Place Mode: Off</button>
+    </div>
+    <div class="hint">
+      Add a character by uploading animation frames for each direction. Then turn on Place Mode and tap the map to place.
+    </div>
+    <div class="hint small">
+      Storage upgrade: character images are saved in <b>IndexedDB</b> now (safe for large libraries).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="panelTitle">Library</div>
+    <div id="charList" class="list"></div>
+  </div>
+
+  <div id="modalBackdrop" class="backdrop hidden"></div>
+  <div id="charModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Add Character">
+    <div class="modalHeader">
+      <div class="modalTitle">Add Character</div>
+      <button id="closeModal">✕</button>
+    </div>
+    <div class="modalBody">
+      <label class="field">
+        <span>Name</span>
+        <input id="charName" placeholder="e.g., Hero"/>
+      </label>
+
+      <div class="hint">
+        Upload <b>PNG</b> frames. You can select multiple files per direction (unlimited). Order = animation order.
+      </div>
+
+      <div class="grid2">
+        <label class="field">
+          <span>North frames</span>
+          <input id="northFiles" type="file" accept="image/png,image/webp,image/jpeg" multiple/>
+        </label>
+        <label class="field">
+          <span>South frames</span>
+          <input id="southFiles" type="file" accept="image/png,image/webp,image/jpeg" multiple/>
+        </label>
+        <label class="field">
+          <span>West frames</span>
+          <input id="westFiles" type="file" accept="image/png,image/webp,image/jpeg" multiple/>
+        </label>
+        <label class="field">
+          <span>East frames</span>
+          <input id="eastFiles" type="file" accept="image/png,image/webp,image/jpeg" multiple/>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>FPS (animation speed)</span>
+        <input id="charFps" type="number" min="1" max="24" value="8"/>
+      </label>
+
+      <div class="row">
+        <button id="createChar" class="primary">Create</button>
+      </div>
+      <div class="hint small">
+        Tip: Bosses/buildings can be larger than 48×48 — we anchor sprites to their bottom-center automatically in playtest.
+      </div>
+    </div>
+  </div>
+</section>
+
 <canvas id="map"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="modeBadge">PLAYTEST</div>
+  <div id="dpad" aria-label="D-pad">
+    <button class="dpad-btn" data-dir="north">▲</button>
+    <div class="dpad-mid">
+      <button class="dpad-btn" data-dir="west">◀</button>
+      <button class="dpad-btn" data-dir="south">▼</button>
+      <button class="dpad-btn" data-dir="east">▶</button>
+    </div>
+  </div>
+</div>
 
 <footer>
   <button id="saveBtn">Save</button>
