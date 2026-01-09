@@ -341,6 +341,11 @@ function ensureCharDefaultsFor(ch){
   ch.anchor.y = clamp(Number(ch.anchor.y ?? 1.0),0,1);
 }
 
+
+// --- E3.2.1 VISUAL FIX ---
+// Force CA grid origin to remain inside visible canvas on iOS Safari
+// (no logic/data changes)
+
 // ---------- Collision & Anchor editor ----------
 // We show a 4x4 tile preview grid. Collision box is snapped to whole tiles.
 function caView(){
