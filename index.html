@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>RPG DREAM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,6 +15,7 @@
   <button data-mode="collision">Collision & Anchor</button>
 </div>
 
+<!-- Terrain Mode: Maps + Viewport -->
 <div id="mapPanel">
   <div class="panel-header">
     <span>Maps</span>
@@ -22,11 +24,21 @@
   <div id="mapList"></div>
 </div>
 
+<div id="viewportPanel">
+  <div class="panel-header">
+    <span>Map View</span>
+    <span class="subtle" id="hint">Add/select a map to begin.</span>
+  </div>
+  <div id="mapViewport" aria-label="Map viewport"></div>
+</div>
+
+<!-- Characters Mode -->
 <div id="charPanel">
   <div class="panel-header">
     <span>Characters</span>
     <button id="addChar">＋ Add</button>
   </div>
+  <div class="subtle pad">Select a character. Then switch to Terrain and tap the map to place.</div>
   <div id="charList"></div>
 </div>
 
