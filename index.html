@@ -4,14 +4,12 @@
   <meta charset="utf-8">
   <title>RPG DREAM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="toolbar">
   <button data-mode="terrain" class="mode-btn active">Terrain</button>
-  <button data-mode="characters" class="mode-btn">Characters</button>
-  <button data-mode="collision" class="mode-btn">Collision & Anchor</button>
 </div>
 
 <div id="mapPanel">
@@ -25,15 +23,18 @@
 <div id="viewportPanel">
   <div class="panel-header">
     <span>Map View</span>
-    <span class="subtle" id="hint">Select a tile, then tap or drag to paint.</span>
+    <span class="subtle" id="hint">Select biome → paint tiles</span>
   </div>
 
-  <div id="palette">
-    <button data-tile="grass" class="tile-btn grass active">Grass</button>
-    <button data-tile="dirt" class="tile-btn dirt">Dirt</button>
-    <button data-tile="water" class="tile-btn water">Water</button>
-    <button data-tile="erase" class="tile-btn erase">Erase</button>
+  <div id="biomes" role="tablist">
+    <button data-biome="grassland" class="biome-btn active">Grassland</button>
+    <button data-biome="desert" class="biome-btn">Desert</button>
+    <button data-biome="snow" class="biome-btn">Snow</button>
+    <button data-biome="volcanic" class="biome-btn">Volcanic</button>
+    <button data-biome="wetlands" class="biome-btn">Wetlands</button>
   </div>
+
+  <div id="palette"></div>
 
   <div id="mapViewport">
     <canvas id="mapCanvas"></canvas>

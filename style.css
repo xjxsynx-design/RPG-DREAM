@@ -1,22 +1,19 @@
-/* unchanged visuals with tiny hover cue */
-:root{
-  --bg:#0f1115; --panel:#161a22; --chip:#222734; --accent:#4da6ff; --text:#e6e6e6;
-}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;}
+body{margin:0;background:#0f1115;color:#e6e6e6;font-family:system-ui,-apple-system,sans-serif;}
 #toolbar{display:flex;gap:8px;padding:10px;}
 .mode-btn{background:#1e222a;border:none;color:#fff;padding:8px 14px;border-radius:10px;}
-.mode-btn.active{outline:2px solid var(--accent);}
-#mapPanel,#viewportPanel{background:var(--panel);margin:10px;padding:10px;border-radius:14px;}
+#mapPanel,#viewportPanel{background:#161a22;margin:10px;padding:10px;border-radius:14px;}
 .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .subtle{color:#a9b0c0;font-size:12px;}
-#addMap{background:var(--accent);border:none;color:#001;padding:7px 12px;border-radius:10px;font-weight:800;}
-#palette{display:flex;gap:8px;margin:8px 0 10px;flex-wrap:wrap;}
-.tile-btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);font-weight:900;color:#fff;background:#2a2f3d;}
-.tile-btn.active{outline:3px solid var(--accent);}
-.grass{background:#2a4a2f}.dirt{background:#4b2e1d}.water{background:#1c3a5a}.erase{background:#3a3a3a}
-#mapViewport{position:relative;width:100%;height:55vh;min-height:360px;border-radius:14px;overflow:hidden;background:#0b0e14;touch-action:none;}
-#mapCanvas{position:absolute;inset:0;width:100%;height:100%;}
-#mapList{display:flex;flex-direction:column;gap:8px;}
-.map-item{padding:10px 12px;background:var(--chip);border-radius:12px;}
-.map-item.active{outline:2px solid var(--accent);}
+#addMap{background:#4da6ff;border:none;color:#001;padding:7px 12px;border-radius:10px;font-weight:800;}
+#biomes{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.biome-btn{padding:6px 10px;border-radius:10px;border:none;background:#2a2f3d;color:#fff;font-weight:700;}
+.biome-btn.active{outline:2px solid #4da6ff;}
+#palette{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.tile-btn{padding:6px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-weight:800;color:#fff;background:#2a2f3d;}
+.tile-btn.active{outline:3px solid #4da6ff;}
+#mapViewport{position:relative;height:360px;background:#0b0e14;touch-action:none;border-radius:12px;}
+#mapCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+#mapList{display:flex;flex-direction:column;gap:6px;}
+.map-item{padding:8px;background:#222734;border-radius:10px;}
+.map-item.active{outline:2px solid #4da6ff;}
 #debug{margin:10px;background:#0b0e14;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;}
