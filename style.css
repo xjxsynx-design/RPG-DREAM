@@ -1,4 +1,67 @@
 
-body { font-family: monospace; background:#111; color:#eee; }
-#toolbar button { margin:4px; padding:8px; }
-#debug { margin-top:12px; background:#222; padding:10px; }
+body {
+  background: #0f1115;
+  color: #e6e6e6;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+#toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+
+#toolbar button {
+  background: #1e222a;
+  border: none;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+#charPanel {
+  background: #161a22;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  display: none;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+#addChar {
+  background: #4da6ff;
+  border: none;
+  color: #000;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+#charList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.char-item {
+  padding: 8px;
+  background: #222734;
+  border-radius: 8px;
+}
+
+.char-item.active {
+  outline: 2px solid #4da6ff;
+}
+
+#debug {
+  margin: 10px;
+  background: #0b0e14;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}

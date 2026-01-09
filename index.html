@@ -7,12 +7,23 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="toolbar">
-    <button data-mode="terrain">Terrain</button>
-    <button data-mode="characters">Characters</button>
-    <button data-mode="collision">Collision & Anchor</button>
+
+<div id="toolbar">
+  <button data-mode="terrain">Terrain</button>
+  <button data-mode="characters">Characters</button>
+  <button data-mode="collision">Collision & Anchor</button>
+</div>
+
+<div id="charPanel">
+  <div class="panel-header">
+    <span>Characters</span>
+    <button id="addChar">＋ Add</button>
   </div>
-  <pre id="debug"></pre>
-  <script src="app.js"></script>
+  <div id="charList"></div>
+</div>
+
+<pre id="debug"></pre>
+
+<script src="app.js"></script>
 </body>
 </html>

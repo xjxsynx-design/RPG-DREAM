@@ -1,6 +1,6 @@
 
 /* =====================================================
-   RPG DREAM — Engine Skeleton (Refactor A)
+   RPG DREAM — Characters Mode v1
    ===================================================== */
 
 const EngineState = {
@@ -14,9 +14,12 @@ const EngineState = {
 
 document.addEventListener("DOMContentLoaded", () => {
   bindModeButtons();
+  bindCharacterUI();
   loadProject();
   render();
 });
+
+/* ---------------- MODE ---------------- */
 
 function setMode(mode) {
   EngineState.mode = mode;
@@ -29,23 +32,63 @@ function bindModeButtons() {
   });
 }
 
-function getActiveCharacter() {
-  return EngineState.characters.find(c => c.id === EngineState.activeCharacterId);
+/* ---------------- CHARACTERS ---------------- */
+
+function bindCharacterUI() {
+  document.getElementById("addChar").onclick = addCharacter;
 }
 
-function render() {
-  const debug = document.getElementById("debug");
-  if (debug) debug.textContent = JSON.stringify(EngineState, null, 2);
-}
-
-function commitCollisionAnchor(collision, anchor) {
-  const char = getActiveCharacter();
-  if (!char) return;
-  char.collision = collision;
-  char.anchor = anchor;
+function addCharacter() {
+  const id = "char_" + crypto.randomUUID().slice(0, 8);
+  EngineState.characters.push({
+    id,
+    name: "New Character",
+    type: "npc",
+    collision: null,
+    anchor: null
+  });
+  EngineState.activeCharacterId = id;
   EngineState.dirty = true;
   saveProject();
+  render();
 }
+
+function selectCharacter(id) {
+  EngineState.activeCharacterId = id;
+  render();
+}
+
+function renderCharacters() {
+  const list = document.getElementById("charList");
+  list.innerHTML = "";
+
+  EngineState.characters.forEach(char => {
+    const div = document.createElement("div");
+    div.className = "char-item";
+    if (char.id === EngineState.activeCharacterId) {
+      div.classList.add("active");
+    }
+    div.textContent = char.name;
+    div.onclick = () => selectCharacter(char.id);
+    list.appendChild(div);
+  });
+}
+
+/* ---------------- RENDER ---------------- */
+
+function render() {
+  document.getElementById("charPanel").style.display =
+    EngineState.mode === "characters" ? "block" : "none";
+
+  if (EngineState.mode === "characters") {
+    renderCharacters();
+  }
+
+  const debug = document.getElementById("debug");
+  debug.textContent = JSON.stringify(EngineState, null, 2);
+}
+
+/* ---------------- STORAGE ---------------- */
 
 function saveProject() {
   localStorage.setItem("RPG_DREAM_PROJECT", JSON.stringify({
