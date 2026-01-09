@@ -1,6 +1,6 @@
 
 /* =====================================================
-   RPG DREAM — Characters Mode v1
+   RPG DREAM — Map Manager v1 (Simple List)
    ===================================================== */
 
 const EngineState = {
@@ -14,6 +14,7 @@ const EngineState = {
 
 document.addEventListener("DOMContentLoaded", () => {
   bindModeButtons();
+  bindMapUI();
   bindCharacterUI();
   loadProject();
   render();
@@ -32,7 +33,49 @@ function bindModeButtons() {
   });
 }
 
-/* ---------------- CHARACTERS ---------------- */
+/* ---------------- MAPS ---------------- */
+
+function bindMapUI() {
+  document.getElementById("addMap").onclick = addMap;
+}
+
+function addMap() {
+  const id = "map_" + crypto.randomUUID().slice(0, 8);
+  EngineState.maps.push({
+    id,
+    name: "New Map",
+    width: 50,
+    height: 50,
+    tiles: []
+  });
+  EngineState.activeMapId = id;
+  EngineState.dirty = true;
+  saveProject();
+  render();
+}
+
+function selectMap(id) {
+  EngineState.activeMapId = id;
+  render();
+}
+
+function renderMaps() {
+  const list = document.getElementById("mapList");
+  list.innerHTML = "";
+
+  EngineState.maps.forEach(map => {
+    const div = document.createElement("div");
+    div.className = "map-item";
+    if (map.id === EngineState.activeMapId) {
+      div.classList.add("active");
+    }
+    div.textContent = map.name;
+    div.onclick = () => selectMap(map.id);
+    list.appendChild(div);
+  });
+}
+
+/* ---------------- CHARACTERS (v1 passthrough) ---------------- */
 
 function bindCharacterUI() {
   document.getElementById("addChar").onclick = addCharacter;
@@ -77,8 +120,15 @@ function renderCharacters() {
 /* ---------------- RENDER ---------------- */
 
 function render() {
+  document.getElementById("mapPanel").style.display =
+    EngineState.mode === "terrain" ? "block" : "none";
+
   document.getElementById("charPanel").style.display =
     EngineState.mode === "characters" ? "block" : "none";
+
+  if (EngineState.mode === "terrain") {
+    renderMaps();
+  }
 
   if (EngineState.mode === "characters") {
     renderCharacters();

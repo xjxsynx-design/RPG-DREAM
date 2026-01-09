@@ -19,7 +19,7 @@ body {
   border-radius: 8px;
 }
 
-#charPanel {
+#mapPanel, #charPanel {
   background: #161a22;
   margin: 10px;
   padding: 10px;
@@ -34,7 +34,7 @@ body {
   margin-bottom: 8px;
 }
 
-#addChar {
+#addMap, #addChar {
   background: #4da6ff;
   border: none;
   color: #000;
@@ -42,19 +42,19 @@ body {
   border-radius: 8px;
 }
 
-#charList {
+#mapList, #charList {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.char-item {
+.map-item, .char-item {
   padding: 8px;
   background: #222734;
   border-radius: 8px;
 }
 
-.char-item.active {
+.map-item.active, .char-item.active {
   outline: 2px solid #4da6ff;
 }
 
