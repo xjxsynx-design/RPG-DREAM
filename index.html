@@ -1,34 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta charset='utf-8'/>
+<meta name='viewport' content='width=device-width,initial-scale=1'/>
 <title>RPG DREAM</title>
-<link rel="stylesheet" href="style.css?v=67">
+<link rel='stylesheet' href='style.css'/>
 </head>
 <body>
-
-<header id="topbar">
-  <button data-mode="terrain" class="mode active">Terrain</button>
-  <button data-mode="collision" class="mode">Collision</button>
-  <button data-mode="characters" class="mode">Characters</button>
-</header>
-
-<div id="layout">
-  <section id="menus" class="scroll">
-    <h3>Maps</h3>
-    <button id="addMap">＋ Add Map</button>
-    <div id="mapList"></div>
-  </section>
-
-  <section id="editor">
-    <div id="status"></div>
-    <div id="viewport">
-      <canvas id="world"></canvas>
-    </div>
-  </section>
-</div>
-
-<script src="app.js"></script>
+<div id='app'></div>
+<script src='app.js'></script>
 </body>
 </html>
