@@ -1,65 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>RPG DREAM</title>
-  <link rel="stylesheet" href="style.css?v=62"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>RPG DREAM</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div id="toolbar">
-    <button class="mode-btn active" data-mode="terrain">Terrain</button>
-    <button class="mode-btn" data-mode="collision">Collision</button>
-    <button class="mode-btn" data-mode="characters">Characters</button>
-    <button class="mode-btn" data-mode="charCollision">Collision & Anchor</button>
-  </div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Maps</div>
-      <button id="addMap" class="primary">＋ Add</button>
-    </div>
+<header id="topbar">
+  <button data-mode="terrain" class="mode active">Terrain</button>
+  <button data-mode="collision" class="mode">Collision</button>
+  <button data-mode="characters" class="mode">Characters</button>
+  <button data-mode="charCollision" class="mode">Collision & Anchor</button>
+</header>
+
+<main id="page">
+  <aside class="panel scroll">
+    <h3>Maps</h3>
+    <button id="addMap">＋ Add Map</button>
     <div id="mapList"></div>
-  </div>
+  </aside>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Editor</div>
-      <div id="hint" class="subtle"></div>
-    </div>
+  <section class="panel scroll">
+    <h3>Editor</h3>
+    <p class="hint" id="hint"></p>
 
     <div id="charactersUI" class="hidden">
-      <div class="row">
-        <button id="addChar" class="primary">＋ Add Character</button>
-        <button id="renameChar" class="ghost">Rename</button>
-      </div>
-      <div id="charList" style="margin-top:8px;"></div>
-      <div class="subtle" style="margin-top:8px;">
-        Select a character, then tap the map to place. Blocked tiles (Collision) prevent placement.
-      </div>
+      <button id="addChar">＋ Add Character</button>
+      <div id="charList"></div>
     </div>
 
-    <div id="charCollisionUI" class="hidden">
-      <div class="row" style="justify-content:space-between;">
-        <div class="chip" id="caCharName">No character selected</div>
-        <button id="caDone" class="primary">Done</button>
-      </div>
-      <div class="subtle" style="margin:8px 0;">
-        <b class="g">Green</b> box = collision (snaps to whole tiles). Drag corners to resize, drag inside to move.
-        <b class="r">Red</b> dot = anchor (feet). Drag freely.
-      </div>
-      <div id="caViewport">
-        <canvas id="caCanvas"></canvas>
-      </div>
+    <div id="viewportWrap">
+      <canvas id="canvas"></canvas>
     </div>
+  </section>
+</main>
 
-    <div id="mapViewport">
-      <canvas id="mapCanvas"></canvas>
-    </div>
-  </div>
-
-  <pre id="debug"></pre>
-
-  <script src="app.js?v=62"></script>
+<script src="app.js"></script>
 </body>
 </html>
