@@ -1,65 +1,24 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>RPG DREAM</title>
-  <link rel="stylesheet" href="style.css?v=62"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RPG DREAM – E3.1 Scroll</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div id="toolbar">
-    <button class="mode-btn active" data-mode="terrain">Terrain</button>
-    <button class="mode-btn" data-mode="collision">Collision</button>
-    <button class="mode-btn" data-mode="characters">Characters</button>
-    <button class="mode-btn" data-mode="charCollision">Collision & Anchor</button>
+<header>
+  <button data-mode="terrain" class="active">Terrain</button>
+  <button data-mode="collision">Collision</button>
+  <button data-mode="characters">Characters</button>
+</header>
+
+<div id="editor">
+  <div id="viewport">
+    <canvas id="grid"></canvas>
   </div>
+</div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Maps</div>
-      <button id="addMap" class="primary">＋ Add</button>
-    </div>
-    <div id="mapList"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Editor</div>
-      <div id="hint" class="subtle"></div>
-    </div>
-
-    <div id="charactersUI" class="hidden">
-      <div class="row">
-        <button id="addChar" class="primary">＋ Add Character</button>
-        <button id="renameChar" class="ghost">Rename</button>
-      </div>
-      <div id="charList" style="margin-top:8px;"></div>
-      <div class="subtle" style="margin-top:8px;">
-        Select a character, then tap the map to place. Blocked tiles (Collision) prevent placement.
-      </div>
-    </div>
-
-    <div id="charCollisionUI" class="hidden">
-      <div class="row" style="justify-content:space-between;">
-        <div class="chip" id="caCharName">No character selected</div>
-        <button id="caDone" class="primary">Done</button>
-      </div>
-      <div class="subtle" style="margin:8px 0;">
-        <b class="g">Green</b> box = collision (snaps to whole tiles). Drag corners to resize, drag inside to move.
-        <b class="r">Red</b> dot = anchor (feet). Drag freely.
-      </div>
-      <div id="caViewport">
-        <canvas id="caCanvas"></canvas>
-      </div>
-    </div>
-
-    <div id="mapViewport">
-      <canvas id="mapCanvas"></canvas>
-    </div>
-  </div>
-
-  <pre id="debug"></pre>
-
-  <script src="app.js?v=62"></script>
+<script src="app.js"></script>
 </body>
 </html>
