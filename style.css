@@ -6,7 +6,8 @@ body{margin:0;background:#0f1115;color:#e8ebf0;font-family:system-ui}
 #layout{display:flex;flex-direction:column;height:calc(100vh - 56px)}
 #menus{padding:10px;background:#161a22}
 .scroll{overflow-y:auto}
-#editor{flex:1;padding:10px}
-#viewport{position:relative;height:100%;background:#0b0e14;border-radius:12px;overflow:hidden}
+#editor{flex:1;padding:10px;display:flex;flex-direction:column}
+#viewport{flex:1;position:relative;background:#0b0e14;border-radius:12px;overflow:hidden}
 #world{touch-action:none}
+#status{padding:6px;font-size:12px;color:#a9b0c0}
 button{margin:6px 0;padding:8px 10px;border:none;border-radius:10px;background:#4da6ff;font-weight:900}
