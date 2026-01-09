@@ -1,12 +1,16 @@
-
 /* =====================================================
-   RPG DREAM — Character Placement v1 (Touch-first DOM)
-   - Place selected character onto active map by tapping.
-   - Drag placed characters to reposition.
+   RPG DREAM — Character Placement v1 (Grid + Canvas)
+   - Terrain: select map, see real grid, tap to place selected character
+   - Drag placed characters to reposition
+   iOS-safe IDs (no crypto.randomUUID)
    ===================================================== */
 
 function makeId(prefix) {
-  return prefix + "_" + Date.now().toString(36) + "_" + Math.floor(Math.random()*1e6).toString(36);
+  return (
+    prefix + "_" +
+    Date.now().toString(36) + "_" +
+    Math.floor(Math.random() * 1e6).toString(36)
+  );
 }
 
 const EngineState = {
@@ -16,6 +20,13 @@ const EngineState = {
   maps: [],
   characters: [],
   dirty: false
+};
+
+// Visual settings (touch-friendly)
+const VIEW = {
+  tileSize: 40,   // pixels per tile
+  offsetX: 0,     // future: camera pan
+  offsetY: 0
 };
 
 let drag = {
@@ -34,6 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
   bindViewportUI();
   loadProject();
   render();
+  // Ensure canvas is correct once DOM is laid out
+  setTimeout(() => {
+    resizeMapCanvas();
+    drawGrid();
+  }, 0);
 });
 
 /* ---------------- MODE ---------------- */
@@ -144,14 +160,82 @@ function renderCharacters() {
   });
 }
 
+/* ---------------- CANVAS GRID ---------------- */
+
+function resizeMapCanvas() {
+  const viewport = document.getElementById("mapViewport");
+  const canvas = document.getElementById("mapCanvas");
+  if (!viewport || !canvas) return;
+
+  const w = Math.max(1, viewport.clientWidth);
+  const h = Math.max(1, viewport.clientHeight);
+
+  // Handle devicePixelRatio for crisp lines
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.floor(w * dpr);
+  canvas.height = Math.floor(h * dpr);
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawGrid() {
+  const canvas = document.getElementById("mapCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  const viewport = document.getElementById("mapViewport");
+  const w = viewport ? viewport.clientWidth : 0;
+  const h = viewport ? viewport.clientHeight : 0;
+
+  // Background
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#0b0e14";
+  ctx.fillRect(0, 0, w, h);
+
+  const map = getActiveMap();
+  if (!map) return;
+
+  const ts = VIEW.tileSize;
+  const ox = VIEW.offsetX % ts;
+  const oy = VIEW.offsetY % ts;
+
+  // Grid lines (visible)
+  ctx.strokeStyle = "rgba(255,255,255,0.10)";
+  ctx.lineWidth = 1;
+
+  // Vertical lines
+  for (let x = -ox; x <= w; x += ts) {
+    ctx.beginPath();
+    ctx.moveTo(Math.round(x) + 0.5, 0);
+    ctx.lineTo(Math.round(x) + 0.5, h);
+    ctx.stroke();
+  }
+
+  // Horizontal lines
+  for (let y = -oy; y <= h; y += ts) {
+    ctx.beginPath();
+    ctx.moveTo(0, Math.round(y) + 0.5);
+    ctx.lineTo(w, Math.round(y) + 0.5);
+    ctx.stroke();
+  }
+
+  // Optional: map bounds label
+  ctx.fillStyle = "rgba(169,176,192,0.9)";
+  ctx.font = "12px system-ui, -apple-system, sans-serif";
+  ctx.fillText(`${map.name} • ${map.width}×${map.height}`, 10, 18);
+}
+
 /* ---------------- VIEWPORT / PLACEMENT ---------------- */
 
 function bindViewportUI() {
   const vp = document.getElementById("mapViewport");
 
-  // tap-to-place
+  // Tap-to-place in terrain mode
   vp.addEventListener("pointerdown", (e) => {
-    // if pointerdown started on an entity, entity handler will stopPropagation
+    // If pointerdown started on an entity, entity handler stops propagation
     if (EngineState.mode !== "terrain") return;
 
     const map = getActiveMap();
@@ -172,9 +256,10 @@ function bindViewportUI() {
     renderDebug();
   });
 
-  // drag move (global)
+  // Drag move (global)
   window.addEventListener("pointermove", (e) => {
     if (!drag.active) return;
+
     const vp = document.getElementById("mapViewport");
     const rect = vp.getBoundingClientRect();
 
@@ -203,6 +288,12 @@ function bindViewportUI() {
     drag.entityId = null;
     saveProject();
   });
+
+  // Keep canvas sized correctly
+  window.addEventListener("resize", () => {
+    resizeMapCanvas();
+    drawGrid();
+  });
 }
 
 function positionEntityElement(entityId, x, y) {
@@ -218,16 +309,20 @@ function renderMapViewport() {
   const map = getActiveMap();
   const char = getActiveCharacter();
 
-  // hint text
+  // Hint text
   if (!map) {
     hint.textContent = "Add/select a map to begin.";
   } else if (!char) {
-    hint.textContent = "Select a character, then tap to place on the map.";
+    hint.textContent = "Select a character, then tap the map to place.";
   } else {
     hint.textContent = `Tap to place: ${char.name}`;
   }
 
-  // clear old entities
+  // Canvas grid
+  resizeMapCanvas();
+  drawGrid();
+
+  // Clear old entities
   vp.querySelectorAll(".entity").forEach(n => n.remove());
 
   if (!map) return;
@@ -247,7 +342,7 @@ function renderMapViewport() {
     div.style.left = `${ent.x}px`;
     div.style.top = `${ent.y}px`;
 
-    // drag start
+    // Drag start
     div.addEventListener("pointerdown", (e) => {
       e.stopPropagation(); // prevent tap-to-place
       if (EngineState.mode !== "terrain") return;
@@ -267,31 +362,28 @@ function renderMapViewport() {
 /* ---------------- RENDER ---------------- */
 
 function render() {
-  // Panels
-  document.getElementById("mapPanel").style.display =
-    EngineState.mode === "terrain" ? "block" : "none";
-  document.getElementById("viewportPanel").style.display =
-    EngineState.mode === "terrain" ? "block" : "none";
+  // Panels (only show what belongs to each mode)
+  const terrainOn = EngineState.mode === "terrain";
+  const charsOn = EngineState.mode === "characters";
 
-  document.getElementById("charPanel").style.display =
-    EngineState.mode === "characters" ? "block" : "none";
+  document.getElementById("mapPanel").style.display = terrainOn ? "block" : "none";
+  document.getElementById("viewportPanel").style.display = terrainOn ? "block" : "none";
+  document.getElementById("charPanel").style.display = charsOn ? "block" : "none";
 
-  if (EngineState.mode === "terrain") {
+  if (terrainOn) {
     renderMaps();
     renderMapViewport();
   }
-
-  if (EngineState.mode === "characters") {
+  if (charsOn) {
     renderCharacters();
   }
 
   renderDebug();
 }
 
-function renderDebug(light=false) {
+function renderDebug(light = false) {
   const debug = document.getElementById("debug");
   if (!debug) return;
-  // If light update, avoid heavy stringify formatting cost? Still fine for small state.
   debug.textContent = JSON.stringify(EngineState, null, 2);
 }
 
@@ -315,7 +407,7 @@ function loadProject() {
   }));
   EngineState.characters = data.characters || [];
 
-  // keep active selections if still exist
+  // keep active selections if missing
   if (EngineState.maps.length && !EngineState.activeMapId) {
     EngineState.activeMapId = EngineState.maps[0].id;
   }

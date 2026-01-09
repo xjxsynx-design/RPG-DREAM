@@ -1,4 +1,3 @@
-
 :root{
   --bg:#0f1115;
   --panel:#161a22;
@@ -83,18 +82,26 @@ body{
   position:relative;
   width:100%;
   height:55vh;
+  min-height:360px; /* iOS-safe so it never collapses */
   border-radius:12px;
   overflow:hidden;
-  background:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-color:#0b0e14;
+  background:#0b0e14;
   touch-action:none; /* enables smooth dragging */
 }
 
+/* Canvas grid fills viewport */
+#mapCanvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none; /* taps go to viewport */
+}
+
+/* Placed entities sit above canvas */
 .entity{
   position:absolute;
+  z-index:10;
   transform: translate(-50%, -50%);
   width:42px;
   height:42px;
