@@ -40,7 +40,7 @@ function bindMapUI() {
 }
 
 function addMap() {
-  const id = "map_" + crypto.randomUUID().slice(0, 8);
+  const id = "map_" + Date.now().toString(36);
   EngineState.maps.push({
     id,
     name: "New Map",
