@@ -14,7 +14,6 @@
   <button data-mode="collision">Collision & Anchor</button>
 </div>
 
-<!-- Terrain Mode: Maps + Viewport -->
 <div id="mapPanel">
   <div class="panel-header">
     <span>Maps</span>
@@ -26,22 +25,24 @@
 <div id="viewportPanel">
   <div class="panel-header">
     <span>Map View</span>
-    <span class="subtle" id="hint">Add/select a map to begin.</span>
+    <span class="subtle" id="hint">Tap tiles to paint.</span>
   </div>
-
-  <div id="mapViewport" aria-label="Map viewport">
-    <!-- Real grid renderer -->
-    <canvas id="mapCanvas" aria-hidden="true"></canvas>
+  <div id="palette">
+    <button data-tile="grass" class="tile grass">Grass</button>
+    <button data-tile="dirt" class="tile dirt">Dirt</button>
+    <button data-tile="water" class="tile water">Water</button>
+    <button data-tile="erase" class="tile erase">Erase</button>
+  </div>
+  <div id="mapViewport">
+    <canvas id="mapCanvas"></canvas>
   </div>
 </div>
 
-<!-- Characters Mode -->
 <div id="charPanel">
   <div class="panel-header">
     <span>Characters</span>
     <button id="addChar">＋ Add</button>
   </div>
-  <div class="subtle pad">Select a character. Then switch to Terrain and tap the map to place.</div>
   <div id="charList"></div>
 </div>
 

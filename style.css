@@ -32,34 +32,52 @@ body{
   margin:10px;
   padding:10px;
   border-radius:12px;
-  display:none;
 }
 
 .panel-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px;
   margin-bottom:8px;
 }
 
-.subtle{
-  color:#a9b0c0;
-  font-size:12px;
+.subtle{ color:#a9b0c0; font-size:12px; }
+
+#palette{
+  display:flex;
+  gap:6px;
+  margin-bottom:8px;
 }
 
-.pad{ margin-bottom:8px; }
-
-#addMap,#addChar{
-  background:var(--accent);
-  border:none;
-  color:#001;
+.tile{
   padding:6px 10px;
   border-radius:8px;
-  font-weight:600;
+  border:none;
+  color:#000;
+  font-weight:700;
 }
 
-#mapList,#charList{
+.grass{ background:#4caf50; }
+.dirt{ background:#8b5a2b; color:#fff; }
+.water{ background:#2196f3; color:#fff; }
+.erase{ background:#777; color:#fff; }
+
+#mapViewport{
+  position:relative;
+  width:100%;
+  height:55vh;
+  min-height:360px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#0b0e14;
+}
+
+#mapCanvas{
+  position:absolute;
+  inset:0;
+}
+
+#mapList, #charList{
   display:flex;
   flex-direction:column;
   gap:6px;
@@ -69,55 +87,9 @@ body{
   padding:8px;
   background:var(--chip);
   border-radius:8px;
-  user-select:none;
-  -webkit-user-select:none;
-  touch-action: manipulation;
 }
 
-.map-item.active,.char-item.active{
-  outline:2px solid var(--accent);
-}
-
-#mapViewport{
-  position:relative;
-  width:100%;
-  height:55vh;
-  min-height:360px; /* iOS-safe so it never collapses */
-  border-radius:12px;
-  overflow:hidden;
-  background:#0b0e14;
-  touch-action:none; /* enables smooth dragging */
-}
-
-/* Canvas grid fills viewport */
-#mapCanvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none; /* taps go to viewport */
-}
-
-/* Placed entities sit above canvas */
-.entity{
-  position:absolute;
-  z-index:10;
-  transform: translate(-50%, -50%);
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  background: rgba(77,166,255,0.22);
-  border: 1px solid rgba(77,166,255,0.65);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  letter-spacing:0.5px;
-  color:#fff;
-  user-select:none;
-  -webkit-user-select:none;
-  touch-action:none;
-}
+.map-item.active{ outline:2px solid var(--accent); }
 
 #debug{
   margin:10px;
@@ -125,5 +97,4 @@ body{
   padding:10px;
   border-radius:8px;
   font-size:12px;
-  white-space:pre-wrap;
 }
