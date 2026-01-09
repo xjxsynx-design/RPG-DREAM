@@ -1,43 +1,18 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>RPG World Builder</title>
-<link rel="stylesheet" href="style.css"/>
+  <meta charset="utf-8">
+  <title>RPG DREAM</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header class="topbar">
-  <div class="title">RPG World Builder</div>
-  <button id="modeBtn">MODE ▾</button>
-</header>
-
-<div id="modeMenu" class="modeMenu hidden">
-  <button data-mode="terrain">Terrain</button>
-  <button data-mode="characters">Characters</button>
-  <button data-mode="collision">Collision & Anchor</button>
-</div>
-
-<canvas id="map"></canvas>
-
-<!-- Collision Panel (DOM-based, no canvas) -->
-<div id="collisionPanel" class="collisionPanel hidden">
-  <div class="collisionHeader">
-    <strong>Collision & Anchor</strong>
-    <select id="charSelect"></select>
-    <button id="doneBtn">Done</button>
+  <div id="toolbar">
+    <button data-mode="terrain">Terrain</button>
+    <button data-mode="characters">Characters</button>
+    <button data-mode="collision">Collision & Anchor</button>
   </div>
-
-  <div id="editorStage">
-    <img id="spritePreview" draggable="false"/>
-    <div id="collisionBox"></div>
-    <div id="anchorDot"></div>
-  </div>
-
-  <div class="hint">Drag green box = collision • Drag red dot = anchor</div>
-</div>
-
-<script src="app.js"></script>
+  <pre id="debug"></pre>
+  <script src="app.js"></script>
 </body>
 </html>
