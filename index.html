@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
@@ -12,30 +12,21 @@
   <button data-mode="terrain" class="mode active">Terrain</button>
   <button data-mode="collision" class="mode">Collision</button>
   <button data-mode="characters" class="mode">Characters</button>
-  <button data-mode="charCollision" class="mode">Collision & Anchor</button>
 </header>
 
-<main id="page">
-  <aside class="panel scroll">
+<div id="layout">
+  <section id="menus" class="scroll">
     <h3>Maps</h3>
     <button id="addMap">＋ Add Map</button>
     <div id="mapList"></div>
-  </aside>
+  </section>
 
-  <section class="panel scroll">
-    <h3>Editor</h3>
-    <p class="hint" id="hint"></p>
-
-    <div id="charactersUI" class="hidden">
-      <button id="addChar">＋ Add Character</button>
-      <div id="charList"></div>
-    </div>
-
-    <div id="viewportWrap">
-      <canvas id="canvas"></canvas>
+  <section id="editor">
+    <div id="viewport">
+      <canvas id="world"></canvas>
     </div>
   </section>
-</main>
+</div>
 
 <script src="app.js"></script>
 </body>
