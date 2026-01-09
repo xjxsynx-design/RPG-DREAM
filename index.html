@@ -10,9 +10,11 @@
 
 <div id="toolbar">
   <button data-mode="terrain" class="mode-btn active">Terrain</button>
+  <button data-mode="characters" class="mode-btn">Characters</button>
+  <button data-mode="collision" class="mode-btn">Collision & Anchor</button>
 </div>
 
-<div id="mapPanel">
+<div id="mapPanel" class="panel">
   <div class="panel-header">
     <span>Maps</span>
     <button id="addMap">＋ Add</button>
@@ -20,21 +22,40 @@
   <div id="mapList"></div>
 </div>
 
-<div id="viewportPanel">
+<div id="viewportPanel" class="panel">
   <div class="panel-header">
-    <span>Map View</span>
-    <span class="subtle" id="hint">Select biome → paint tiles</span>
+    <span id="panelTitle">Map View</span>
+    <span class="subtle" id="hint">Terrain mode: select biome → paint tiles</span>
   </div>
 
-  <div id="biomes" role="tablist">
-    <button data-biome="grassland" class="biome-btn active">Grassland</button>
-    <button data-biome="desert" class="biome-btn">Desert</button>
-    <button data-biome="snow" class="biome-btn">Snow</button>
-    <button data-biome="volcanic" class="biome-btn">Volcanic</button>
-    <button data-biome="wetlands" class="biome-btn">Wetlands</button>
+  <!-- Terrain-only UI -->
+  <div id="terrainUI">
+    <div id="biomes" role="tablist">
+      <button data-biome="grassland" class="biome-btn active">Grassland</button>
+      <button data-biome="desert" class="biome-btn">Desert</button>
+      <button data-biome="snow" class="biome-btn">Snow</button>
+      <button data-biome="volcanic" class="biome-btn">Volcanic</button>
+      <button data-biome="wetlands" class="biome-btn">Wetlands</button>
+    </div>
+    <div id="palette"></div>
   </div>
 
-  <div id="palette"></div>
+  <!-- Characters-only UI -->
+  <div id="charactersUI" class="hidden">
+    <div class="subtle" style="margin:6px 0 10px;">
+      Characters mode is still stubbed (next phase). This is here so the mode selector stays stable.
+    </div>
+    <button id="addChar" class="ghost-btn">＋ Add Character</button>
+    <div id="charList" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- Collision-only UI -->
+  <div id="collisionUI" class="hidden">
+    <div class="subtle" style="margin:6px 0 10px;">
+      Collision & Anchor editor returns in E3 (Layers). Mode stays visible so we don’t regress UI again.
+    </div>
+    <div class="chip">Select a character in Characters mode first (coming next).</div>
+  </div>
 
   <div id="mapViewport">
     <canvas id="mapCanvas"></canvas>
