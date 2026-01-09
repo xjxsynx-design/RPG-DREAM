@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <title>RPG DREAM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="style.css?v=32">
+<link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
 
 <div id="toolbar">
   <button data-mode="terrain" class="mode-btn active">Terrain</button>
   <button data-mode="collision" class="mode-btn">Collision</button>
+  <button data-mode="characters" class="mode-btn">Characters</button>
 </div>
 
 <div class="panel">
@@ -23,8 +24,14 @@
 
 <div class="panel">
   <div class="panel-header">
-    <span id="panelTitle">Map View</span>
+    <span id="panelTitle">Editor</span>
   </div>
+
+  <div id="charactersUI" class="hidden">
+    <button id="addChar">＋ Add Character</button>
+    <div id="charList"></div>
+  </div>
+
   <div id="mapViewport">
     <canvas id="mapCanvas"></canvas>
   </div>
