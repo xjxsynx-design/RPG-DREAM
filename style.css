@@ -29,3 +29,40 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .chip{background:var(--chip);padding:10px 12px;border-radius:999px;font-weight:900}
 .g{color:#56d364}
 .r{color:#ff5a5a}
+
+/* ADD: PALETTE UI */
+#palette-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #161a22;
+}
+
+.palette-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.palette-title {
+  width: 100%;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.biome-btn,
+.tile-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2a2f3d;
+  color: #fff;
+  font-size: 12px;
+}
+
+.biome-btn.active,
+.tile-btn.active {
+  outline: 2px solid #4da6ff;
+}
