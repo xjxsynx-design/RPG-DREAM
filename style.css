@@ -19,19 +19,23 @@ body{
   padding:10px;
 }
 
-#toolbar button{
+.mode-btn{
   background:#1e222a;
   border:none;
   color:#fff;
   padding:8px 14px;
-  border-radius:8px;
+  border-radius:10px;
+}
+
+.mode-btn.active{
+  outline:2px solid var(--accent);
 }
 
 #mapPanel,#charPanel,#viewportPanel{
   background:var(--panel);
   margin:10px;
   padding:10px;
-  border-radius:12px;
+  border-radius:14px;
 }
 
 .panel-header{
@@ -42,51 +46,74 @@ body{
 }
 
 .subtle{ color:#a9b0c0; font-size:12px; }
+.pad{ margin-top:6px; }
+
+#addMap,#addChar{
+  background:var(--accent);
+  border:none;
+  color:#001;
+  padding:7px 12px;
+  border-radius:10px;
+  font-weight:800;
+}
 
 #palette{
   display:flex;
-  gap:6px;
-  margin-bottom:8px;
+  gap:8px;
+  margin:8px 0 10px;
+  flex-wrap:wrap;
 }
 
-.tile{
-  padding:6px 10px;
-  border-radius:8px;
-  border:none;
-  color:#000;
-  font-weight:700;
+.tile-btn{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-weight:900;
+  letter-spacing:0.2px;
+  color:#fff;
+  background:#2a2f3d;
 }
 
-.grass{ background:#4caf50; }
-.dirt{ background:#8b5a2b; color:#fff; }
-.water{ background:#2196f3; color:#fff; }
-.erase{ background:#777; color:#fff; }
+.tile-btn.grass{ background:#2a4a2f; }
+.tile-btn.dirt{ background:#4b2e1d; }
+.tile-btn.water{ background:#1c3a5a; }
+.tile-btn.erase{ background:#3a3a3a; }
+
+.tile-btn.active{
+  outline:3px solid var(--accent);
+  box-shadow: 0 0 0 4px rgba(77,166,255,0.15);
+}
 
 #mapViewport{
   position:relative;
   width:100%;
   height:55vh;
   min-height:360px;
-  border-radius:12px;
+  border-radius:14px;
   overflow:hidden;
   background:#0b0e14;
+  touch-action: none;
 }
 
 #mapCanvas{
   position:absolute;
   inset:0;
+  width:100%;
+  height:100%;
 }
 
 #mapList, #charList{
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:8px;
 }
 
 .map-item,.char-item{
-  padding:8px;
+  padding:10px 12px;
   background:var(--chip);
-  border-radius:8px;
+  border-radius:12px;
+  user-select:none;
+  -webkit-user-select:none;
 }
 
 .map-item.active{ outline:2px solid var(--accent); }
@@ -95,6 +122,7 @@ body{
   margin:10px;
   background:#0b0e14;
   padding:10px;
-  border-radius:8px;
+  border-radius:10px;
   font-size:12px;
+  white-space:pre-wrap;
 }
