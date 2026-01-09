@@ -82,7 +82,7 @@ function bindCharacterUI() {
 }
 
 function addCharacter() {
-  const id = "char_" + crypto.randomUUID().slice(0, 8);
+  const id = "char_" + Date.now().toString(36);
   EngineState.characters.push({
     id,
     name: "New Character",
