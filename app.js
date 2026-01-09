@@ -19,6 +19,17 @@ const State = {
   characters: [],
   activeCharId: null,
 
+  // ADD: PALETTE STATE
+let activeBiome = "plains";
+let activeTile = "grass";
+
+const TILE_COLORS = {
+  grass: "#4caf50",
+  water: "#2196f3",
+  dirt: "#8b5a2b",
+  stone: "#777"
+};
+
   // collision painting
   painting: false,
   paintValue: true,
@@ -63,6 +74,23 @@ function bindUI(){
       save(); renderCharacters(); renderCAHeader(); renderDebug(); drawAll();
     }
   });
+
+  // ADD: PALETTE BINDING
+document.querySelectorAll(".biome-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".biome-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeBiome = btn.dataset.biome;
+  });
+});
+
+document.querySelectorAll(".tile-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tile-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTile = btn.dataset.tile;
+  });
+});
 
   $("caDone").addEventListener("click", ()=>{
     // HARD DONE: persist + exit to Characters mode, keep selection
