@@ -3,21 +3,19 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RPG DREAM – E3.1 Scroll</title>
+<title>RPG DREAM – E3 LOCK</title>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-<header>
+<header id="topbar">
   <button data-mode="terrain" class="active">Terrain</button>
   <button data-mode="collision">Collision</button>
   <button data-mode="characters">Characters</button>
 </header>
 
-<div id="editor">
-  <div id="viewport">
-    <canvas id="grid"></canvas>
-  </div>
-</div>
+<main id="editor">
+  <canvas id="grid"></canvas>
+</main>
 
 <script src="app.js"></script>
 </body>
