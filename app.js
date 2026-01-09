@@ -333,7 +333,7 @@ function drawMap(){
     const py = ent.y*TILE;
 
     // placeholder body
-    ctx.fillStyle = "#4da6ff";
+    ctx.fillStyle = TILE_COLORS[activeTile] || "#4da6ff";
     ctx.globalAlpha = 0.95;
     ctx.fillRect(px+8, py+6, TILE-16, TILE-12);
     ctx.globalAlpha = 1;
