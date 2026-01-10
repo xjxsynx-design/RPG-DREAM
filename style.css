@@ -1,13 +1,45 @@
-body{margin:0;background:#0b0f14;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
-#ui{padding:12px;display:flex;flex-direction:column;gap:12px}
-#toolbar{display:flex;gap:8px}
-button{background:#1f2937;color:#e5e7eb;border:none;padding:8px 14px;border-radius:14px}
-button.active,button.primary{background:#3b82f6}
-.panel{background:#111827;border-radius:16px;padding:12px}
-.panel-header{display:flex;justify-content:space-between;align-items:center}
-.label{font-size:14px;opacity:.8;margin-bottom:6px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.chip{padding:6px 12px;border-radius:12px;background:#1f2937}
-.chip.active{background:#3b82f6}
-#mapViewport{background:#020617;border-radius:12px;overflow:hidden}
-#mapCanvas{width:100%;height:300px;display:block}
+body {
+  margin: 0;
+  background: #0b1020;
+  color: #fff;
+  font-family: system-ui, -apple-system;
+}
+
+#app {
+  padding: 12px;
+}
+
+.top-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: #1a2244;
+  color: #aaa;
+  border: none;
+}
+
+.tab.active {
+  background: #2d6cff;
+  color: #fff;
+}
+
+#panel {
+  background: #111830;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+#editor {
+  background: #0f162e;
+  border-radius: 16px;
+  padding: 12px;
+}
+canvas {
+  display: block;
+}

@@ -1,67 +1,72 @@
-console.log("✅ app.js loaded");
-
-const canvas = document.getElementById("mapCanvas");
-if (!canvas) {
-  alert("Canvas not found");
-  throw new Error("Canvas not found");
-}
-
-const ctx = canvas.getContext("2d");
-
-// 🔒 CRITICAL: SET CANVAS SIZE
-function resizeCanvas() {
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+console.log("app.js loaded");
 
 const TILE = 40;
-const GRID_W = 20;
-const GRID_H = 15;
 
-let currentTile = "#4caf50";
+document.addEventListener("DOMContentLoaded", () => {
+  const panel = document.getElementById("panel");
+  const editor = document.getElementById("editor");
 
-const grid = Array.from({ length: GRID_H }, () =>
-  Array.from({ length: GRID_W }, () => null)
-);
+  const canvas = document.createElement("canvas");
+  canvas.width = 320;
+  canvas.height = 320;
+  editor.appendChild(canvas);
 
-function drawGrid() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const ctx = canvas.getContext("2d");
 
-  for (let y = 0; y < GRID_H; y++) {
-    for (let x = 0; x < GRID_W; x++) {
-      const px = x * TILE;
-      const py = y * TILE;
-
-      if (grid[y][x]) {
-        ctx.fillStyle = grid[y][x];
-        ctx.fillRect(px, py, TILE, TILE);
-      }
-
-      ctx.strokeStyle = "rgba(255,255,255,0.08)";
-      ctx.strokeRect(px, py, TILE, TILE);
+  function drawGrid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    for (let x = 0; x <= canvas.width; x += TILE) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= canvas.height; y += TILE) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
     }
   }
-}
 
-canvas.addEventListener("pointerdown", e => {
-  const rect = canvas.getBoundingClientRect();
-  const x = Math.floor((e.clientX - rect.left) / TILE);
-  const y = Math.floor((e.clientY - rect.top) / TILE);
-
-  if (x >= 0 && y >= 0 && x < GRID_W && y < GRID_H) {
-    grid[y][x] = currentTile;
-    drawGrid();
+  function showTerrainPanel() {
+    panel.innerHTML = `
+      <strong>Biome</strong><br/>
+      <button>Plains</button>
+      <button>Desert</button>
+      <button>Tropical</button>
+      <button>Volcanic</button>
+      <button>Wetlands</button>
+      <br/><br/>
+      <strong>Terrain</strong><br/>
+      <button>Grass</button>
+      <button>Water</button>
+      <button>Dirt</button>
+      <button>Stone</button>
+    `;
   }
-});
 
-document.querySelectorAll("[data-tile]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    currentTile = btn.dataset.tile;
+  function showCollisionPanel() {
+    panel.innerHTML = "<strong>Collision mode</strong>";
+  }
+
+  function showCharactersPanel() {
+    panel.innerHTML = "<strong>Characters</strong><br/><button>+ Add Character</button>";
+  }
+
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const tab = btn.dataset.tab;
+      if (tab === "terrain") showTerrainPanel();
+      if (tab === "collision") showCollisionPanel();
+      if (tab === "characters") showCharactersPanel();
+    });
   });
-});
 
-drawGrid();
-console.log("✅ grid drawn");
+  showTerrainPanel();
+  drawGrid();
+});
