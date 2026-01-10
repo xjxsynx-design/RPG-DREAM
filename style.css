@@ -1,34 +1,109 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
 body {
   margin: 0;
   background: #0b0f14;
   color: #fff;
-  font-family: system-ui, sans-serif;
 }
 
-#topbar {
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.mode-btn {
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: none;
+  background: #1a1f27;
+  color: #bbb;
+  font-size: 16px;
+}
+
+.mode-btn.active {
+  background: #2f81f7;
+  color: #fff;
+}
+
+/* PALETTE PANEL */
+.palette-panel {
+  padding: 12px;
+  background: #10151c;
+}
+
+.palette-group {
+  margin-bottom: 14px;
+}
+
+.palette-label {
+  margin-bottom: 6px;
+  opacity: 0.7;
+}
+
+.palette-row {
   display: flex;
   gap: 8px;
-  padding: 8px;
+  flex-wrap: wrap;
 }
 
-.mode.active {
-  outline: 2px solid #4aa3ff;
+.palette-btn {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: #1c222c;
+  color: #ccc;
+  border: none;
 }
 
-#palettes {
-  padding: 8px;
+.palette-btn.active {
+  background: #2f81f7;
+  color: #fff;
 }
 
-button {
-  background: #1c2330;
+/* MAIN LAYOUT */
+.main-panel {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+}
+
+/* MAPS */
+.maps-panel {
+  width: 160px;
+  background: #10151c;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.maps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#addMapBtn {
+  background: #2f81f7;
   color: #fff;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 10px;
+  padding: 4px 10px;
+}
+
+/* EDITOR */
+.editor-panel {
+  flex: 1;
+  background: #0e131a;
+  border-radius: 16px;
+  padding: 10px;
 }
 
 canvas {
-  display: block;
-  margin: 0 auto;
-  background: #111;
+  width: 100%;
+  height: 100%;
+  background: #0b0f14;
+  border-radius: 12px;
 }
