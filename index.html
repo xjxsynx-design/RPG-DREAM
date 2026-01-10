@@ -38,6 +38,9 @@ border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
+
+.character-selected{outline:2px solid #f1c40f;outline-offset:-2px}
+
 </style>
 </head>
 <body>
@@ -109,14 +112,16 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6a</footer>
+<footer>RPG DREAM • Phase C.6b</footer>
 
 <script>
 
 // === Characters (C.3 Unlimited Instances) ===
 const characters = new Set();
 const characterIds = new Map();
+const characterNames = new Map();
 let characterIdCounter = 1;
+let selectedCharacterIndex = null;
 let selectedCharacterColor = '#9b59b6';
 let characterPlacementArmed = false;
 
@@ -228,6 +233,69 @@ document.getElementById('selectCharacter').onclick = () => {
   characterModal.classList.remove('open');
 };
 
+
+// === C.6b Character Selection & Name (guarded, additive) ===
+const charInfoModal = document.getElementById('characterInfoModal');
+const charNameInput = document.getElementById('charNameInput');
+
+function openCharInfoAt(index){
+  selectedCharacterIndex = index;
+  const name = characterNames.get(index) || '';
+  charNameInput.value = name;
+  charInfoModal.classList.add('open');
+}
+
+function closeCharInfo(){
+  charInfoModal.classList.remove('open');
+}
+
+document.getElementById('closeCharInfo').onclick =
+document.getElementById('cancelCharInfo').onclick = closeCharInfo;
+
+document.getElementById('saveCharInfo').onclick = () => {
+  if(selectedCharacterIndex !== null){
+    characterNames.set(selectedCharacterIndex, charNameInput.value || '');
+  }
+  closeCharInfo();
+};
+
+// Wrap existing character grid handlers to add selection when not placing
+const cg = document.getElementById('characterGrid');
+[...cg.children].forEach((cell, i) => {
+  const prev = cell.onclick;
+  cell.onclick = (e) => {
+    if (characterPlacementArmed){
+      prev && prev(e);
+      return;
+    }
+    // selection mode
+    [...cg.children].forEach(el=>el.classList.remove('character-selected'));
+    if (characters.has(i)){
+      cell.classList.add('character-selected');
+      openCharInfoAt(i);
+    }
+  };
+});
+
 </script>
+
+<!-- Character Info Modal (C.6b) -->
+<div class="modal" id="characterInfoModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Character Info</strong>
+      <button class="btn" id="closeCharInfo">✕</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Name:</label>
+      <input id="charNameInput" class="select" placeholder="Enter name" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelCharInfo">Cancel</button>
+      <button class="btn primary" id="saveCharInfo">Save</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
