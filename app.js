@@ -1,73 +1,110 @@
-console.log('app.js loaded');
+console.log("app.js loaded");
 
 const TILE = 40;
-const GRID = 20;
+const GRID_W = 20;
+const GRID_H = 20;
 
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-const State = {
-  mode: 'terrain',
-  biome: 'plains',
-  tile: 'grass',
-  tiles: {}
+canvas.width = GRID_W * TILE;
+canvas.height = GRID_H * TILE;
+
+/* STATE */
+let currentMode = "terrain";
+let currentBiome = "Plains";
+let currentTerrain = "Grass";
+
+/* DATA */
+const BIOMES = ["Plains", "Desert", "Tropical", "Volcanic", "Wetlands"];
+const TERRAINS = ["Grass", "Water", "Dirt", "Stone"];
+
+const COLORS = {
+  Grass: "#4caf50",
+  Water: "#2196f3",
+  Dirt: "#8b5a2b",
+  Stone: "#777"
 };
 
-function bindUI() {
-  document.querySelectorAll('.mode').forEach(btn => {
+/* MAP DATA */
+const map = Array.from({ length: GRID_H }, () =>
+  Array.from({ length: GRID_W }, () => null)
+);
+
+/* BUILD PALETTES */
+function buildPalette(containerId, items, onSelect) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = "";
+
+  items.forEach(item => {
+    const btn = document.createElement("button");
+    btn.className = "palette-btn";
+    btn.textContent = item;
+
     btn.onclick = () => {
-      document.querySelectorAll('.mode').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      State.mode = btn.id.replace('mode-', '');
+      [...el.children].forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      onSelect(item);
     };
+
+    el.appendChild(btn);
   });
 
-  document.querySelectorAll('#biomes button').forEach(btn => {
-    btn.onclick = () => State.biome = btn.dataset.biome;
-  });
-
-  document.querySelectorAll('#terrain button').forEach(btn => {
-    btn.onclick = () => State.tile = btn.dataset.tile;
-  });
+  el.children[0].classList.add("active");
 }
 
+buildPalette("biomePalette", BIOMES, v => currentBiome = v);
+buildPalette("terrainPalette", TERRAINS, v => currentTerrain = v);
+
+/* MODE BUTTONS */
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentMode = btn.dataset.mode;
+  };
+});
+
+/* DRAW */
 function drawGrid() {
-  ctx.strokeStyle = '#222';
-  for (let x = 0; x <= GRID; x++) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let y = 0; y < GRID_H; y++) {
+    for (let x = 0; x < GRID_W; x++) {
+      if (map[y][x]) {
+        ctx.fillStyle = COLORS[map[y][x]];
+        ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+      }
+    }
+  }
+
+  ctx.strokeStyle = "rgba(255,255,255,0.1)";
+  for (let x = 0; x <= GRID_W; x++) {
     ctx.beginPath();
     ctx.moveTo(x * TILE, 0);
-    ctx.lineTo(x * TILE, GRID * TILE);
+    ctx.lineTo(x * TILE, canvas.height);
     ctx.stroke();
   }
-  for (let y = 0; y <= GRID; y++) {
+  for (let y = 0; y <= GRID_H; y++) {
     ctx.beginPath();
     ctx.moveTo(0, y * TILE);
-    ctx.lineTo(GRID * TILE, y * TILE);
+    ctx.lineTo(canvas.width, y * TILE);
     ctx.stroke();
   }
 }
 
-function drawTiles() {
-  for (const key in State.tiles) {
-    const [x, y] = key.split(',').map(Number);
-    ctx.fillStyle = '#3fa34d';
-    ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
-  }
-}
+drawGrid();
 
-canvas.addEventListener('click', e => {
+/* PAINT */
+canvas.addEventListener("click", e => {
+  if (currentMode !== "terrain") return;
+
   const rect = canvas.getBoundingClientRect();
   const x = Math.floor((e.clientX - rect.left) / TILE);
   const y = Math.floor((e.clientY - rect.top) / TILE);
-  State.tiles[`${x},${y}`] = State.tile;
-  draw();
-});
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawTiles();
+  if (x < 0 || y < 0 || x >= GRID_W || y >= GRID_H) return;
+
+  map[y][x] = currentTerrain;
   drawGrid();
-}
-
-bindUI();
-draw();
+});
