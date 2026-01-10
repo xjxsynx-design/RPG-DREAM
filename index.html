@@ -89,6 +89,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 <footer>RPG DREAM • Phase C.4</footer>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
 
 // === Characters (C.3 Unlimited Instances) ===
 const characters = []; // { index, type }
@@ -153,22 +154,7 @@ function renderGrid(id){
 renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
 renderGrid('characterGrid');
 
-// === Character Grid Override (C.3 Unlimited) ===
-const characterGrid = document.getElementById('characterGrid');
-[...characterGrid.children].forEach((cell, i) => {
-  cell.onclick = () => {
-    if (!characterPlacementArmed) return;
 
-    if (characters.has(i)) {
-      characters.delete(i);
-      cell.classList.remove('filled');
-    } else {
-      characters.add(i);
-      cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', '#9b59b6');
-    }
-  };
-});
 
 updateCurrent();
 
@@ -196,7 +182,6 @@ document.getElementById('confirmCharacter').onclick = () => {
 };
 
 // Extend character placement to store type
-const characterGrid = document.getElementById('characterGrid');
 [...characterGrid.children].forEach((cell, i) => {
   cell.onclick = () => {
     if (!characterPlacementArmed) return;
@@ -213,6 +198,7 @@ const characterGrid = document.getElementById('characterGrid');
   };
 });
 
+});
 </script>
 
 <!-- Character Selection Modal (C.4) -->
