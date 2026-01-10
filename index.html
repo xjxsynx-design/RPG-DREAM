@@ -145,7 +145,7 @@ function renderGrid(id){
   const g=document.getElementById(id); g.innerHTML='';
   for(let i=0;i<120;i++){
     const c=document.createElement('div'); c.className='cell';
-    c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)};
+    if(id!=='characterGrid'){c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)}};
     g.appendChild(c);
   }
 }
