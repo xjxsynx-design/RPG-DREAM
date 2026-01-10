@@ -3,136 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM · Phase C.2.1</title>
-
+<title>RPG DREAM • Engine v1.1 DEV (C.1)</title>
 <style>
-:root{
-  --bg:#0b0f1a;--panel:#121a2a;--accent:#2f7cff;
-  --grid:#1c2740;--grid-line:#223154;
-}
+:root{--bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;--text:#e6edf3;--muted:#9aa4af;
+--btn:#21262d;--btn-h:#2a313c;--accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#e6ecff;font-family:system-ui}
-header{display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--grid-line)}
-.tabs{display:flex;gap:8px;padding:12px}
-.tab{padding:8px 14px;border-radius:12px;background:#121a2a;border:1px solid var(--grid-line);color:#c6d4ff}
-.tab.active{background:var(--accent);color:#fff}
-.section{display:none;padding:12px}
-.section.active{display:block}
-.controls{display:flex;gap:10px;align-items:center;margin-bottom:10px}
-.btn{padding:8px 14px;border-radius:12px;background:#121a2a;border:1px solid var(--grid-line);color:#c6d4ff}
-.btn.primary{background:var(--accent);color:#fff}
-.btn.armed{outline:2px solid #9b59b6}
-.status{opacity:.8}
-.grid{display:grid;grid-template-columns:repeat(16,1fr);gap:2px}
-.cell{aspect-ratio:1/1;background:#0e1525;border:1px solid var(--grid-line);position:relative}
-.cell.terrain{background:#4caf50}
-.cell.collision{background:#2ea043}
-.cell.character::after{
-  content:"";
-  position:absolute;inset:6px;
-  background:#9b59b6;border-radius:6px;
-}
-footer{text-align:center;padding:12px;color:#9aa4af;border-top:1px solid var(--grid-line)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;
+background:linear-gradient(180deg,var(--panel),var(--panel-soft));border-bottom:1px solid var(--edge)}
+.tabs{display:flex;gap:8px;margin:12px}
+.tab{background:var(--btn);border:1px solid var(--grid);color:var(--muted);padding:10px 18px;border-radius:10px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent-2)}
+section{display:none;padding:12px}
+section.active{display:block}
+h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9}
+.grid{background:#0b0f14;border-radius:12px;display:grid;grid-template-columns:repeat(12,1fr);
+grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
+.cell{background:#161b22;border:1px solid var(--grid)}
+.cell.collision{background:var(--collision-color)}
+.btn{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 14px;border-radius:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent-2)}
+.btn:hover{background:var(--btn-h)}
+.add-btn{margin:10px 0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
+border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-card{background:var(--panel);border-radius:16px;width:min(520px,92vw);padding:14px;border:1px solid var(--edge)}
+.modal-header{display:flex;align-items:center;justify-content:space-between}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.swatch{min-width:90px;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,.2);text-align:center}
+.swatch.active{outline:2px solid var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
 </style>
 </head>
-
 <body>
-
-<header>
-  <div>RPG DREAM</div>
-  <div>Phase C.2.1</div>
-</header>
-
+<header><div>RPG DREAM</div><div>Engine v1.1 DEV • C.1</div></header>
 <div class="tabs">
-  <button class="tab active" data-mode="terrain">Terrain</button>
-  <button class="tab" data-mode="collision">Collision</button>
-  <button class="tab" data-mode="characters">Characters</button>
+  <button class="tab active" data-tab="terrain">Terrain</button>
+  <button class="tab" data-tab="collision">Collision</button>
+  <button class="tab" data-tab="characters">Characters</button>
 </div>
 
-<div class="section active" id="editor">
-  <div class="controls" id="charControls" style="display:none">
-    <button id="addChar" class="btn primary">+ Add Character</button>
-    <span id="charStatus" class="status">Not armed</span>
+<section id="terrain" class="active">
+  <h3>Terrain</h3>
+  <div class="grid" id="terrainGrid"></div>
+</section>
+
+<section id="collision">
+  <h3>Collision</h3>
+  <button class="btn primary" id="openCollision">Open Collision Palette</button>
+  <div class="current"><span>Current collision:</span><strong id="currentCollisionLabel"></strong></div>
+  <div class="grid" id="collisionGrid"></div>
+</section>
+
+<section id="characters">
+  <h3>Characters</h3>
+  <button class="add-btn">+ Add Character</button>
+  <div class="grid" id="characterGrid"></div>
+</section>
+
+<div class="modal" id="collisionModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Collision Palette</strong>
+      <button class="btn" id="closeCollision">✕</button>
+    </div>
+    <div class="swatches" id="collisionSwatches"></div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelCollision">Cancel</button>
+      <button class="btn primary" id="selectCollision">Select</button>
+    </div>
   </div>
-  <div class="grid" id="grid"></div>
 </div>
 
-<footer>RPG DREAM · Phase C.2.1 · Character Placement Engine</footer>
+<footer>RPG DREAM • Collision Modal Parity</footer>
 
 <script>
-/* ---------- ENGINE STATE ---------- */
-const Engine = {
-  mode: 'terrain',
-  terrain: new Set(),
-  collision: new Set(),
-  characters: new Set(),
-  charArmed: false
+const collisionTypes={
+  blocked:{label:'Blocked',color:'#8b0000'},
+  water:{label:'Water',color:'#1f6feb'},
+  hazard:{label:'Hazard',color:'#ff4500'},
+  npc:{label:'NPC-only',color:'#9b59b6'}
+};
+let currentCollision='blocked';
+let pendingCollision=currentCollision;
+
+const modal=document.getElementById('collisionModal');
+const swatches=document.getElementById('collisionSwatches');
+const currentLabel=document.getElementById('currentCollisionLabel');
+
+function renderCollisionSwatches(){
+  swatches.innerHTML='';
+  Object.entries(collisionTypes).forEach(([id,data])=>{
+    const d=document.createElement('div');
+    d.className='swatch'+(id===pendingCollision?' active':'');
+    d.style.background=data.color;
+    d.textContent=data.label;
+    d.onclick=()=>{pendingCollision=id;renderCollisionSwatches()};
+    swatches.appendChild(d);
+  });
+}
+function updateCurrent(){
+  currentLabel.textContent=collisionTypes[currentCollision].label;
+  currentLabel.style.color=collisionTypes[currentCollision].color;
+}
+document.getElementById('openCollision').onclick=()=>{
+  pendingCollision=currentCollision;
+  renderCollisionSwatches();
+  modal.classList.add('open');
+};
+document.getElementById('closeCollision').onclick=()=>modal.classList.remove('open');
+document.getElementById('cancelCollision').onclick=()=>modal.classList.remove('open');
+document.getElementById('selectCollision').onclick=()=>{
+  currentCollision=pendingCollision;
+  updateCurrent();
+  modal.classList.remove('open');
 };
 
-/* ---------- GRID ---------- */
-const grid = document.getElementById('grid');
-const SIZE = 16 * 16;
-
-for(let i=0;i<SIZE;i++){
-  const cell = document.createElement('div');
-  cell.className = 'cell';
-  cell.dataset.i = i;
-  cell.onclick = () => handlePaint(i, cell);
-  grid.appendChild(cell);
+function renderGrid(id){
+  const g=document.getElementById(id); g.innerHTML='';
+  for(let i=0;i<120;i++){
+    const c=document.createElement('div'); c.className='cell';
+    c.onclick=()=>{
+      c.classList.add('collision');
+      c.style.setProperty('--collision-color',collisionTypes[currentCollision].color);
+    };
+    g.appendChild(c);
+  }
 }
+renderGrid('terrainGrid');renderGrid('collisionGrid');renderGrid('characterGrid');updateCurrent();
 
-/* ---------- MODE SWITCH ---------- */
-const charControls = document.getElementById('charControls');
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.onclick = ()=>{
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    Engine.mode = btn.dataset.mode;
-    disarmCharacters();
-    charControls.style.display = (Engine.mode === 'characters') ? 'flex' : 'none';
-  };
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(t.dataset.tab).classList.add('active');
 });
-
-/* ---------- CHARACTER ARMING ---------- */
-const addCharBtn = document.getElementById('addChar');
-const charStatus = document.getElementById('charStatus');
-
-function armCharacters(){
-  Engine.charArmed = true;
-  addCharBtn.classList.add('armed');
-  charStatus.textContent = 'Tap grid to place';
-}
-function disarmCharacters(){
-  Engine.charArmed = false;
-  addCharBtn.classList.remove('armed');
-  charStatus.textContent = 'Not armed';
-}
-
-addCharBtn.onclick = ()=>{
-  Engine.charArmed ? disarmCharacters() : armCharacters();
-};
-
-/* ---------- PAINT LOGIC ---------- */
-function handlePaint(i, cell){
-  if(Engine.mode === 'terrain'){
-    Engine.terrain.add(i);
-    cell.classList.add('terrain');
-  }
-  if(Engine.mode === 'collision'){
-    Engine.collision.add(i);
-    cell.classList.add('collision');
-  }
-  if(Engine.mode === 'characters' && Engine.charArmed){
-    if(Engine.characters.has(i)){
-      Engine.characters.delete(i);
-      cell.classList.remove('character');
-    } else {
-      Engine.characters.add(i);
-      cell.classList.add('character');
-    }
-  }
-}
 </script>
-
 </body>
 </html>
