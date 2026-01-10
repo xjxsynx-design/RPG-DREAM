@@ -3,33 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RPG DREAM – E3 Base</title>
+  <title>RPG Dream</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="topbar">
-    <button id="mode-terrain" class="mode active">Terrain</button>
-    <button id="mode-collision" class="mode">Collision</button>
-    <button id="mode-characters" class="mode">Characters</button>
+
+  <!-- TOP MODE BAR -->
+  <div class="top-bar">
+    <button class="mode-btn active" data-mode="terrain">Terrain</button>
+    <button class="mode-btn" data-mode="collision">Collision</button>
+    <button class="mode-btn" data-mode="characters">Characters</button>
   </div>
 
-  <div id="palettes">
-    <div id="biomes">
-      <button data-biome="plains">Plains</button>
-      <button data-biome="desert">Desert</button>
-      <button data-biome="tropical">Tropical</button>
-      <button data-biome="volcanic">Volcanic</button>
-      <button data-biome="wetlands">Wetlands</button>
+  <!-- PALETTE PANEL -->
+  <div class="palette-panel">
+
+    <div class="palette-group">
+      <div class="palette-label">Biome</div>
+      <div class="palette-row" id="biomePalette"></div>
     </div>
-    <div id="terrain">
-      <button data-tile="grass">Grass</button>
-      <button data-tile="water">Water</button>
-      <button data-tile="dirt">Dirt</button>
-      <button data-tile="stone">Stone</button>
+
+    <div class="palette-group">
+      <div class="palette-label">Terrain</div>
+      <div class="palette-row" id="terrainPalette"></div>
     </div>
+
   </div>
 
-  <canvas id="canvas" width="800" height="800"></canvas>
+  <!-- MAIN AREA -->
+  <div class="main-panel">
+
+    <div class="maps-panel">
+      <div class="maps-header">
+        <span>Maps</span>
+        <button id="addMapBtn">+ Add</button>
+      </div>
+    </div>
+
+    <div class="editor-panel">
+      <canvas id="canvas"></canvas>
+    </div>
+
+  </div>
 
   <script src="app.js"></script>
 </body>
