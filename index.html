@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM • Single-File Editor</title>
+<title>RPG DREAM • Engine v1.1 DEV (C.1)</title>
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;--text:#e6edf3;--muted:#9aa4af;
 --btn:#21262d;--btn-h:#2a313c;--accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d}
@@ -20,20 +20,18 @@ h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9}
 .grid{background:#0b0f14;border-radius:12px;display:grid;grid-template-columns:repeat(12,1fr);
 grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
 .cell{background:#161b22;border:1px solid var(--grid)}
-.cell.filled{background:var(--tile-color)}
+.cell.collision{background:var(--collision-color)}
 .btn{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 14px;border-radius:8px}
 .btn.primary{background:var(--accent);border-color:var(--accent-2)}
 .btn:hover{background:var(--btn-h)}
 .add-btn{margin:10px 0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
 border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
-/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}
 .modal.open{display:flex}
 .modal-card{background:var(--panel);border-radius:16px;width:min(520px,92vw);padding:14px;border:1px solid var(--edge)}
 .modal-header{display:flex;align-items:center;justify-content:space-between}
-.select{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 10px;border-radius:8px}
-.swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.swatch{width:34px;height:34px;border-radius:8px;border:2px solid rgba(255,255,255,.25)}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.swatch{min-width:90px;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,.2);text-align:center}
 .swatch.active{outline:2px solid var(--accent)}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
@@ -41,7 +39,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 </style>
 </head>
 <body>
-<header><div>RPG DREAM</div><div>offline • loaded</div></header>
+<header><div>RPG DREAM</div><div>Engine v1.1 DEV • C.1</div></header>
 <div class="tabs">
   <button class="tab active" data-tab="terrain">Terrain</button>
   <button class="tab" data-tab="collision">Collision</button>
@@ -50,102 +48,92 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 
 <section id="terrain" class="active">
   <h3>Terrain</h3>
-  <button class="btn primary" id="openTerrain">Open Terrain Palette</button>
-  <div class="current"><span>Current tile:</span><span id="currentTileBox" class="swatch"></span></div>
-  <h3>Maps</h3>
-  <button class="add-btn" id="addMap">+ Add Map</button>
   <div class="grid" id="terrainGrid"></div>
 </section>
 
 <section id="collision">
   <h3>Collision</h3>
+  <button class="btn primary" id="openCollision">Open Collision Palette</button>
+  <div class="current"><span>Current collision:</span><strong id="currentCollisionLabel"></strong></div>
   <div class="grid" id="collisionGrid"></div>
 </section>
 
 <section id="characters">
   <h3>Characters</h3>
-  <button class="add-btn" id="addCharacter">+ Add Character</button>
+  <button class="add-btn">+ Add Character</button>
   <div class="grid" id="characterGrid"></div>
 </section>
 
-<div class="modal" id="terrainModal">
+<div class="modal" id="collisionModal">
   <div class="modal-card">
     <div class="modal-header">
-      <strong>Terrain Palette</strong>
-      <button class="btn" id="closeTerrain">✕</button>
+      <strong>Collision Palette</strong>
+      <button class="btn" id="closeCollision">✕</button>
     </div>
-    <div style="margin-top:10px">
-      <label>Biome:</label>
-      <select id="biomeSelect" class="select"></select>
-    </div>
-    <div class="swatches" id="tileSwatches"></div>
+    <div class="swatches" id="collisionSwatches"></div>
     <div class="modal-footer">
-      <button class="btn" id="cancelTerrain">Cancel</button>
-      <button class="btn primary" id="selectTerrain">Select</button>
+      <button class="btn" id="cancelCollision">Cancel</button>
+      <button class="btn primary" id="selectCollision">Select</button>
     </div>
   </div>
 </div>
 
-<footer>RPG DREAM • Phase B.1</footer>
+<footer>RPG DREAM • Collision Modal Parity</footer>
 
 <script>
-const biomes={
-  plains:['#4caf50','#8b5a2b','#777'],
-  desert:['#c2b280','#a67b5b','#8c7a3a'],
-  tropical:['#3cb371','#2e8b57','#20b2aa'],
-  volcanic:['#4b3621','#8b0000','#ff4500'],
-  wetlands:['#2f4f4f','#3cb371','#4682b4']
+const collisionTypes={
+  blocked:{label:'Blocked',color:'#8b0000'},
+  water:{label:'Water',color:'#1f6feb'},
+  hazard:{label:'Hazard',color:'#ff4500'},
+  npc:{label:'NPC-only',color:'#9b59b6'}
 };
-let currentBiome='plains';
-let currentTile=biomes[currentBiome][0];
-let pendingTile=currentTile;
+let currentCollision='blocked';
+let pendingCollision=currentCollision;
 
-const tileBox=document.getElementById('currentTileBox');
-const modal=document.getElementById('terrainModal');
-const biomeSelect=document.getElementById('biomeSelect');
-const swatches=document.getElementById('tileSwatches');
+const modal=document.getElementById('collisionModal');
+const swatches=document.getElementById('collisionSwatches');
+const currentLabel=document.getElementById('currentCollisionLabel');
 
-function renderBiomeSelect(){
-  biomeSelect.innerHTML='';
-  Object.keys(biomes).forEach(b=>{
-    const o=document.createElement('option');
-    o.value=b;o.textContent=b;o.selected=b===currentBiome;
-    biomeSelect.appendChild(o);
-  });
-}
-function renderSwatches(){
+function renderCollisionSwatches(){
   swatches.innerHTML='';
-  biomes[currentBiome].forEach(c=>{
-    const s=document.createElement('div');
-    s.className='swatch'+(c===pendingTile?' active':'');
-    s.style.background=c;
-    s.onclick=()=>{pendingTile=c;renderSwatches()};
-    swatches.appendChild(s);
+  Object.entries(collisionTypes).forEach(([id,data])=>{
+    const d=document.createElement('div');
+    d.className='swatch'+(id===pendingCollision?' active':'');
+    d.style.background=data.color;
+    d.textContent=data.label;
+    d.onclick=()=>{pendingCollision=id;renderCollisionSwatches()};
+    swatches.appendChild(d);
   });
 }
-function updateCurrent(){ tileBox.style.background=currentTile; }
-
-document.getElementById('openTerrain').onclick=()=>{
-  pendingTile=currentTile; modal.classList.add('open');
-  renderBiomeSelect(); renderSwatches();
+function updateCurrent(){
+  currentLabel.textContent=collisionTypes[currentCollision].label;
+  currentLabel.style.color=collisionTypes[currentCollision].color;
+}
+document.getElementById('openCollision').onclick=()=>{
+  pendingCollision=currentCollision;
+  renderCollisionSwatches();
+  modal.classList.add('open');
 };
-document.getElementById('closeTerrain').onclick=()=>modal.classList.remove('open');
-document.getElementById('cancelTerrain').onclick=()=>modal.classList.remove('open');
-document.getElementById('selectTerrain').onclick=()=>{
-  currentTile=pendingTile; updateCurrent(); modal.classList.remove('open');
+document.getElementById('closeCollision').onclick=()=>modal.classList.remove('open');
+document.getElementById('cancelCollision').onclick=()=>modal.classList.remove('open');
+document.getElementById('selectCollision').onclick=()=>{
+  currentCollision=pendingCollision;
+  updateCurrent();
+  modal.classList.remove('open');
 };
-biomeSelect.onchange=e=>{currentBiome=e.target.value; pendingTile=biomes[currentBiome][0]; renderSwatches()};
 
 function renderGrid(id){
   const g=document.getElementById(id); g.innerHTML='';
   for(let i=0;i<120;i++){
     const c=document.createElement('div'); c.className='cell';
-    c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)};
+    c.onclick=()=>{
+      c.classList.add('collision');
+      c.style.setProperty('--collision-color',collisionTypes[currentCollision].color);
+    };
     g.appendChild(c);
   }
 }
-renderGrid('terrainGrid'); renderGrid('collisionGrid'); renderGrid('characterGrid');
-updateCurrent();
+renderGrid('terrainGrid');renderGrid('collisionGrid');renderGrid('characterGrid');updateCurrent();
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
@@ -153,8 +141,6 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   document.getElementById(t.dataset.tab).classList.add('active');
 });
-document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
-document.getElementById('addCharacter').onclick=()=>alert('Character added (stub)');
 </script>
 </body>
 </html>
