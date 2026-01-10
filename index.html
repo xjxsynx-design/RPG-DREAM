@@ -1,626 +1,236 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1020" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>RPG DREAM • Phase C.6d-SINGLE-A</title>
-  <link rel="manifest" href="manifest.json" />
-  <style>
-    :root {
-      --bg:#0b1020;
-      --panel:#121a33;
-      --panel2:#0f1730;
-      --ink:#e8ecff;
-      --muted:#9aa6d6;
-      --accent:#7c5cff;
-      --ok:#4caf50;
-      --danger:#c0392b;
-      --warn:#f1c40f;
-      --cell:28px;
-      --radius:14px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%; margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink);}
-    button,select,input{font:inherit}
-    .app{min-height:100%; display:flex; flex-direction:column; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); gap:12px;}
-    .topbar{display:flex; gap:10px; align-items:center; justify-content:space-between; padding:12px; background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius);}
-    .brand{display:flex; flex-direction:column; gap:2px;}
-    .brand strong{font-size:16px; letter-spacing:.4px;}
-    .brand small{color:var(--muted); font-weight:700; opacity:.9}
-    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .btn{border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:var(--ink); padding:10px 12px; border-radius:12px; font-weight:800; letter-spacing:.2px; }
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:rgba(124,92,255,.22); border-color:rgba(124,92,255,.55);}
-    .btn.ok{background:rgba(76,175,80,.22); border-color:rgba(76,175,80,.55);}
-    .btn.danger{background:rgba(192,57,43,.18); border-color:rgba(192,57,43,.55);}
-    .btn.active{box-shadow:0 0 0 2px rgba(241,196,15,.5) inset;}
-    .pill{display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);}
-    .dot{width:16px; height:16px; border-radius:4px; border:1px solid rgba(255,255,255,.25);}
-    .muted{color:var(--muted); font-weight:700;}
-    .tabs{display:flex; gap:8px; padding:8px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius);}
-    .tab{flex:1; text-align:center; padding:12px 10px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); font-weight:900; color:var(--muted);}
-    .tab.active{color:var(--ink); background:rgba(124,92,255,.18); border-color:rgba(124,92,255,.45);}
-    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:12px; display:none;}
-    .panel.active{display:block;}
-    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;}
-    .sectionTitle h3{margin:0; font-size:14px; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
-    .gridWrap{overflow:auto; border-radius:14px; border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.18); padding:10px;}
-    .grid{display:grid; grid-template-columns:repeat(12, var(--cell)); gap:6px; width:max-content;}
-    .cell{width:var(--cell); height:var(--cell); border-radius:8px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03); position:relative;}
-    .cell.filled{background:var(--fill, rgba(255,255,255,.12));}
-    .cell.blocked::after{content:""; position:absolute; inset:4px; border-radius:6px; box-shadow:0 0 0 2px rgba(231,76,60,.85) inset;}
-    .cell.character::before{content:""; position:absolute; inset:6px; border-radius:6px; background:var(--char, rgba(155,89,182,.9));}
-    .cell.selected{outline:2px solid rgba(241,196,15,.95); outline-offset:-2px;}
-    .footer{text-align:center; color:rgba(154,166,214,.95); font-weight:800; padding:6px 0;}
-    .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.65); z-index:99;}
-    .modal.open{display:flex;}
-    .card{width:min(520px, 100%); background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid rgba(255,255,255,.10); border-radius:18px; padding:14px;}
-    .cardHeader{display:flex; align-items:center; justify-content:space-between; gap:10px;}
-    .cardHeader strong{font-size:14px; letter-spacing:.3px;}
-    .field{display:flex; flex-direction:column; gap:6px; margin-top:12px;}
-    label{font-weight:900; color:var(--muted); font-size:12px; letter-spacing:.3px; text-transform:uppercase;}
-    select,input{padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:var(--ink);}
-    .swatches{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
-    .swatch{width:34px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.20); background:var(--c);}
-    .cardFooter{display:flex; gap:10px; justify-content:flex-end; margin-top:14px;}
-    .help{font-size:12px; color:rgba(154,166,214,.95); line-height:1.3; margin-top:10px;}
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RPG DREAM • Single-File Editor</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;--text:#e6edf3;--muted:#9aa4af;
+--btn:#21262d;--btn-h:#2a313c;--accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;
+background:linear-gradient(180deg,var(--panel),var(--panel-soft));border-bottom:1px solid var(--edge)}
+.tabs{display:flex;gap:8px;margin:12px}
+.tab{background:var(--btn);border:1px solid var(--grid);color:var(--muted);padding:10px 18px;border-radius:10px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent-2)}
+section{display:none;padding:12px}
+section.active{display:block}
+h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9}
+.grid{background:#0b0f14;border-radius:12px;display:grid;grid-template-columns:repeat(12,1fr);
+grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
+.cell{background:#161b22;border:1px solid var(--grid)}
+.cell.filled{background:var(--tile-color)}
+.btn{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 14px;border-radius:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent-2)}
+.btn:hover{background:var(--btn-h)}
+.add-btn{margin:10px 0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
+border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-card{background:var(--panel);border-radius:16px;width:min(520px,92vw);padding:14px;border:1px solid var(--edge)}
+.modal-header{display:flex;align-items:center;justify-content:space-between}
+.select{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 10px;border-radius:8px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.swatch{width:34px;height:34px;border-radius:8px;border:2px solid rgba(255,255,255,.25)}
+.swatch.active{outline:2px solid var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
+
+/* === C.6.e UI alignment patch === */
+.map-section { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.map-section .map-actions { display:flex; gap:10px; justify-content:center; width:100%; }
+.map-section .map-actions button { font-size:0.9rem; padding:10px 14px; }
+
+.characters-header { display:flex; align-items:center; justify-content:space-between; }
+.character-controls { display:flex; justify-content:center; gap:12px; margin-top:8px; }
+.character-controls button { min-width:72px; }
+
+button.active { outline:2px solid #7c3aed; }
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <strong>RPG DREAM</strong>
-        <small>Phase C.6d-SINGLE-A • Single-file runtime + PWA support</small>
-      </div>
-      <div class="row">
-        <div class="pill" title="Current map">
-          <span class="muted">Map</span>
-          <select id="mapSelect" aria-label="Map select"></select>
-        </div>
-        <button class="btn primary" id="mapsBtn">Maps</button>
-        <button class="btn" id="exportBtn">Export</button>
-        <label class="btn" style="cursor:pointer;">
-          Import
-          <input id="importFile" type="file" accept="application/json" style="display:none" />
-        </label>
-      </div>
-    </div>
+<header><div>RPG DREAM</div><div>offline • loaded</div></header>
+<div class="tabs">
+<button class="tab active" data-tab="terrain">Terrain</button>
+<button class="tab" data-tab="collision">Collision</button>
+<button class="tab" data-tab="characters">Characters</button>
+</div>
+<section class="active" id="terrain">
+<h3>Terrain</h3>
+<button class="btn primary" id="openTerrain">Open Terrain Palette</button>
+<div class="current"><span>Current tile:</span><span class="swatch" id="currentTileBox"></span></div>
+<h3>Maps</h3>
+<button class="add-btn" id="addMap">+ Add Map</button>
+<div class="grid" id="terrainGrid"></div>
+</section>
+<section id="collision">
+<h3>Collision</h3>
+<div class="grid" id="collisionGrid"></div>
+</section>
+<section id="characters">
+<div class="characters-header"><h3>Characters</h3></div>
+<button class="add-btn" id="addCharacter">+ Add Character</button>
+<div class="grid" id="characterGrid"></div>
+<div class="character-controls"></div></section>
+<div class="modal" id="characterModal">
+<div class="modal-card">
+<div class="modal-header">
+<strong>Character Palette</strong>
+<button class="btn" id="closeCharacter">✕</button>
+</div>
+<div style="margin-top:10px">
+<label>Type:</label>
+<select class="select" id="characterType">
+<option value="#9b59b6">NPC</option>
+<option value="#3498db">Party</option>
+<option value="#e74c3c">Enemy</option>
+</select>
+</div>
+<div class="modal-footer">
+<button class="btn" id="cancelCharacter">Cancel</button>
+<button class="btn primary" id="selectCharacter">Select</button>
+</div>
+</div>
+</div>
+<div class="modal" id="terrainModal">
+<div class="modal-card">
+<div class="modal-header">
+<strong>Terrain Palette</strong>
+<button class="btn" id="closeTerrain">✕</button>
+</div>
+<div style="margin-top:10px">
+<label>Biome:</label>
+<select class="select" id="biomeSelect"></select>
+</div>
+<div class="swatches" id="tileSwatches"></div>
+<div class="modal-footer">
+<button class="btn" id="cancelTerrain">Cancel</button>
+<button class="btn primary" id="selectTerrain">Select</button>
+</div>
+</div>
+</div>
+<footer>RPG DREAM • Phase C.5</footer>
+<script>
 
-    <div class="tabs" role="tablist" aria-label="Editor tabs">
-      <button class="tab active" data-tab="terrain">Terrain</button>
-      <button class="tab" data-tab="collision">Collision</button>
-      <button class="tab" data-tab="characters">Characters</button>
-    </div>
+// === Characters (C.3 Unlimited Instances) ===
+const characters = new Set();
+let selectedCharacterColor = '#9b59b6';
+let characterPlacementArmed = false;
 
-    <section class="panel active" id="terrain" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Terrain</h3>
-        <div class="row">
-          <div class="pill" title="Current tile">
-            <span class="muted">Tile</span>
-            <span class="dot" id="currentTileDot"></span>
-          </div>
-          <button class="btn primary" id="terrainPaletteBtn">Palette</button>
-        </div>
-      </div>
-      <div class="gridWrap">
-        <div class="grid" id="terrainGrid" aria-label="Terrain grid"></div>
-      </div>
-      <div class="help">Tap cells to paint. Use Palette to change biome and tile.</div>
-    </section>
+const biomes={
+  plains:['#4caf50','#8b5a2b','#777'],
+  desert:['#c2b280','#a67b5b','#8c7a3a'],
+  tropical:['#3cb371','#2e8b57','#20b2aa'],
+  volcanic:['#4b3621','#8b0000','#ff4500'],
+  wetlands:['#2f4f4f','#3cb371','#4682b4']
+};
+let currentBiome='plains';
+let currentTile=biomes[currentBiome][0];
+let pendingTile=currentTile;
 
-    <section class="panel" id="collision" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Collision</h3>
-        <div class="help" style="margin:0">Tap to toggle blocked cells (red outline).</div>
-      </div>
-      <div class="gridWrap">
-        <div class="grid" id="collisionGrid" aria-label="Collision grid"></div>
-      </div>
-    </section>
+const tileBox=document.getElementById('currentTileBox');
+const modal=document.getElementById('terrainModal');
+const biomeSelect=document.getElementById('biomeSelect');
+const swatches=document.getElementById('tileSwatches');
 
-    <section class="panel" id="characters" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Characters</h3>
-        <div class="row" style="width:100%; justify-content:space-between;">
-          <div class="row">
-            <button class="btn ok" id="addCharacterBtn">Add Character</button>
-            <button class="btn danger" id="deleteCharacterBtn">Delete Character</button>
-          </div>
-          <div class="pill" id="modePill" title="Current character mode">
-            <span class="muted">Mode</span>
-            <span id="modeText" style="font-weight:900;">Select</span>
-          </div>
-        </div>
-      </div>
-      <div class="gridWrap">
-        <div class="grid" id="characterGrid" aria-label="Character grid"></div>
-      </div>
-      <div class="help">
-        <b>Select:</b> tap a placed character to edit name.<br/>
-        <b>Place:</b> choose a character type/color, then tap empty cells.<br/>
-        <b>Delete:</b> tap placed characters to remove.
-      </div>
-    </section>
+function renderBiomeSelect(){
+  biomeSelect.innerHTML='';
+  Object.keys(biomes).forEach(b=>{
+    const o=document.createElement('option');
+    o.value=b;o.textContent=b;o.selected=b===currentBiome;
+    biomeSelect.appendChild(o);
+  });
+}
+function renderSwatches(){
+  swatches.innerHTML='';
+  biomes[currentBiome].forEach(c=>{
+    const s=document.createElement('div');
+    s.className='swatch'+(c===pendingTile?' active':'');
+    s.style.background=c;
+    s.onclick=()=>{pendingTile=c;renderSwatches()};
+    swatches.appendChild(s);
+  });
+}
+function updateCurrent(){ tileBox.style.background=currentTile; }
 
-    <div class="footer">RPG DREAM • Phase C.6d-SINGLE-A</div>
-  </div>
+document.getElementById('openTerrain').onclick=()=>{
+  pendingTile=currentTile; modal.classList.add('open');
+  renderBiomeSelect(); renderSwatches();
+};
+document.getElementById('closeTerrain').onclick=()=>modal.classList.remove('open');
+document.getElementById('cancelTerrain').onclick=()=>modal.classList.remove('open');
+document.getElementById('selectTerrain').onclick=()=>{
+  currentTile=pendingTile; updateCurrent(); modal.classList.remove('open');
+};
+biomeSelect.onchange=e=>{currentBiome=e.target.value; pendingTile=biomes[currentBiome][0]; renderSwatches()};
 
-  <div class="modal" id="terrainModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Terrain Palette</strong>
-        <button class="btn" id="closeTerrainModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Biome</label>
-        <select id="biomeSelect"></select>
-      </div>
-      <div class="field">
-        <label>Tiles</label>
-        <div class="swatches" id="tileSwatches"></div>
-      </div>
-      <div class="cardFooter">
-        <button class="btn primary" id="doneTerrainModal">Done</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="characterModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Add Character</strong>
-        <button class="btn" id="closeCharacterModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Type</label>
-        <select id="characterTypeSelect">
-          <option value="#9b59b6" selected>NPC (Purple)</option>
-          <option value="#3498db">Player (Blue)</option>
-          <option value="#e67e22">Boss (Orange)</option>
-          <option value="#2ecc71">Merchant (Green)</option>
-          <option value="#f1c40f">Quest (Gold)</option>
-        </select>
-      </div>
-      <div class="help">Tap <b>Select</b> to enter Place mode, then tap empty cells in the grid.</div>
-      <div class="cardFooter">
-        <button class="btn" id="cancelCharacterPick">Cancel</button>
-        <button class="btn primary" id="selectCharacterPick">Select</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="characterInfoModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Character Info</strong>
-        <button class="btn" id="closeCharInfo">✕</button>
-      </div>
-      <div class="field">
-        <label>Name</label>
-        <input id="charNameInput" placeholder="Enter character name" />
-      </div>
-      <div class="cardFooter">
-        <button class="btn" id="cancelCharInfo">Cancel</button>
-        <button class="btn primary" id="saveCharInfo">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="mapsModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Maps</strong>
-        <button class="btn" id="closeMapsModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Create new map</label>
-        <input id="newMapName" placeholder="Map name (e.g., Region 1)" />
-      </div>
-      <div class="cardFooter">
-        <button class="btn primary" id="createMapBtn">Create Map</button>
-      </div>
-      <div class="help">Tip: Each map stores its own Terrain, Collision, and Characters.</div>
-    </div>
-  </div>
-
-  <script>
-  // PWA: register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+function renderGrid(id){
+  const g=document.getElementById(id); g.innerHTML='';
+  for(let i=0;i<120;i++){
+    const c=document.createElement('div'); c.className='cell';
+    if(id!=='characterGrid'){c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)}};
+    g.appendChild(c);
   }
+}
+renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
+renderGrid('characterGrid');
 
-  const STORAGE_KEY = 'rpg_dream_state_singleA_v1';
-  const GRID_SIZE = 120;
+// === Character Grid Override (C.3 Unlimited) ===
+const characterGrid = document.getElementById('characterGrid');
+[...characterGrid.children].forEach((cell, i) => {
+  cell.onclick = () => {
+    if (!characterPlacementArmed) return;
 
-  const BIOMES = {
-    plains: ['#4caf50','#8b5a2b','#777'],
-    desert: ['#c2b280','#a67b5b','#8c7a3a'],
-    tropical: ['#2ecc71','#27ae60','#1abc9c'],
-    volcanic: ['#2c3e50','#e74c3c','#7f8c8d'],
-    wetlands: ['#16a085','#2ecc71','#5d6d7e'],
-    grassland: ['#7dce82','#5dbb63','#2e7d32']
+    if (characters.has(i)) {
+      characters.delete(i);
+      cell.classList.remove('filled');
+    } else {
+      characters.add(i);
+      cell.classList.add('filled');
+      cell.style.setProperty('--tile-color', selectedCharacterColor);
+    }
   };
+});
 
-  let state;
+updateCurrent();
 
-  function uid() {
-    return 'm_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
-  }
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(t.dataset.tab).classList.add('active');
+});
+document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
 
-  function defaultMap(name='Map 1') {
-    return {
-      id: uid(),
-      name,
-      terrain: Array(GRID_SIZE).fill(null),
-      collision: Array(GRID_SIZE).fill(false),
-      characters: {}
-    };
-  }
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) throw new Error('no state');
-      const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.maps) || !parsed.activeMapId) throw new Error('bad state');
-      return parsed;
-    } catch {
-      const m = defaultMap();
-      return {
-        maps:[m],
-        activeMapId:m.id,
-        currentBiome:'plains',
-        currentTile: BIOMES.plains[0],
-      };
-    }
-  }
+// === Character Modal (C.5 UI-only) ===
+const characterModal = document.getElementById('characterModal');
+const characterTypeSelect = document.getElementById('characterType');
 
-  let saveTimer = null;
-  function saveStateDebounced() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {} 
-    }, 120);
-  }
+document.getElementById('addCharacter').onclick = () => {
+  characterModal.classList.add('open');
+};
 
-  function getActiveMap() {
-    return state.maps.find(m => m.id === state.activeMapId) || state.maps[0];
-  }
+document.getElementById('closeCharacter').onclick =
+document.getElementById('cancelCharacter').onclick = () => {
+  characterModal.classList.remove('open');
+};
 
-  const tabs = Array.from(document.querySelectorAll('.tab'));
-  const panels = {
-    terrain: document.getElementById('terrain'),
-    collision: document.getElementById('collision'),
-    characters: document.getElementById('characters'),
-  };
+document.getElementById('selectCharacter').onclick = () => {
+  characterPlacementArmed = true;
+  selectedCharacterColor = characterTypeSelect.value;
+  characterModal.classList.remove('open');
+};
 
-  const terrainGrid = document.getElementById('terrainGrid');
-  const collisionGrid = document.getElementById('collisionGrid');
-  const characterGrid = document.getElementById('characterGrid');
 
-  const currentTileDot = document.getElementById('currentTileDot');
-  const terrainPaletteBtn = document.getElementById('terrainPaletteBtn');
-  const terrainModal = document.getElementById('terrainModal');
-  const closeTerrainModal = document.getElementById('closeTerrainModal');
-  const doneTerrainModal = document.getElementById('doneTerrainModal');
-  const biomeSelect = document.getElementById('biomeSelect');
-  const tileSwatches = document.getElementById('tileSwatches');
-
-  const addCharacterBtn = document.getElementById('addCharacterBtn');
-  const deleteCharacterBtn = document.getElementById('deleteCharacterBtn');
-  const modeText = document.getElementById('modeText');
-  const characterModal = document.getElementById('characterModal');
-  const closeCharacterModal = document.getElementById('closeCharacterModal');
-  const cancelCharacterPick = document.getElementById('cancelCharacterPick');
-  const selectCharacterPick = document.getElementById('selectCharacterPick');
-  const characterTypeSelect = document.getElementById('characterTypeSelect');
-
-  const characterInfoModal = document.getElementById('characterInfoModal');
-  const closeCharInfo = document.getElementById('closeCharInfo');
-  const cancelCharInfo = document.getElementById('cancelCharInfo');
-  const saveCharInfo = document.getElementById('saveCharInfo');
-  const charNameInput = document.getElementById('charNameInput');
-
-  const mapSelect = document.getElementById('mapSelect');
-  const mapsBtn = document.getElementById('mapsBtn');
-  const mapsModal = document.getElementById('mapsModal');
-  const closeMapsModal = document.getElementById('closeMapsModal');
-  const newMapName = document.getElementById('newMapName');
-  const createMapBtn = document.getElementById('createMapBtn');
-
-  const exportBtn = document.getElementById('exportBtn');
-  const importFile = document.getElementById('importFile');
-
-  function setTab(key) {
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === key));
-    Object.keys(panels).forEach(k => panels[k].classList.toggle('active', k === key));
-  }
-  tabs.forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
-
-  function openModal(el) { el.classList.add('open'); el.setAttribute('aria-hidden','false'); }
-  function closeModal(el) { el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
-
-  function renderBiomeOptions() {
-    biomeSelect.innerHTML = '';
-    Object.keys(BIOMES).forEach(b => {
-      const opt = document.createElement('option');
-      opt.value = b;
-      opt.textContent = b;
-      if (b === state.currentBiome) opt.selected = true;
-      biomeSelect.appendChild(opt);
-    });
-  }
-
-  function renderSwatches() {
-    tileSwatches.innerHTML = '';
-    BIOMES[state.currentBiome].forEach(c => {
-      const b = document.createElement('button');
-      b.className = 'swatch';
-      b.style.setProperty('--c', c);
-      b.addEventListener('click', () => {
-        state.currentTile = c;
-        currentTileDot.style.background = c;
-        saveStateDebounced();
-      });
-      tileSwatches.appendChild(b);
-    });
-  }
-
-  terrainPaletteBtn.addEventListener('click', () => {
-    renderBiomeOptions();
-    renderSwatches();
-    openModal(terrainModal);
-  });
-  closeTerrainModal.addEventListener('click', () => closeModal(terrainModal));
-  doneTerrainModal.addEventListener('click', () => closeModal(terrainModal));
-
-  biomeSelect.addEventListener('change', () => {
-    state.currentBiome = biomeSelect.value;
-    state.currentTile = BIOMES[state.currentBiome][0];
-    currentTileDot.style.background = state.currentTile;
-    renderSwatches();
-    saveStateDebounced();
-  });
-
-  function renderMapSelect() {
-    mapSelect.innerHTML = '';
-    state.maps.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.name;
-      if (m.id === state.activeMapId) opt.selected = true;
-      mapSelect.appendChild(opt);
-    });
-  }
-
-  function switchMap(id) {
-    state.activeMapId = id;
-    renderAll();
-    saveStateDebounced();
-  }
-
-  mapSelect.addEventListener('change', () => switchMap(mapSelect.value));
-
-  mapsBtn.addEventListener('click', () => {
-    newMapName.value = '';
-    openModal(mapsModal);
-  });
-  closeMapsModal.addEventListener('click', () => closeModal(mapsModal));
-
-  createMapBtn.addEventListener('click', () => {
-    const name = (newMapName.value || '').trim() || `Map ${state.maps.length+1}`;
-    const m = defaultMap(name);
-    state.maps.push(m);
-    state.activeMapId = m.id;
-    renderMapSelect();
-    renderAll();
-    saveStateDebounced();
-    closeModal(mapsModal);
-  });
-
-  exportBtn.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `rpg_dream_export_C.6d-SINGLE-A.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
-
-  importFile.addEventListener('change', async () => {
-    const f = importFile.files && importFile.files[0];
-    if (!f) return;
-    try {
-      const txt = await f.text();
-      const parsed = JSON.parse(txt);
-      if (!parsed || !Array.isArray(parsed.maps)) throw new Error('bad import');
-      state = parsed;
-      if (!state.maps.some(m => m.id === state.activeMapId)) state.activeMapId = state.maps[0] ? state.maps[0].id : defaultMap().id;
-      renderMapSelect();
-      renderAll();
-      saveStateDebounced();
-    } catch {
-      alert('Import failed: file is not a valid RPG DREAM export.');
-    } finally {
-      importFile.value = '';
-    }
-  });
-
-  let charMode = 'select'; // select | place | delete | edit
-  let pendingCharColor = '#9b59b6';
-  let editIndex = null;
-
-  function setCharMode(next) {
-    charMode = next;
-    modeText.textContent = next.charAt(0).toUpperCase() + next.slice(1);
-    addCharacterBtn.classList.toggle('active', next === 'place');
-    deleteCharacterBtn.classList.toggle('active', next === 'delete');
-  }
-
-  addCharacterBtn.addEventListener('click', () => {
-    openModal(characterModal);
-  });
-
-  closeCharacterModal.addEventListener('click', () => closeModal(characterModal));
-  cancelCharacterPick.addEventListener('click', () => closeModal(characterModal));
-  selectCharacterPick.addEventListener('click', () => {
-    pendingCharColor = characterTypeSelect.value;
-    closeModal(characterModal);
-    setCharMode('place');
-  });
-
-  deleteCharacterBtn.addEventListener('click', () => {
-    setCharMode(charMode === 'delete' ? 'select' : 'delete');
-  });
-
-  function openCharInfo(i) {
-    const m = getActiveMap();
-    editIndex = i;
-    const entry = m.characters[String(i)] || {color:'#9b59b6', name:''};
-    charNameInput.value = entry.name || '';
-    setCharMode('edit');
-    openModal(characterInfoModal);
-  }
-
-  function closeCharInfoModal() {
-    closeModal(characterInfoModal);
-    setCharMode('select');
-    editIndex = null;
-  }
-
-  closeCharInfo.addEventListener('click', closeCharInfoModal);
-  cancelCharInfo.addEventListener('click', closeCharInfoModal);
-  saveCharInfo.addEventListener('click', () => {
-    if (editIndex === null) { closeCharInfoModal(); return; }
-    const m = getActiveMap();
-    const key = String(editIndex);
-    if (!m.characters[key]) m.characters[key] = {color: pendingCharColor, name:''};
-    m.characters[key].name = (charNameInput.value || '').trim();
-    saveStateDebounced();
-    closeCharInfoModal();
-  });
-
-  function buildGrid(el, onTap) {
-    el.innerHTML = '';
-    for (let i=0; i<GRID_SIZE; i++) {
-      const c = document.createElement('div');
-      c.className = 'cell';
-      c.addEventListener('click', () => onTap(i, c));
-      el.appendChild(c);
-    }
-  }
-
-  function renderAll() {
-    renderMapSelect();
-    currentTileDot.style.background = state.currentTile;
-
-    const m = getActiveMap();
-
-    for (let i=0; i<GRID_SIZE; i++) {
-      const cell = terrainGrid.children[i];
-      const col = m.terrain[i];
-      if (col) {
-        cell.classList.add('filled');
-        cell.style.background = col;
-      } else {
-        cell.classList.remove('filled');
-        cell.style.background = '';
-      }
-    }
-
-    for (let i=0; i<GRID_SIZE; i++) {
-      const cell = collisionGrid.children[i];
-      const blocked = !!m.collision[i];
-      cell.classList.toggle('blocked', blocked);
-    }
-
-    for (let i=0; i<GRID_SIZE; i++) {
-      const cell = characterGrid.children[i];
-      const entry = m.characters[String(i)];
-      const has = !!entry;
-      cell.classList.toggle('character', has);
-      cell.style.setProperty('--char', has ? entry.color : '');
-      cell.classList.remove('selected');
-    }
-  }
-
-  buildGrid(terrainGrid, (i, cell) => {
-    const m = getActiveMap();
-    m.terrain[i] = state.currentTile;
-    cell.classList.add('filled');
-    cell.style.background = state.currentTile;
-    saveStateDebounced();
-  });
-
-  buildGrid(collisionGrid, (i, cell) => {
-    const m = getActiveMap();
-    m.collision[i] = !m.collision[i];
-    cell.classList.toggle('blocked', m.collision[i]);
-    saveStateDebounced();
-  });
-
-  buildGrid(characterGrid, (i, cell) => {
-    const m = getActiveMap();
-    const key = String(i);
-
-    if (charMode === 'edit') return;
-
-    if (charMode === 'delete') {
-      if (m.characters[key]) {
-        delete m.characters[key];
-        saveStateDebounced();
-        renderAll();
-      }
-      return;
-    }
-
-    if (charMode === 'place') {
-      if (!m.characters[key]) {
-        m.characters[key] = {color: pendingCharColor, name:''};
-        saveStateDebounced();
-        renderAll();
-      }
-      return;
-    }
-
-    if (m.characters[key]) {
-      for (let j=0; j<GRID_SIZE; j++) characterGrid.children[j].classList.remove('selected');
-      cell.classList.add('selected');
-      openCharInfo(i);
-    }
-  });
-
-  state = loadState();
-  if (!state.currentBiome) state.currentBiome = 'plains';
-  if (!state.currentTile) state.currentTile = (BIOMES[state.currentBiome] && BIOMES[state.currentBiome][0]) || BIOMES.plains[0];
-  if (!Array.isArray(state.maps) || state.maps.length === 0) {
-    const m = defaultMap();
-    state.maps = [m];
-    state.activeMapId = m.id;
-  }
-
-  // Ensure each map has required arrays
-  state.maps.forEach(m => {
-    if (!Array.isArray(m.terrain) || m.terrain.length !== GRID_SIZE) m.terrain = Array(GRID_SIZE).fill(null);
-    if (!Array.isArray(m.collision) || m.collision.length !== GRID_SIZE) m.collision = Array(GRID_SIZE).fill(false);
-    if (!m.characters || typeof m.characters !== 'object') m.characters = {};
-  });
-
-  renderMapSelect();
-  setCharMode('select');
-  renderAll();
-
-  // Fill placeholder phase in export filename
-  // (static replacement for the template marker)
-  // Not strictly necessary for functionality.
-  </script>
+// C.6.e guard: Info requires a selected character
+function canOpenInfo(){
+  return !!window.selectedCharacterId;
+}
+</script>
 </body>
 </html>
