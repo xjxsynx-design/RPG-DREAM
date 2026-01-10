@@ -47,6 +47,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 <header><div>RPG DREAM</div><div>offline • loaded</div></header>
 <div class="tabs">
   <button class="tab active" data-tab="terrain">Terrain</button>
+<button id="eraseCharacter" class="btn">Erase Character</button>
   <button class="tab" data-tab="collision">Collision</button>
   <button class="tab" data-tab="characters">Characters</button>
 </div>
@@ -112,7 +113,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6b</footer>
+<footer>RPG DREAM • Phase C.6c</footer>
 
 <script>
 
@@ -122,6 +123,8 @@ const characterIds = new Map();
 const characterNames = new Map();
 let characterIdCounter = 1;
 let selectedCharacterIndex = null;
+let characterEraseArmed = false;
+
 let selectedCharacterColor = '#9b59b6';
 let characterPlacementArmed = false;
 
@@ -270,6 +273,44 @@ const cg = document.getElementById('characterGrid');
     }
     // selection mode
     [...cg.children].forEach(el=>el.classList.remove('character-selected'));
+    if (characters.has(i)){
+      cell.classList.add('character-selected');
+      openCharInfoAt(i);
+    }
+  };
+});
+
+
+// === C.6c Character Erase Mode ===
+const eraseBtn = document.getElementById('eraseCharacter');
+eraseBtn.onclick = () => {
+  characterEraseArmed = !characterEraseArmed;
+  // Turning on erase disables placement
+  if (characterEraseArmed) characterPlacementArmed = false;
+  eraseBtn.classList.toggle('primary', characterEraseArmed);
+};
+
+
+// === C.6c Exclusive Mode Guard (Erase > Place > Select) ===
+const cg2 = document.getElementById('characterGrid');
+[...cg2.children].forEach((cell, i) => {
+  const prev = cell.onclick;
+  cell.onclick = (e) => {
+    // Erase mode
+    if (characterEraseArmed){
+      if (characters.has(i)){
+        characters.delete(i);
+        cell.classList.remove('filled','character-selected');
+      }
+      return;
+    }
+    // Place mode
+    if (characterPlacementArmed){
+      prev && prev(e);
+      return;
+    }
+    // Select mode
+    [...cg2.children].forEach(el=>el.classList.remove('character-selected'));
     if (characters.has(i)){
       cell.classList.add('character-selected');
       openCharInfoAt(i);
