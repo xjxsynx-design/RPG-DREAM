@@ -69,24 +69,13 @@
     .cardFooter{display:flex; gap:10px; justify-content:flex-end; margin-top:14px;}
     .help{font-size:12px; color:rgba(154,166,214,.95); line-height:1.3; margin-top:10px;}
   
-/* FINAL C.6.e UI fixes */
-.characters-header{
-  display:flex;
-  align-items:center;
-  gap:12px; /* keep Done close to label */
-}
-.characters-header .done-btn{
-  margin-left:8px;
-}
-.character-controls{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-top:6px;
-}
-.map-actions .btn{
-  font-size:0.9rem;
-}
+/* C6e CONFIRMED LAYOUT PATCH */
+header h1 { text-align:center; }
+.map-selector { display:flex; justify-content:center; margin:8px 0; }
+.map-actions { display:flex; justify-content:center; gap:10px; flex-wrap:nowrap; }
+.characters-header { display:flex; align-items:center; gap:10px; }
+.character-controls { display:flex; justify-content:center; gap:10px; margin:6px 0; }
+footer.phase { position:relative; left:0; text-align:left; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -140,7 +129,7 @@
 </div>
 </section>
 <section class="panel" id="characters" role="tabpanel">
-<div class="sectionTitle">
+<div class="character-controls"><button class="btn ok" id="addCharacterBtn">Add</button><button class="btn danger" id="deleteCharacterBtn">Delete</button></div><div class="sectionTitle">
 <div class="characters-header"><h3>Characters</h3></div>
 <div class="row" style="width:100%; justify-content:space-between;">
 <div class="row">
@@ -161,7 +150,7 @@
 <b>Place:</b> choose a character type/color, then tap empty cells.<br/>
 <b>Delete:</b> tap placed characters to remove.
       </div>
-<div class="character-controls"><button class="btn ok" id="addCharacterBtn">Add</button><button class="btn danger" id="deleteCharacterBtn">Delete</button></div></section>
+</section>
 <div class="footer">RPG DREAM • Phase C.6d-SINGLE-A</div>
 </div>
 <div aria-hidden="true" class="modal" id="terrainModal">
