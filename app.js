@@ -1,66 +1,60 @@
-console.log('app.js loaded');
-
-const TILE=32;
-const State={mode:'terrain',biome:'Plains',tile:'Grass',map:{w:20,h:15,tiles:{}}};
-const Biomes=['Plains','Desert','Tropical','Volcanic','Wetlands'];
-const Tiles=['Grass','Water','Dirt','Stone'];
-
-const canvas=document.getElementById('mapCanvas');
-const ctx=canvas.getContext('2d');
-
-function resize(){canvas.width=canvas.clientWidth;canvas.height=canvas.clientHeight;draw()}
-window.addEventListener('resize',resize);
-
-function bindUI(){
- document.querySelectorAll('.mode-btn').forEach(b=>{
-  b.onclick=()=>{
-   State.mode=b.dataset.mode;
-   document.querySelectorAll('.mode-btn').forEach(x=>x.classList.toggle('active',x===b));
-  };
- });
-}
-
-function buildPalettes(){
- const bb=document.getElementById('biomes');
- const tb=document.getElementById('tiles');
- Biomes.forEach(b=>{
-  const e=document.createElement('div');
-  e.className='chip'+(b===State.biome?' active':'');
-  e.textContent=b;
-  e.onclick=()=>{State.biome=b;document.querySelectorAll('#biomes .chip').forEach(c=>c.classList.toggle('active',c===e))};
-  bb.appendChild(e);
- });
- Tiles.forEach(t=>{
-  const e=document.createElement('div');
-  e.className='chip'+(t===State.tile?' active':'');
-  e.textContent=t;
-  e.onclick=()=>{State.tile=t;document.querySelectorAll('#tiles .chip').forEach(c=>c.classList.toggle('active',c===e))};
-  tb.appendChild(e);
- });
-}
-
-canvas.onclick=e=>{
- if(State.mode!=='terrain')return;
- const r=canvas.getBoundingClientRect();
- const x=Math.floor((e.clientX-r.left)/TILE);
- const y=Math.floor((e.clientY-r.top)/TILE);
- State.map.tiles[`${x},${y}`]=State.tile;
- draw();
+const State = {
+  mode: "terrain",
+  characters: [],
+  activeCharacterId: null
 };
 
-function draw(){
- ctx.clearRect(0,0,canvas.width,canvas.height);
- for(let y=0;y<State.map.h;y++){
-  for(let x=0;x<State.map.w;x++){
-   ctx.strokeStyle='#1f2937';
-   ctx.strokeRect(x*TILE,y*TILE,TILE,TILE);
-   const k=`${x},${y}`;
-   if(State.map.tiles[k]){
-    ctx.fillStyle={Grass:'#16a34a',Water:'#2563eb',Dirt:'#92400e',Stone:'#6b7280'}[State.map.tiles[k]];
-    ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
-   }
-  }
- }
+const tabs = document.querySelectorAll(".tab");
+tabs.forEach(btn => {
+  btn.onclick = () => setMode(btn.dataset.mode);
+});
+
+function setMode(mode) {
+  State.mode = mode;
+  tabs.forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+  document.getElementById("terrainPanel").classList.toggle("hidden", mode !== "terrain");
+  document.getElementById("charactersPanel").classList.toggle("hidden", mode !== "characters");
 }
 
-window.addEventListener('DOMContentLoaded',()=>{bindUI();buildPalettes();resize()});
+document.getElementById("addCharacterBtn").onclick = () => {
+  const id = "char_" + Math.random().toString(36).slice(2, 6);
+  State.characters.push({ id, name: "New Character" });
+  State.activeCharacterId = id;
+  renderCharacters();
+};
+
+function renderCharacters() {
+  const list = document.getElementById("characterList");
+  list.innerHTML = "";
+  State.characters.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "pill";
+    btn.textContent = c.name;
+    btn.onclick = () => State.activeCharacterId = c.id;
+    list.appendChild(btn);
+  });
+}
+
+// simple grid render
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const TILE = 40;
+
+function drawGrid() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = "#1f2937";
+  for (let x = 0; x < canvas.width; x += TILE) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = 0; y < canvas.height; y += TILE) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
+drawGrid();

@@ -1,42 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RPG DREAM</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-<div id="ui">
-  <div id="toolbar">
-    <button class="mode-btn active" data-mode="terrain">Terrain</button>
-    <button class="mode-btn" data-mode="collision">Collision</button>
-    <button class="mode-btn" data-mode="characters">Characters</button>
-  </div>
+  <div id="app">
+    <div class="top-tabs">
+      <button data-mode="terrain" class="tab active">Terrain</button>
+      <button data-mode="collision" class="tab">Collision</button>
+      <button data-mode="characters" class="tab">Characters</button>
+    </div>
 
-  <div class="panel">
-    <div class="label">Biome</div>
-    <div id="biomes" class="row"></div>
+    <div id="terrainPanel" class="panel">
+      <h3>Biome</h3>
+      <div class="row">
+        <button class="pill active">Plains</button>
+        <button class="pill">Desert</button>
+        <button class="pill">Tropical</button>
+        <button class="pill">Volcanic</button>
+        <button class="pill">Wetlands</button>
+      </div>
 
-    <div class="label">Terrain</div>
-    <div id="tiles" class="row"></div>
-  </div>
+      <h3>Terrain</h3>
+      <div class="row">
+        <button class="pill active">Grass</button>
+        <button class="pill">Water</button>
+        <button class="pill">Dirt</button>
+        <button class="pill">Stone</button>
+      </div>
+    </div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div class="label">Maps</div>
-      <button id="addMap" class="primary">+ Add</button>
+    <div id="charactersPanel" class="panel hidden">
+      <div class="panel-header">
+        <h3>Characters</h3>
+        <button id="addCharacterBtn">+ Add Character</button>
+      </div>
+      <div id="characterList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Maps</h3>
+        <button id="addMapBtn">+ Add</button>
+      </div>
+    </div>
+
+    <div class="panel editor">
+      <canvas id="canvas" width="400" height="400"></canvas>
     </div>
   </div>
 
-  <div class="panel">
-    <div class="label">Editor</div>
-    <div id="mapViewport">
-      <canvas id="mapCanvas"></canvas>
-    </div>
-  </div>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
