@@ -38,6 +38,11 @@ border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
+
+/* === Character Mode Indicators (C.6d) === */
+.add-btn.active { background:#4caf50; color:#fff; }
+#deleteCharacter.active { background:#c0392b; color:#fff; }
+
 </style>
 </head>
 <body>
@@ -64,7 +69,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 
 <section id="characters">
   <h3>Characters</h3>
-  <button class="add-btn" id="addCharacter">+ Add Character</button>
+  <button class="add-btn" id="addCharacter">+ Add Character</button> <button id="deleteCharacter" class="btn danger">Delete Character</button>
   <div class="grid" id="characterGrid"></div>
 </section>
 
@@ -86,7 +91,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6c.4</footer>
+<footer>RPG DREAM • Phase C.6dc.4</footer>
 
 <script>
 
@@ -94,6 +99,13 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 const characters = new Set();
 
 
+
+
+// === Character State (C.6d) ===
+let characterPlacementArmed = false;
+let characterEraseArmed = false;
+let selectedCharacterIndex = null;
+const characterNames = new Map();
 // === Character Metadata (C.6c.4) ===
 const characterNames = new Map(); // index -> name
 let selectedCharacterIndex = null;
@@ -207,6 +219,50 @@ document.getElementById('saveCharInfo').onclick = () => {
     characterNames.set(selectedCharacterIndex, charNameInput.value || '');
   }
   closeCharInfo();
+};
+
+
+// === Character Info Modal Logic (C.6d) ===
+const charInfoModal = document.getElementById('characterInfoModal');
+const charNameInput = document.getElementById('charNameInput');
+
+function openCharInfoAt(index){
+  selectedCharacterIndex = index;
+  charNameInput.value = characterNames.get(index) || '';
+  charInfoModal.classList.add('open');
+}
+
+function closeCharInfo(){
+  charInfoModal.classList.remove('open');
+}
+
+document.getElementById('closeCharInfo').onclick =
+document.getElementById('cancelCharInfo').onclick = closeCharInfo;
+
+document.getElementById('saveCharInfo').onclick = () => {
+  if (selectedCharacterIndex !== null){
+    characterNames.set(selectedCharacterIndex, charNameInput.value || '');
+  }
+  closeCharInfo();
+};
+
+
+// === Character Controls (C.6d) ===
+const addBtn = document.getElementById('addCharacter');
+const delBtn = document.getElementById('deleteCharacter');
+
+addBtn.onclick = () => {
+  characterPlacementArmed = !characterPlacementArmed;
+  characterEraseArmed = false;
+  addBtn.classList.toggle('active', characterPlacementArmed);
+  delBtn.classList.remove('active');
+};
+
+delBtn.onclick = () => {
+  characterEraseArmed = !characterEraseArmed;
+  characterPlacementArmed = false;
+  delBtn.classList.toggle('active', characterEraseArmed);
+  addBtn.classList.remove('active');
 };
 
 </script>
