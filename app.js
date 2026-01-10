@@ -1,140 +1,73 @@
-/*
-  RPG DREAM - Camera Aware Baseline (Phase A)
-  - Camera exists but does NOT move yet
-  - Drawing is camera-aware (Camera.x/Camera.y offsets)
-  - Pointer math is camera-aware (pointerToGrid adds Camera offsets)
-  - Grid is camera-aware (grid lines use Camera modulo)
-  - No scroll / zoom yet (we'll add after this is stable)
-*/
-console.log('APP JS LOADED');
+console.log('app.js loaded');
+
 const TILE = 40;
+const GRID = 20;
 
-// --- Camera (does not move yet)
-const Camera = { x: 0, y: 0 };
-
-// --- Canvas setup
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-function resize() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-  drawAll();
-}
-window.addEventListener('resize', resize);
-
-// --- State (minimal, safe defaults)
 const State = {
-  mode: 'terrain', // 'terrain' | 'collision' | 'characters'
-  maps: [{
-    id: 'map_0',
-    w: 50,
-    h: 50,
-    tiles: {},      // "x,y" -> color
-    collision: {},  // "x,y" -> true
-    entities: []    // {x,y}
-  }],
-  activeMap: 0,
-  activeTile: 'Grass'
+  mode: 'terrain',
+  biome: 'plains',
+  tile: 'grass',
+  tiles: {}
 };
 
-function activeMap() {
-  return State.maps[State.activeMap];
+function bindUI() {
+  document.querySelectorAll('.mode').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.mode').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      State.mode = btn.id.replace('mode-', '');
+    };
+  });
+
+  document.querySelectorAll('#biomes button').forEach(btn => {
+    btn.onclick = () => State.biome = btn.dataset.biome;
+  });
+
+  document.querySelectorAll('#terrain button').forEach(btn => {
+    btn.onclick = () => State.tile = btn.dataset.tile;
+  });
 }
 
-// --- Pointer helpers
-function pointerPos(e, el) {
-  const r = el.getBoundingClientRect();
-  return { x: e.clientX - r.left, y: e.clientY - r.top };
-}
-
-function pointerToGrid(e, el) {
-  const p = pointerPos(e, el);
-  const worldX = p.x + Camera.x;
-  const worldY = p.y + Camera.y;
-  return { x: Math.floor(worldX / TILE), y: Math.floor(worldY / TILE) };
-}
-
-// --- Drawing
 function drawGrid() {
-  const w = canvas.width;
-  const h = canvas.height;
-
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 1;
-
-  // Vertical lines
-  for (let x = -(Camera.x % TILE); x < w; x += TILE) {
+  ctx.strokeStyle = '#222';
+  for (let x = 0; x <= GRID; x++) {
     ctx.beginPath();
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, h);
+    ctx.moveTo(x * TILE, 0);
+    ctx.lineTo(x * TILE, GRID * TILE);
     ctx.stroke();
   }
-  // Horizontal lines
-  for (let y = -(Camera.y % TILE); y < h; y += TILE) {
+  for (let y = 0; y <= GRID; y++) {
     ctx.beginPath();
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(w, y + 0.5);
+    ctx.moveTo(0, y * TILE);
+    ctx.lineTo(GRID * TILE, y * TILE);
     ctx.stroke();
   }
 }
 
 function drawTiles() {
-  const map = activeMap();
-  for (const key in map.tiles) {
+  for (const key in State.tiles) {
     const [x, y] = key.split(',').map(Number);
-    ctx.fillStyle = map.tiles[key];
-    ctx.fillRect(x * TILE - Camera.x, y * TILE - Camera.y, TILE, TILE);
+    ctx.fillStyle = '#3fa34d';
+    ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
   }
 }
 
-function drawCollision() {
-  const map = activeMap();
-  ctx.fillStyle = 'rgba(0,255,0,0.28)';
-  for (const key in map.collision) {
-    const [x, y] = key.split(',').map(Number);
-    ctx.fillRect(x * TILE - Camera.x, y * TILE - Camera.y, TILE, TILE);
-  }
-}
-
-function drawEntities() {
-  const map = activeMap();
-  ctx.fillStyle = '#4aa3ff';
-  for (const ent of map.entities) {
-    const px = ent.x * TILE - Camera.x;
-    const py = ent.y * TILE - Camera.y;
-    ctx.fillRect(px, py, TILE, TILE);
-  }
-}
-
-function drawAll() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid();
-  drawTiles();
-  if (State.mode === 'collision') drawCollision();
-  drawEntities();
-}
-
-// --- Input (minimal test: tap paints / collision / drops a block)
-canvas.addEventListener('pointerdown', (e) => {
-  const map = activeMap();
-  const g = pointerToGrid(e, canvas);
-
-  // bounds guard (optional)
-  if (g.x < 0 || g.y < 0 || g.x >= map.w || g.y >= map.h) return;
-
-  const key = g.x + ',' + g.y;
-
-  if (State.mode === 'terrain') {
-    map.tiles[key] = (State.activeTile === 'Grass') ? '#4caf50' : '#777';
-  } else if (State.mode === 'collision') {
-    map.collision[key] = true;
-  } else if (State.mode === 'characters') {
-    map.entities.push({ x: g.x, y: g.y });
-  }
-
-  drawAll();
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / TILE);
+  const y = Math.floor((e.clientY - rect.top) / TILE);
+  State.tiles[`${x},${y}`] = State.tile;
+  draw();
 });
 
-// --- Boot
-resize();
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawTiles();
+  drawGrid();
+}
+
+bindUI();
+draw();

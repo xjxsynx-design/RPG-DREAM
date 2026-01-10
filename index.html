@@ -1,84 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>RPG DREAM</title>
-  <link rel="stylesheet" href="style.css?v=62"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG DREAM – E3 Base</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="toolbar">
-    <button class="mode-btn active" data-mode="terrain">Terrain</button>
-    <button class="mode-btn" data-mode="collision">Collision</button>
-    <button class="mode-btn" data-mode="characters">Characters</button>
-    <button class="mode-btn" data-mode="charCollision">Collision & Anchor</button>
-  </div>
-  <!-- ADD: TERRAIN & BIOME PALETTES -->
-<div id="palette-bar">
-  <div class="palette-section">
-    <div class="palette-title">Biome</div>
-    <button class="biome-btn active" data-biome="plains">Plains</button>
-    <button class="biome-btn" data-biome="desert">Desert</button>
-    <button class="biome-btn" data-biome="tropical">Tropical</button>
-    <button class="biome-btn" data-biome="volcanic">Volcanic</button>
-    <button class="biome-btn" data-biome="wetlands">Wetlands</button>
+  <div id="topbar">
+    <button id="mode-terrain" class="mode active">Terrain</button>
+    <button id="mode-collision" class="mode">Collision</button>
+    <button id="mode-characters" class="mode">Characters</button>
   </div>
 
-  <div class="palette-section">
-    <div class="palette-title">Terrain</div>
-    <button class="tile-btn active" data-tile="grass">Grass</button>
-    <button class="tile-btn" data-tile="water">Water</button>
-    <button class="tile-btn" data-tile="dirt">Dirt</button>
-    <button class="tile-btn" data-tile="stone">Stone</button>
-  </div>
-</div>
-
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Maps</div>
-      <button id="addMap" class="primary">＋ Add</button>
+  <div id="palettes">
+    <div id="biomes">
+      <button data-biome="plains">Plains</button>
+      <button data-biome="desert">Desert</button>
+      <button data-biome="tropical">Tropical</button>
+      <button data-biome="volcanic">Volcanic</button>
+      <button data-biome="wetlands">Wetlands</button>
     </div>
-    <div id="mapList"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-header">
-      <div class="title">Editor</div>
-      <div id="hint" class="subtle"></div>
-    </div>
-
-    <div id="charactersUI" class="hidden">
-      <div class="row">
-        <button id="addChar" class="primary">＋ Add Character</button>
-        <button id="renameChar" class="ghost">Rename</button>
-      </div>
-      <div id="charList" style="margin-top:8px;"></div>
-      <div class="subtle" style="margin-top:8px;">
-        Select a character, then tap the map to place. Blocked tiles (Collision) prevent placement.
-      </div>
-    </div>
-
-    <div id="charCollisionUI" class="hidden">
-      <div class="row" style="justify-content:space-between;">
-        <div class="chip" id="caCharName">No character selected</div>
-        <button id="caDone" class="primary">Done</button>
-      </div>
-      <div class="subtle" style="margin:8px 0;">
-        <b class="g">Green</b> box = collision (snaps to whole tiles). Drag corners to resize, drag inside to move.
-        <b class="r">Red</b> dot = anchor (feet). Drag freely.
-      </div>
-      <div id="caViewport">
-        <canvas id="caCanvas"></canvas>
-      </div>
-    </div>
-
-    <div id="mapViewport">
-      <canvas id="mapCanvas"></canvas>
+    <div id="terrain">
+      <button data-tile="grass">Grass</button>
+      <button data-tile="water">Water</button>
+      <button data-tile="dirt">Dirt</button>
+      <button data-tile="stone">Stone</button>
     </div>
   </div>
 
-  <pre id="debug"></pre>
+  <canvas id="canvas" width="800" height="800"></canvas>
 
-  <script src="app.js?v=62"></script>
+  <script src="app.js"></script>
 </body>
 </html>
