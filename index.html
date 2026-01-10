@@ -47,7 +47,6 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 <header><div>RPG DREAM</div><div>offline • loaded</div></header>
 <div class="tabs">
   <button class="tab active" data-tab="terrain">Terrain</button>
-<button id="eraseCharacter" class="btn">Erase Character</button>
   <button class="tab" data-tab="collision">Collision</button>
   <button class="tab" data-tab="characters">Characters</button>
 </div>
@@ -68,7 +67,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 
 <section id="characters">
   <h3>Characters</h3>
-  <button class="add-btn" id="addCharacter">+ Add Character</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;"><button class="add-btn" id="addCharacter">+ Add Character</button><button id="eraseCharacter" class="btn">Erase Character</button></div>
   <div class="grid" id="characterGrid"></div>
 </section>
 
@@ -113,7 +112,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6c.1</footer>
+<footer>RPG DREAM • Phase C.6c.2</footer>
 
 <script>
 
@@ -214,6 +213,10 @@ document.getElementById('cancelCharacter').onclick = () => {
 
 document.getElementById('selectCharacter').onclick = () => {
   characterPlacementArmed = true;
+  // Selecting a character always exits erase mode
+  characterEraseArmed = false;
+  const eb = document.getElementById('eraseCharacter');
+  if (eb) eb.classList.remove('primary');
   selectedCharacterColor = characterTypeSelect.value;
   characterModal.classList.remove('open');
 };
@@ -244,37 +247,18 @@ document.getElementById('saveCharInfo').onclick = () => {
   closeCharInfo();
 };
 
-// Wrap existing character grid handlers to add selection when not placing
-const cg = document.getElementById('characterGrid');
-[...cg.children].forEach((cell, i) => {
-  const prev = cell.onclick;
-  cell.onclick = (e) => {
-    if (characterPlacementArmed){
-      prev && prev(e);
-      return;
-    }
-    // selection mode
-    [...cg.children].forEach(el=>el.classList.remove('character-selected'));
-    if (characters.has(i)){
-      cell.classList.add('character-selected');
-      openCharInfoAt(i);
-    }
-  };
-});
-
 
 // === C.6c Character Erase Mode ===
 const eraseBtn = document.getElementById('eraseCharacter');
-eraseBtn.onclick = () => {
+if (eraseBtn) eraseBtn.onclick = () => {
   characterEraseArmed = !characterEraseArmed;
   // Turning on erase disables placement
   if (characterEraseArmed) characterPlacementArmed = false;
   eraseBtn.classList.toggle('primary', characterEraseArmed);
 };
 
-
-
-
+// (eraseBtn may be null outside Characters section)
+}
 
 // === C.6c.1 Authoritative Character Grid Dispatcher ===
 const characterGrid = document.getElementById('characterGrid');
