@@ -1,9 +1,8 @@
 {
-  "name": "RPG World Builder",
-  "short_name": "RPG Builder",
-  "start_url": "index.html",
+  "name": "RPG DREAM",
+  "short_name": "RPGDREAM",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
-  "icons": []
+  "background_color": "#020617",
+  "theme_color": "#020617"
 }

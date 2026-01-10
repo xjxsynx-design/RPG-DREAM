@@ -1,42 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG DREAM</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-
-  <!-- MODE TABS -->
-  <div class="top-bar">
+<div id="ui">
+  <div id="toolbar">
     <button class="mode-btn active" data-mode="terrain">Terrain</button>
     <button class="mode-btn" data-mode="collision">Collision</button>
     <button class="mode-btn" data-mode="characters">Characters</button>
   </div>
 
-  <!-- PALETTE CARD -->
-  <div class="palette-card">
+  <div class="panel">
+    <div class="label">Biome</div>
+    <div id="biomes" class="row"></div>
 
-    <div class="palette-group">
-      <div class="palette-label">Biome</div>
-      <div class="palette-row" id="biomePalette"></div>
-    </div>
-
-    <div class="palette-group">
-      <div class="palette-label">Terrain</div>
-      <div class="palette-row" id="terrainPalette"></div>
-    </div>
-
+    <div class="label">Terrain</div>
+    <div id="tiles" class="row"></div>
   </div>
 
-  <!-- WORK AREA -->
-  <div class="workspace">
-
-    <div class="maps-panel">
-      <div class="maps-header">
-        <span>Maps</span>
-        <button id="addMapBtn">+ Add</button>
-      </div>
+  <div class="panel">
+    <div class="panel-header">
+      <div class="label">Maps</div>
+      <button id="addMap" class="primary">+ Add</button>
     </div>
-
-    <div class="editor-panel">
-      <canvas id="canvas"></canvas>
-    </div>
-
   </div>
 
-  <script src="app.js"></script>
+  <div class="panel">
+    <div class="label">Editor</div>
+    <div id="mapViewport">
+      <canvas id="mapCanvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
+</html>
