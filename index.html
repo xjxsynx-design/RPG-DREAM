@@ -1,14 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1020" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>RPG DREAM • Phase C.6d-SINGLE-A</title>
-  <link rel="manifest" href="manifest.json" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#0b1020" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>RPG DREAM • Phase C.6d-SINGLE-A</title>
+<link href="manifest.json" rel="manifest"/>
+<style>
     :root {
       --bg:#0b1020;
       --panel:#121a33;
@@ -67,168 +68,196 @@
     .swatch{width:34px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.20); background:var(--c);}
     .cardFooter{display:flex; gap:10px; justify-content:flex-end; margin-top:14px;}
     .help{font-size:12px; color:rgba(154,166,214,.95); line-height:1.3; margin-top:10px;}
-  </style>
+  
+/* === C.6.e PATCH (UI ONLY) === */
+
+/* Map section alignment */
+.topbar .row {
+  flex-wrap: wrap;
+}
+.map-block {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.map-actions {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  width:100%;
+}
+.map-actions .btn,
+.map-actions label.btn {
+  font-size:0.9rem;
+  padding:10px 12px;
+  flex:1;
+}
+
+/* Characters layout */
+.characters-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.character-controls {
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <strong>RPG DREAM</strong>
-        <small>Phase C.6d-SINGLE-A • Single-file runtime + PWA support</small>
-      </div>
-      <div class="row">
-        <div class="pill" title="Current map">
-          <span class="muted">Map</span>
-          <select id="mapSelect" aria-label="Map select"></select>
-        </div>
-        <button class="btn primary" id="mapsBtn">Maps</button>
-        <button class="btn" id="exportBtn">Export</button>
-        <label class="btn" style="cursor:pointer;">
+<div class="app">
+<div class="topbar">
+<div class="brand">
+<strong>RPG DREAM</strong>
+<small>Phase C.6d-SINGLE-A • Single-file runtime + PWA support</small>
+</div>
+<div class="row">
+
+
+
+
+<div class="map-block"><div class="pill" title="Current map">
+<span class="muted">Map</span>
+<select aria-label="Map select" id="mapSelect"></select>
+</div><div class="map-actions"><button class="btn primary" id="mapsBtn">Maps</button><label class="btn" style="cursor:pointer;">
           Import
-          <input id="importFile" type="file" accept="application/json" style="display:none" />
-        </label>
-      </div>
-    </div>
+          <input accept="application/json" id="importFile" style="display:none" type="file"/>
+</label><button class="btn" id="exportBtn">Export</button></div></div></div>
+</div>
+<div aria-label="Editor tabs" class="tabs" role="tablist">
+<button class="tab active" data-tab="terrain">Terrain</button>
+<button class="tab" data-tab="collision">Collision</button>
+<button class="tab" data-tab="characters">Characters</button>
+</div>
+<section class="panel active" id="terrain" role="tabpanel">
+<div class="sectionTitle">
+<h3>Terrain</h3>
+<div class="row">
+<div class="pill" title="Current tile">
+<span class="muted">Tile</span>
+<span class="dot" id="currentTileDot"></span>
+</div>
+<button class="btn primary" id="terrainPaletteBtn">Palette</button>
+</div>
+</div>
+<div class="gridWrap">
+<div aria-label="Terrain grid" class="grid" id="terrainGrid"></div>
+</div>
+<div class="help">Tap cells to paint. Use Palette to change biome and tile.</div>
+</section>
+<section class="panel" id="collision" role="tabpanel">
+<div class="sectionTitle">
+<h3>Collision</h3>
+<div class="help" style="margin:0">Tap to toggle blocked cells (red outline).</div>
+</div>
+<div class="gridWrap">
+<div aria-label="Collision grid" class="grid" id="collisionGrid"></div>
+</div>
+</section>
+<section class="panel" id="characters" role="tabpanel">
+<div class="sectionTitle">
+<div class="characters-header"><h3>Characters</h3><button class="btn" id="doneCharacterBtn">Done</button></div>
+<div class="row" style="width:100%; justify-content:space-between;">
+<div class="row">
 
-    <div class="tabs" role="tablist" aria-label="Editor tabs">
-      <button class="tab active" data-tab="terrain">Terrain</button>
-      <button class="tab" data-tab="collision">Collision</button>
-      <button class="tab" data-tab="characters">Characters</button>
-    </div>
 
-    <section class="panel active" id="terrain" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Terrain</h3>
-        <div class="row">
-          <div class="pill" title="Current tile">
-            <span class="muted">Tile</span>
-            <span class="dot" id="currentTileDot"></span>
-          </div>
-          <button class="btn primary" id="terrainPaletteBtn">Palette</button>
-        </div>
+</div>
+<div class="pill" id="modePill" title="Current character mode">
+<span class="muted">Mode</span>
+<span id="modeText" style="font-weight:900;">Select</span>
+</div>
+</div>
+<div class="character-controls"><button class="btn ok ok" id="addCharacterBtn">Add</button><button class="btn danger" id="deleteCharacterBtn">Delete</button><button class="btn" id="infoCharacterBtn">Info</button></div></div>
+<div class="gridWrap">
+<div aria-label="Character grid" class="grid" id="characterGrid"></div>
+</div>
+<div class="help">
+<b>Select:</b> tap a placed character to edit name.<br/>
+<b>Place:</b> choose a character type/color, then tap empty cells.<br/>
+<b>Delete:</b> tap placed characters to remove.
       </div>
-      <div class="gridWrap">
-        <div class="grid" id="terrainGrid" aria-label="Terrain grid"></div>
-      </div>
-      <div class="help">Tap cells to paint. Use Palette to change biome and tile.</div>
-    </section>
-
-    <section class="panel" id="collision" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Collision</h3>
-        <div class="help" style="margin:0">Tap to toggle blocked cells (red outline).</div>
-      </div>
-      <div class="gridWrap">
-        <div class="grid" id="collisionGrid" aria-label="Collision grid"></div>
-      </div>
-    </section>
-
-    <section class="panel" id="characters" role="tabpanel">
-      <div class="sectionTitle">
-        <h3>Characters</h3>
-        <div class="row" style="width:100%; justify-content:space-between;">
-          <div class="row">
-            <button class="btn ok" id="addCharacterBtn">Add Character</button>
-            <button class="btn danger" id="deleteCharacterBtn">Delete Character</button>
-          </div>
-          <div class="pill" id="modePill" title="Current character mode">
-            <span class="muted">Mode</span>
-            <span id="modeText" style="font-weight:900;">Select</span>
-          </div>
-        </div>
-      </div>
-      <div class="gridWrap">
-        <div class="grid" id="characterGrid" aria-label="Character grid"></div>
-      </div>
-      <div class="help">
-        <b>Select:</b> tap a placed character to edit name.<br/>
-        <b>Place:</b> choose a character type/color, then tap empty cells.<br/>
-        <b>Delete:</b> tap placed characters to remove.
-      </div>
-    </section>
-
-    <div class="footer">RPG DREAM • Phase C.6d-SINGLE-A</div>
-  </div>
-
-  <div class="modal" id="terrainModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Terrain Palette</strong>
-        <button class="btn" id="closeTerrainModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Biome</label>
-        <select id="biomeSelect"></select>
-      </div>
-      <div class="field">
-        <label>Tiles</label>
-        <div class="swatches" id="tileSwatches"></div>
-      </div>
-      <div class="cardFooter">
-        <button class="btn primary" id="doneTerrainModal">Done</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="characterModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Add Character</strong>
-        <button class="btn" id="closeCharacterModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Type</label>
-        <select id="characterTypeSelect">
-          <option value="#9b59b6" selected>NPC (Purple)</option>
-          <option value="#3498db">Player (Blue)</option>
-          <option value="#e67e22">Boss (Orange)</option>
-          <option value="#2ecc71">Merchant (Green)</option>
-          <option value="#f1c40f">Quest (Gold)</option>
-        </select>
-      </div>
-      <div class="help">Tap <b>Select</b> to enter Place mode, then tap empty cells in the grid.</div>
-      <div class="cardFooter">
-        <button class="btn" id="cancelCharacterPick">Cancel</button>
-        <button class="btn primary" id="selectCharacterPick">Select</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="characterInfoModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Character Info</strong>
-        <button class="btn" id="closeCharInfo">✕</button>
-      </div>
-      <div class="field">
-        <label>Name</label>
-        <input id="charNameInput" placeholder="Enter character name" />
-      </div>
-      <div class="cardFooter">
-        <button class="btn" id="cancelCharInfo">Cancel</button>
-        <button class="btn primary" id="saveCharInfo">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="mapsModal" aria-hidden="true">
-    <div class="card">
-      <div class="cardHeader">
-        <strong>Maps</strong>
-        <button class="btn" id="closeMapsModal">✕</button>
-      </div>
-      <div class="field">
-        <label>Create new map</label>
-        <input id="newMapName" placeholder="Map name (e.g., Region 1)" />
-      </div>
-      <div class="cardFooter">
-        <button class="btn primary" id="createMapBtn">Create Map</button>
-      </div>
-      <div class="help">Tip: Each map stores its own Terrain, Collision, and Characters.</div>
-    </div>
-  </div>
-
-  <script>
+</section>
+<div class="footer">RPG DREAM • Phase C.6d-SINGLE-A</div>
+</div>
+<div aria-hidden="true" class="modal" id="terrainModal">
+<div class="card">
+<div class="cardHeader">
+<strong>Terrain Palette</strong>
+<button class="btn" id="closeTerrainModal">✕</button>
+</div>
+<div class="field">
+<label>Biome</label>
+<select id="biomeSelect"></select>
+</div>
+<div class="field">
+<label>Tiles</label>
+<div class="swatches" id="tileSwatches"></div>
+</div>
+<div class="cardFooter">
+<button class="btn primary" id="doneTerrainModal">Done</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="modal" id="characterModal">
+<div class="card">
+<div class="cardHeader">
+<strong>Add Character</strong>
+<button class="btn" id="closeCharacterModal">✕</button>
+</div>
+<div class="field">
+<label>Type</label>
+<select id="characterTypeSelect">
+<option selected="" value="#9b59b6">NPC (Purple)</option>
+<option value="#3498db">Player (Blue)</option>
+<option value="#e67e22">Boss (Orange)</option>
+<option value="#2ecc71">Merchant (Green)</option>
+<option value="#f1c40f">Quest (Gold)</option>
+</select>
+</div>
+<div class="help">Tap <b>Select</b> to enter Place mode, then tap empty cells in the grid.</div>
+<div class="cardFooter">
+<button class="btn" id="cancelCharacterPick">Cancel</button>
+<button class="btn primary" id="selectCharacterPick">Select</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="modal" id="characterInfoModal">
+<div class="card">
+<div class="cardHeader">
+<strong>Character Info</strong>
+<button class="btn" id="closeCharInfo">✕</button>
+</div>
+<div class="field">
+<label>Name</label>
+<input id="charNameInput" placeholder="Enter character name"/>
+</div>
+<div class="cardFooter">
+<button class="btn" id="cancelCharInfo">Cancel</button>
+<button class="btn primary" id="saveCharInfo">Save</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="modal" id="mapsModal">
+<div class="card">
+<div class="cardHeader">
+<strong>Maps</strong>
+<button class="btn" id="closeMapsModal">✕</button>
+</div>
+<div class="field">
+<label>Create new map</label>
+<input id="newMapName" placeholder="Map name (e.g., Region 1)"/>
+</div>
+<div class="cardFooter">
+<button class="btn primary" id="createMapBtn">Create Map</button>
+</div>
+<div class="help">Tip: Each map stores its own Terrain, Collision, and Characters.</div>
+</div>
+</div>
+<script>
   // PWA: register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
@@ -621,6 +650,24 @@
   // Fill placeholder phase in export filename
   // (static replacement for the template marker)
   // Not strictly necessary for functionality.
-  </script>
+  
+/* === C.6.e behavior patch === */
+const doneCharacterBtn = document.getElementById('doneCharacterBtn');
+const infoCharacterBtn = document.getElementById('infoCharacterBtn');
+
+if (doneCharacterBtn) {
+  doneCharacterBtn.addEventListener('click', () => {
+    setCharMode('select'); // exits sub-modes only
+  });
+}
+
+if (infoCharacterBtn) {
+  infoCharacterBtn.addEventListener('click', () => {
+    // require selected character
+    if (editIndex === null) return;
+    openCharInfo(editIndex);
+  });
+}
+</script>
 </body>
 </html>
