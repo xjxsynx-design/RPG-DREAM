@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,90 +5,172 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG DREAM • Single-File Editor</title>
 <style>
+/* ===============================
+   PHASE A — UI POLISH (CSS ONLY)
+   Audited: No JS / No DOM changes
+   =============================== */
+
+:root {
+  --bg:#0d1117;
+  --panel:#161b22;
+  --panel-soft:#1b2230;
+  --panel-edge:#0b0f14;
+  --text:#e6edf3;
+  --muted:#9aa4af;
+
+  --btn:#21262d;
+  --btn-border:#30363d;
+  --btn-hover:#2a313c;
+  --btn-active:#2f81f7;
+
+  --accent:#2f81f7;
+  --accent-soft:#1f6feb;
+
+  --grid:#30363d;
+}
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  background-color: #0d1117;
-  color: #e6edf3;
-  font-family: system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
 }
+
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
-  background: #161b22;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+  border-bottom: 1px solid var(--panel-edge);
   font-weight: 600;
+  letter-spacing: .02em;
 }
+
+/* Tabs */
 .tabs {
   display: flex;
   justify-content: space-around;
-  margin: 10px;
+  margin: 12px;
+  gap: 8px;
 }
+
 button.tab {
-  background: #21262d;
-  border: none;
-  color: #c9d1d9;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 16px;
-  margin: 0 4px;
+  background: var(--btn);
+  border: 1px solid var(--btn-border);
+  color: var(--muted);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
+
+button.tab:hover {
+  background: var(--btn-hover);
+  color: var(--text);
+}
+
 button.tab.active {
-  background: #2f81f7;
-  color: white;
+  background: var(--btn-active);
+  color: #fff;
+  border-color: var(--accent-soft);
 }
+
+/* Sections */
 section {
   display: none;
   padding: 12px;
 }
+
 section.active {
   display: block;
 }
-.grid {
-  background: #0d1117;
+
+/* Panels */
+h3 {
+  margin: 12px 0 6px;
+  font-size: 14px;
+  letter-spacing: .04em;
+  color: #c9d1d9;
+}
+
+.biomes,
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Buttons */
+.biomes button,
+.palette button {
+  background: var(--btn);
+  border: 1px solid var(--btn-border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.biomes button:hover,
+.palette button:hover {
+  background: var(--btn-hover);
+}
+
+.biomes button.active,
+.palette button.active {
+  background: var(--accent);
+  border-color: var(--accent-soft);
+  color: #fff;
+}
+
+/* Add buttons */
+.add-btn {
+  margin: 10px 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-soft));
+  border: none;
+  color: white;
+  padding: 10px 16px;
   border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+
+.add-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* Grid */
+.grid {
+  background: #0b0f14;
+  border-radius: 12px;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: 32px;
   gap: 1px;
   margin-top: 12px;
+  border: 1px solid var(--panel-edge);
 }
+
 .cell {
   background: #161b22;
-  border: 1px solid #21262d;
+  border: 1px solid var(--grid);
 }
+
 .cell.filled {
   background: var(--tile-color);
 }
-.palette, .biomes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.palette button, .biomes button {
-  background: #21262d;
-  border: none;
-  color: #c9d1d9;
-  padding: 8px 16px;
-  border-radius: 8px;
-}
-.palette button.active, .biomes button.active {
-  background: #2f81f7;
-  color: white;
-}
-.add-btn {
-  margin: 8px 0;
-  background: #2f81f7;
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-}
+
+/* Footer */
 footer {
   text-align: center;
-  color: #8b949e;
-  font-size: 14px;
-  padding: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 14px;
+  border-top: 1px solid var(--panel-edge);
 }
 </style>
 </head>
