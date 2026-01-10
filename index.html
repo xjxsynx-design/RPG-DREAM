@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM · Phase C.2</title>
+<title>RPG DREAM · Phase C.2.1</title>
 
 <style>
 :root{
@@ -18,6 +18,11 @@ header{display:flex;justify-content:space-between;padding:14px 16px;border-botto
 .tab.active{background:var(--accent);color:#fff}
 .section{display:none;padding:12px}
 .section.active{display:block}
+.controls{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.btn{padding:8px 14px;border-radius:12px;background:#121a2a;border:1px solid var(--grid-line);color:#c6d4ff}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.armed{outline:2px solid #9b59b6}
+.status{opacity:.8}
 .grid{display:grid;grid-template-columns:repeat(16,1fr);gap:2px}
 .cell{aspect-ratio:1/1;background:#0e1525;border:1px solid var(--grid-line);position:relative}
 .cell.terrain{background:#4caf50}
@@ -35,7 +40,7 @@ footer{text-align:center;padding:12px;color:#9aa4af;border-top:1px solid var(--g
 
 <header>
   <div>RPG DREAM</div>
-  <div>Phase C.2</div>
+  <div>Phase C.2.1</div>
 </header>
 
 <div class="tabs">
@@ -45,10 +50,14 @@ footer{text-align:center;padding:12px;color:#9aa4af;border-top:1px solid var(--g
 </div>
 
 <div class="section active" id="editor">
+  <div class="controls" id="charControls" style="display:none">
+    <button id="addChar" class="btn primary">+ Add Character</button>
+    <span id="charStatus" class="status">Not armed</span>
+  </div>
   <div class="grid" id="grid"></div>
 </div>
 
-<footer>RPG DREAM · Phase C.2 · Character Placement Engine</footer>
+<footer>RPG DREAM · Phase C.2.1 · Character Placement Engine</footer>
 
 <script>
 /* ---------- ENGINE STATE ---------- */
@@ -56,7 +65,8 @@ const Engine = {
   mode: 'terrain',
   terrain: new Set(),
   collision: new Set(),
-  characters: new Set()
+  characters: new Set(),
+  charArmed: false
 };
 
 /* ---------- GRID ---------- */
@@ -67,19 +77,40 @@ for(let i=0;i<SIZE;i++){
   const cell = document.createElement('div');
   cell.className = 'cell';
   cell.dataset.i = i;
-
   cell.onclick = () => handlePaint(i, cell);
   grid.appendChild(cell);
 }
 
 /* ---------- MODE SWITCH ---------- */
+const charControls = document.getElementById('charControls');
 document.querySelectorAll('.tab').forEach(btn=>{
   btn.onclick = ()=>{
     document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     Engine.mode = btn.dataset.mode;
+    disarmCharacters();
+    charControls.style.display = (Engine.mode === 'characters') ? 'flex' : 'none';
   };
 });
+
+/* ---------- CHARACTER ARMING ---------- */
+const addCharBtn = document.getElementById('addChar');
+const charStatus = document.getElementById('charStatus');
+
+function armCharacters(){
+  Engine.charArmed = true;
+  addCharBtn.classList.add('armed');
+  charStatus.textContent = 'Tap grid to place';
+}
+function disarmCharacters(){
+  Engine.charArmed = false;
+  addCharBtn.classList.remove('armed');
+  charStatus.textContent = 'Not armed';
+}
+
+addCharBtn.onclick = ()=>{
+  Engine.charArmed ? disarmCharacters() : armCharacters();
+};
 
 /* ---------- PAINT LOGIC ---------- */
 function handlePaint(i, cell){
@@ -87,13 +118,11 @@ function handlePaint(i, cell){
     Engine.terrain.add(i);
     cell.classList.add('terrain');
   }
-
   if(Engine.mode === 'collision'){
     Engine.collision.add(i);
     cell.classList.add('collision');
   }
-
-  if(Engine.mode === 'characters'){
+  if(Engine.mode === 'characters' && Engine.charArmed){
     if(Engine.characters.has(i)){
       Engine.characters.delete(i);
       cell.classList.remove('character');
