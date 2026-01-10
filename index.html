@@ -6,179 +6,48 @@
 <title>RPG DREAM • Single-File Editor</title>
 <style>
 /* ===============================
-   PHASE A — UI POLISH (CSS ONLY)
-   Audited: No JS / No DOM changes
+   PHASE B — UX (Terrain Popup)
    =============================== */
-
 :root {
-  --bg:#0d1117;
-  --panel:#161b22;
-  --panel-soft:#1b2230;
-  --panel-edge:#0b0f14;
-  --text:#e6edf3;
-  --muted:#9aa4af;
-
-  --btn:#21262d;
-  --btn-border:#30363d;
-  --btn-hover:#2a313c;
-  --btn-active:#2f81f7;
-
-  --accent:#2f81f7;
-  --accent-soft:#1f6feb;
-
-  --grid:#30363d;
+  --bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;
+  --text:#e6edf3;--muted:#9aa4af;--btn:#21262d;--btn-h:#2a313c;
+  --accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d;
 }
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
-}
-
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
-  border-bottom: 1px solid var(--panel-edge);
-  font-weight: 600;
-  letter-spacing: .02em;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  margin: 12px;
-  gap: 8px;
-}
-
-button.tab {
-  background: var(--btn);
-  border: 1px solid var(--btn-border);
-  color: var(--muted);
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 15px;
-  transition: background .15s ease, color .15s ease, border-color .15s ease;
-}
-
-button.tab:hover {
-  background: var(--btn-hover);
-  color: var(--text);
-}
-
-button.tab.active {
-  background: var(--btn-active);
-  color: #fff;
-  border-color: var(--accent-soft);
-}
-
-/* Sections */
-section {
-  display: none;
-  padding: 12px;
-}
-
-section.active {
-  display: block;
-}
-
-/* Panels */
-h3 {
-  margin: 12px 0 6px;
-  font-size: 14px;
-  letter-spacing: .04em;
-  color: #c9d1d9;
-}
-
-.biomes,
-.palette {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Buttons */
-.biomes button,
-.palette button {
-  background: var(--btn);
-  border: 1px solid var(--btn-border);
-  color: var(--text);
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: background .15s ease, border-color .15s ease;
-}
-
-.biomes button:hover,
-.palette button:hover {
-  background: var(--btn-hover);
-}
-
-.biomes button.active,
-.palette button.active {
-  background: var(--accent);
-  border-color: var(--accent-soft);
-  color: #fff;
-}
-
-/* Add buttons */
-.add-btn {
-  margin: 10px 0;
-  background: linear-gradient(180deg, var(--accent), var(--accent-soft));
-  border: none;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  letter-spacing: .03em;
-}
-
-.add-btn:hover {
-  filter: brightness(1.05);
-}
-
-/* Grid */
-.grid {
-  background: #0b0f14;
-  border-radius: 12px;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: 32px;
-  gap: 1px;
-  margin-top: 12px;
-  border: 1px solid var(--panel-edge);
-}
-
-.cell {
-  background: #161b22;
-  border: 1px solid var(--grid);
-}
-
-.cell.filled {
-  background: var(--tile-color);
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-  padding: 14px;
-  border-top: 1px solid var(--panel-edge);
-}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;
+  background:linear-gradient(180deg,var(--panel),var(--panel-soft));border-bottom:1px solid var(--edge)}
+.tabs{display:flex;gap:8px;margin:12px}
+.tab{background:var(--btn);border:1px solid var(--grid);color:var(--muted);
+  padding:10px 18px;border-radius:10px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent-2)}
+section{display:none;padding:12px}
+section.active{display:block}
+h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9;letter-spacing:.04em}
+.grid{background:#0b0f14;border-radius:12px;display:grid;grid-template-columns:repeat(12,1fr);
+  grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
+.cell{background:#161b22;border:1px solid var(--grid)}
+.cell.filled{background:var(--tile-color)}
+.btn{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 14px;border-radius:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent-2)}
+.btn:hover{background:var(--btn-h)}
+.add-btn{margin:10px 0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
+  border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-card{background:var(--panel);border-radius:16px;width:min(520px,92vw);padding:14px;border:1px solid var(--edge)}
+.modal-header{display:flex;align-items:center;justify-content:space-between}
+.select{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 10px;border-radius:8px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.swatch{width:34px;height:34px;border-radius:8px;border:2px solid rgba(255,255,255,.25)}
+.swatch.active{outline:2px solid var(--accent)}
+.current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
 </style>
 </head>
 <body>
-<header>
-  <div>RPG DREAM</div>
-  <div>offline • loaded</div>
-</header>
+<header><div>RPG DREAM</div><div>offline • loaded</div></header>
 <div class="tabs">
   <button class="tab active" data-tab="terrain">Terrain</button>
   <button class="tab" data-tab="collision">Collision</button>
@@ -186,10 +55,9 @@ footer {
 </div>
 
 <section id="terrain" class="active">
-  <h3>Biome</h3>
-  <div class="biomes" id="biomes"></div>
-  <h3>Tiles</h3>
-  <div class="palette" id="palette"></div>
+  <h3>Terrain</h3>
+  <button class="btn primary" id="openTerrain">Open Terrain Palette</button>
+  <div class="current"><span>Current tile:</span><span id="currentTileBox" class="swatch"></span></div>
   <h3>Maps</h3>
   <button class="add-btn" id="addMap">+ Add Map</button>
   <div class="grid" id="terrainGrid"></div>
@@ -206,86 +74,85 @@ footer {
   <div class="grid" id="characterGrid"></div>
 </section>
 
-<footer>RPG DREAM • single-file offline editor</footer>
+<div class="modal" id="terrainModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Terrain Palette</strong>
+      <button class="btn" id="closeTerrain">Close</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Biome:</label>
+      <select id="biomeSelect" class="select"></select>
+    </div>
+    <div class="swatches" id="tileSwatches"></div>
+  </div>
+</div>
+
+<footer>RPG DREAM • Phase B</footer>
 
 <script>
-const biomes = {
-  plains: ['#4caf50', '#8b5a2b', '#777'],
-  desert: ['#c2b280', '#a67b5b', '#8c7a3a'],
-  tropical: ['#3cb371', '#2e8b57', '#20b2aa'],
-  volcanic: ['#4b3621', '#8b0000', '#ff4500'],
-  wetlands: ['#2f4f4f', '#3cb371', '#4682b4']
+const biomes={
+  plains:['#4caf50','#8b5a2b','#777'],
+  desert:['#c2b280','#a67b5b','#8c7a3a'],
+  tropical:['#3cb371','#2e8b57','#20b2aa'],
+  volcanic:['#4b3621','#8b0000','#ff4500'],
+  wetlands:['#2f4f4f','#3cb371','#4682b4']
 };
+let currentBiome='plains';
+let currentTile=biomes[currentBiome][0];
 
-let currentBiome = 'plains';
-let currentTile = biomes[currentBiome][0];
+const tileBox=document.getElementById('currentTileBox');
+const modal=document.getElementById('terrainModal');
+const biomeSelect=document.getElementById('biomeSelect');
+const swatches=document.getElementById('tileSwatches');
 
-function renderBiomes() {
-  const container = document.getElementById('biomes');
-  container.innerHTML = '';
-  Object.keys(biomes).forEach(b => {
-    const btn = document.createElement('button');
-    btn.textContent = b;
-    if (b === currentBiome) btn.classList.add('active');
-    btn.onclick = () => {
-      currentBiome = b;
-      currentTile = biomes[b][0];
-      renderBiomes();
-      renderPalette();
-    };
-    container.appendChild(btn);
+function renderBiomeSelect(){
+  biomeSelect.innerHTML='';
+  Object.keys(biomes).forEach(b=>{
+    const o=document.createElement('option');
+    o.value=b;o.textContent=b;o.selected=b===currentBiome;
+    biomeSelect.appendChild(o);
   });
 }
-
-function renderPalette() {
-  const container = document.getElementById('palette');
-  container.innerHTML = '';
-  biomes[currentBiome].forEach(color => {
-    const btn = document.createElement('button');
-    btn.style.backgroundColor = color;
-    btn.onclick = () => {
-      currentTile = color;
-      renderPalette();
-    };
-    if (color === currentTile) btn.classList.add('active');
-    container.appendChild(btn);
+function renderSwatches(){
+  swatches.innerHTML='';
+  biomes[currentBiome].forEach(c=>{
+    const s=document.createElement('div');
+    s.className='swatch'+(c===currentTile?' active':'');
+    s.style.background=c;
+    s.onclick=()=>{currentTile=c;updateCurrent();renderSwatches()};
+    swatches.appendChild(s);
   });
 }
+function updateCurrent(){
+  tileBox.style.background=currentTile;
+}
 
-function renderGrid(id) {
-  const grid = document.getElementById(id);
-  grid.innerHTML = '';
-  for (let i = 0; i < 120; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.onclick = () => {
-      cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', currentTile);
-    };
-    grid.appendChild(cell);
+document.getElementById('openTerrain').onclick=()=>{modal.classList.add('open')};
+document.getElementById('closeTerrain').onclick=()=>{modal.classList.remove('open')};
+biomeSelect.onchange=e=>{currentBiome=e.target.value;currentTile=biomes[currentBiome][0];renderSwatches();updateCurrent()};
+
+renderBiomeSelect();renderSwatches();updateCurrent();
+
+function renderGrid(id){
+  const g=document.getElementById(id);g.innerHTML='';
+  for(let i=0;i<120;i++){
+    const c=document.createElement('div');c.className='cell';
+    c.onclick=()=>{c.classList.add('filled');c.style.setProperty('--tile-color',currentTile)};
+    g.appendChild(c);
   }
 }
+renderGrid('terrainGrid');renderGrid('collisionGrid');renderGrid('characterGrid');
 
-function bindTabs() {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById(tab.dataset.tab).classList.add('active');
-    };
-  });
-}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(t.dataset.tab).classList.add('active');
+});
 
-document.getElementById('addMap').onclick = () => alert('Map added (stub)');
-document.getElementById('addCharacter').onclick = () => alert('Character added (stub)');
-
-renderBiomes();
-renderPalette();
-renderGrid('terrainGrid');
-renderGrid('collisionGrid');
-renderGrid('characterGrid');
-bindTabs();
+document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
+document.getElementById('addCharacter').onclick=()=>alert('Character added (stub)');
 </script>
 </body>
 </html>
