@@ -112,7 +112,25 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6c.2</footer>
+<footer>RPG DREAM • Phase C.6c.AUDITEDc.2</footer>
+
+<!-- Character Info Modal (C.6b) -->
+<div class="modal" id="characterInfoModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Character Info</strong>
+      <button class="btn" id="closeCharInfo">✕</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Name:</label>
+      <input id="charNameInput" class="select" placeholder="Enter name" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelCharInfo">Cancel</button>
+      <button class="btn primary" id="saveCharInfo">Save</button>
+    </div>
+  </div>
+</div>
 
 <script>
 
@@ -178,12 +196,13 @@ function renderGrid(id){
   const g=document.getElementById(id); g.innerHTML='';
   for(let i=0;i<120;i++){
     const c=document.createElement('div'); c.className='cell';
-    if(id!=='characterGrid'){c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)}};
+    if(id!=='characterGrid'){
+      c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)};
+    }
     g.appendChild(c);
   }
 }
-renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
-renderGrid('characterGrid');
+renderGrid('terrainGrid'); renderGrid('collisionGrid'); renderGrid('characterGrid');
 
 
 
@@ -258,7 +277,6 @@ if (eraseBtn) eraseBtn.onclick = () => {
 };
 
 // (eraseBtn may be null outside Characters section)
-}
 
 // === C.6c.1 Authoritative Character Grid Dispatcher ===
 const characterGrid = document.getElementById('characterGrid');
@@ -300,23 +318,7 @@ const characterGrid = document.getElementById('characterGrid');
 
 </script>
 
-<!-- Character Info Modal (C.6b) -->
-<div class="modal" id="characterInfoModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <strong>Character Info</strong>
-      <button class="btn" id="closeCharInfo">✕</button>
-    </div>
-    <div style="margin-top:10px">
-      <label>Name:</label>
-      <input id="charNameInput" class="select" placeholder="Enter name" />
-    </div>
-    <div class="modal-footer">
-      <button class="btn" id="cancelCharInfo">Cancel</button>
-      <button class="btn primary" id="saveCharInfo">Save</button>
-    </div>
-  </div>
-</div>
+
 
 </body>
 </html>
