@@ -6,7 +6,7 @@
   - Grid is camera-aware (grid lines use Camera modulo)
   - No scroll / zoom yet (we'll add after this is stable)
 */
-
+console.log('APP JS LOADED');
 const TILE = 40;
 
 // --- Camera (does not move yet)
