@@ -86,15 +86,13 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.4</footer>
+<footer>RPG DREAM • Phase B.1</footer>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
 
 // === Characters (C.3 Unlimited Instances) ===
-const characters = []; // { index, type }
+const characters = new Set();
 let characterPlacementArmed = false;
-let currentCharacterType = 'npc';
 
 const biomes={
   plains:['#4caf50','#8b5a2b','#777'],
@@ -154,7 +152,22 @@ function renderGrid(id){
 renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
 renderGrid('characterGrid');
 
+// === Character Grid Override (C.3 Unlimited) ===
+const characterGrid = document.getElementById('characterGrid');
+[...characterGrid.children].forEach((cell, i) => {
+  cell.onclick = () => {
+    if (!characterPlacementArmed) return;
 
+    if (characters.has(i)) {
+      characters.delete(i);
+      cell.classList.remove('filled');
+    } else {
+      characters.add(i);
+      cell.classList.add('filled');
+      cell.style.setProperty('--tile-color', '#9b59b6');
+    }
+  };
+});
 
 updateCurrent();
 
@@ -165,57 +178,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.getElementById(t.dataset.tab).classList.add('active');
 });
 document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
-document.getElementById('addCharacter').onclick = () => { openCharacterModal(); };
-
-// === C.4 Character Modal Logic ===
-function openCharacterModal(){
-  document.getElementById('characterModal').style.display='block';
-}
-function closeCharacterModal(){
-  document.getElementById('characterModal').style.display='none';
-}
-
-document.getElementById('confirmCharacter').onclick = () => {
-  currentCharacterType = document.getElementById('characterTypeSelect').value;
-  characterPlacementArmed = true;
-  closeCharacterModal();
-};
-
-// Extend character placement to store type
-[...characterGrid.children].forEach((cell, i) => {
-  cell.onclick = () => {
-    if (!characterPlacementArmed) return;
-
-    const idx = characters.findIndex(c => c.index === i);
-    if (idx >= 0) {
-      characters.splice(idx, 1);
-      cell.classList.remove('filled');
-    } else {
-      characters.push({ index: i, type: currentCharacterType });
-      cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', '#9b59b6');
-    }
-  };
-});
-
-});
+document.getElementById('addCharacter').onclick = () => { characterPlacementArmed = !characterPlacementArmed; };
 </script>
-
-<!-- Character Selection Modal (C.4) -->
-<div id="characterModal" class="modal" style="display:none">
-  <div class="modal-content">
-    <h3>Select Character</h3>
-    <select id="characterTypeSelect">
-      <option value="party">Party</option>
-      <option value="npc">NPC</option>
-      <option value="enemy">Enemy</option>
-    </select>
-    <div style="margin-top:10px">
-      <button id="confirmCharacter">Select</button>
-      <button onclick="closeCharacterModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
