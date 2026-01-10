@@ -113,7 +113,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6c</footer>
+<footer>RPG DREAM • Phase C.6c.1</footer>
 
 <script>
 
@@ -186,25 +186,7 @@ function renderGrid(id){
 renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
 renderGrid('characterGrid');
 
-// === Character Grid Override (C.3 Unlimited) ===
-const characterGrid = document.getElementById('characterGrid');
-[...characterGrid.children].forEach((cell, i) => {
-  cell.onclick = () => {
-    if (!characterPlacementArmed) return;
 
-    if (characters.has(i)) {
-      characters.delete(i);
-      cell.classList.remove('filled');
-    } else {
-      characters.add(i);
-      if (!characterIds.has(i)) {
-        characterIds.set(i, `char_${String(characterIdCounter++).padStart(4,'0')}`);
-      }
-      cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', selectedCharacterColor);
-    }
-  };
-});
 
 updateCurrent();
 
@@ -291,27 +273,41 @@ eraseBtn.onclick = () => {
 };
 
 
-// === C.6c Exclusive Mode Guard (Erase > Place > Select) ===
-const cg2 = document.getElementById('characterGrid');
-[...cg2.children].forEach((cell, i) => {
-  const prev = cell.onclick;
-  cell.onclick = (e) => {
-    // Erase mode
-    if (characterEraseArmed){
-      if (characters.has(i)){
+
+
+
+// === C.6c.1 Authoritative Character Grid Dispatcher ===
+const characterGrid = document.getElementById('characterGrid');
+[...characterGrid.children].forEach((cell, i) => {
+  cell.onclick = () => {
+    // ERASE MODE
+    if (characterEraseArmed) {
+      if (characters.has(i)) {
         characters.delete(i);
         cell.classList.remove('filled','character-selected');
       }
       return;
     }
-    // Place mode
-    if (characterPlacementArmed){
-      prev && prev(e);
+
+    // PLACE MODE
+    if (characterPlacementArmed) {
+      if (characters.has(i)) {
+        // no-op on filled when placing (prevents accidental delete)
+        return;
+      }
+      characters.add(i);
+      if (!characterIds.has(i)) {
+        characterIds.set(i, `char_${String(characterIdCounter++).padStart(4,'0')}`);
+      }
+      cell.classList.add('filled');
+      cell.style.setProperty('--tile-color', selectedCharacterColor);
       return;
     }
-    // Select mode
-    [...cg2.children].forEach(el=>el.classList.remove('character-selected'));
-    if (characters.has(i)){
+
+    // SELECT MODE
+    document.querySelectorAll('#characterGrid .character-selected')
+      .forEach(el => el.classList.remove('character-selected'));
+    if (characters.has(i)) {
       cell.classList.add('character-selected');
       openCharInfoAt(i);
     }
