@@ -1,116 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RPG DREAM • Phase C.2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG DREAM · Phase C.2</title>
+
 <style>
 :root{
-  --bg:#0b0f1a;--panel:#121a2a;--panel-2:#0f1624;--accent:#2f7cff;--muted:#8ea2c6;
-  --grid:#1c2740;--grid-line:#223154;--ok:#4caf50;
+  --bg:#0b0f1a;--panel:#121a2a;--accent:#2f7cff;
+  --grid:#1c2740;--grid-line:#223154;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:linear-gradient(180deg,#070b14,#0b1222);color:#e6ecff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
-header .title{letter-spacing:.08em;opacity:.9}
-header .status{color:#9fb3ff;opacity:.8}
-.tabs{display:flex;gap:10px;padding:8px 12px}
-.tab{padding:10px 16px;border-radius:14px;background:#0e1525;color:#c6d4ff;border:1px solid #1a2440}
-.tab.active{background:var(--accent);color:#fff;border-color:#3f8cff}
-.section{margin:12px;border-radius:18px;background:radial-gradient(120% 120% at 0% 0%,#16223b,#0e1525)}
-.section .hd{padding:14px 16px;color:#9fb3ff;font-weight:600}
-.controls{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px}
-.btn{background:#14203a;color:#e6ecff;border:1px solid #20305a;border-radius:14px;padding:10px 14px}
-.btn.primary{background:var(--accent);border-color:#3f8cff}
-.grid-wrap{margin:12px;border-radius:18px;background:#0b1120;padding:12px}
+body{margin:0;background:var(--bg);color:#e6ecff;font-family:system-ui}
+header{display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--grid-line)}
+.tabs{display:flex;gap:8px;padding:12px}
+.tab{padding:8px 14px;border-radius:12px;background:#121a2a;border:1px solid var(--grid-line);color:#c6d4ff}
+.tab.active{background:var(--accent);color:#fff}
+.section{display:none;padding:12px}
+.section.active{display:block}
 .grid{display:grid;grid-template-columns:repeat(16,1fr);gap:2px}
-.cell{aspect-ratio:1/1;background:#0e1525;border:1px solid var(--grid-line)}
-.cell.paint{background:var(--ok)}
-.footer{opacity:.6;text-align:center;padding:14px}
-.modal{position:fixed;inset:0;background:rgba(5,8,16,.6);display:none;align-items:center;justify-content:center}
-.modal .box{background:#0f1624;border:1px solid #1f2d52;border-radius:18px;padding:14px;min-width:280px}
-.palette{display:flex;gap:10px}
-.sw{width:36px;height:36px;border-radius:10px;border:2px solid #20305a}
-.sw.sel{outline:2px solid var(--accent)}
+.cell{aspect-ratio:1/1;background:#0e1525;border:1px solid var(--grid-line);position:relative}
+.cell.terrain{background:#4caf50}
+.cell.collision{background:#2ea043}
+.cell.character::after{
+  content:"";
+  position:absolute;inset:6px;
+  background:#9b59b6;border-radius:6px;
+}
+footer{text-align:center;padding:12px;color:#9aa4af;border-top:1px solid var(--grid-line)}
 </style>
 </head>
+
 <body>
+
 <header>
-  <div class="title">RPG DREAM</div>
-  <div class="status">offline • loaded</div>
+  <div>RPG DREAM</div>
+  <div>Phase C.2</div>
 </header>
 
 <div class="tabs">
-  <button class="tab active" data-tab="terrain">Terrain</button>
-  <button class="tab" data-tab="collision">Collision</button>
-  <button class="tab" data-tab="characters">Characters</button>
+  <button class="tab active" data-mode="terrain">Terrain</button>
+  <button class="tab" data-mode="collision">Collision</button>
+  <button class="tab" data-mode="characters">Characters</button>
 </div>
 
-<div id="terrain" class="section">
-  <div class="hd">Terrain</div>
-  <div class="controls">
-    <button class="btn primary" id="openPalette">Open Terrain Palette</button>
-    <div class="btn">Current tile: <span id="currentTile" class="sw sel" style="background:#4caf50"></span></div>
-  </div>
+<div class="section active" id="editor">
+  <div class="grid" id="grid"></div>
 </div>
 
-<div id="collision" class="section" style="display:none">
-  <div class="hd">Collision</div>
-  <div class="controls">
-    <div class="btn">Paint collision (green)</div>
-  </div>
-</div>
-
-<div id="characters" class="section" style="display:none">
-  <div class="hd">Characters</div>
-  <div class="controls">
-    <button class="btn primary" id="addChar">+ Add Character</button>
-  </div>
-</div>
-
-<div class="grid-wrap">
-  <div id="grid" class="grid"></div>
-</div>
-
-<div class="footer">RPG DREAM • Phase C.2</div>
-
-<div id="modal" class="modal">
-  <div class="box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <strong>Terrain Palette</strong>
-      <button class="btn" id="closeModal">Close</button>
-    </div>
-    <div class="palette">
-      <div class="sw sel" data-col="#4caf50" style="background:#4caf50"></div>
-      <div class="sw" data-col="#8d6e63" style="background:#8d6e63"></div>
-      <div class="sw" data-col="#9e9e9e" style="background:#9e9e9e"></div>
-    </div>
-  </div>
-</div>
+<footer>RPG DREAM · Phase C.2 · Character Placement Engine</footer>
 
 <script>
-const grid=document.getElementById('grid');
-let mode='terrain', paint=true, current='#4caf50';
-for(let i=0;i<16*16;i++){
-  const c=document.createElement('div'); c.className='cell';
-  c.onclick=()=>{ if(mode!=='characters'){ c.style.background=current; c.classList.add('paint'); } };
-  grid.appendChild(c);
+/* ---------- ENGINE STATE ---------- */
+const Engine = {
+  mode: 'terrain',
+  terrain: new Set(),
+  collision: new Set(),
+  characters: new Set()
+};
+
+/* ---------- GRID ---------- */
+const grid = document.getElementById('grid');
+const SIZE = 16 * 16;
+
+for(let i=0;i<SIZE;i++){
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  cell.dataset.i = i;
+
+  cell.onclick = () => handlePaint(i, cell);
+  grid.appendChild(cell);
 }
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  mode=b.dataset.tab;
-  ['terrain','collision','characters'].forEach(id=>document.getElementById(id).style.display=(id===mode?'block':'none'));
+
+/* ---------- MODE SWITCH ---------- */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    Engine.mode = btn.dataset.mode;
+  };
 });
-const modal=document.getElementById('modal');
-document.getElementById('openPalette').onclick=()=>modal.style.display='flex';
-document.getElementById('closeModal').onclick=()=>modal.style.display='none';
-document.querySelectorAll('.sw').forEach(sw=>sw.onclick=()=>{
-  document.querySelectorAll('.sw').forEach(x=>x.classList.remove('sel'));
-  sw.classList.add('sel'); current=sw.dataset.col||current;
-  document.getElementById('currentTile').style.background=current;
-});
-document.getElementById('addChar').onclick=()=>alert('Character added (stub)');
+
+/* ---------- PAINT LOGIC ---------- */
+function handlePaint(i, cell){
+  if(Engine.mode === 'terrain'){
+    Engine.terrain.add(i);
+    cell.classList.add('terrain');
+  }
+
+  if(Engine.mode === 'collision'){
+    Engine.collision.add(i);
+    cell.classList.add('collision');
+  }
+
+  if(Engine.mode === 'characters'){
+    if(Engine.characters.has(i)){
+      Engine.characters.delete(i);
+      cell.classList.remove('character');
+    } else {
+      Engine.characters.add(i);
+      cell.classList.add('character');
+    }
+  }
+}
 </script>
+
 </body>
 </html>
