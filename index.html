@@ -69,42 +69,23 @@
     .cardFooter{display:flex; gap:10px; justify-content:flex-end; margin-top:14px;}
     .help{font-size:12px; color:rgba(154,166,214,.95); line-height:1.3; margin-top:10px;}
   
-/* === C.6.e PATCH (UI ONLY) === */
-
-/* Map section alignment */
-.topbar .row {
-  flex-wrap: wrap;
-}
-.map-block {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-}
-.map-actions {
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  width:100%;
-}
-.map-actions .btn,
-.map-actions label.btn {
-  font-size:0.9rem;
-  padding:10px 12px;
-  flex:1;
-}
-
-/* Characters layout */
-.characters-header {
+/* FINAL C.6.e UI fixes */
+.characters-header{
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  gap:12px; /* keep Done close to label */
 }
-.character-controls {
+.characters-header .done-btn{
+  margin-left:8px;
+}
+.character-controls{
   display:flex;
   justify-content:center;
   gap:10px;
-  margin-bottom:8px;
+  margin-top:6px;
+}
+.map-actions .btn{
+  font-size:0.9rem;
 }
 </style>
 </head>
@@ -116,17 +97,17 @@
 <small>Phase C.6d-SINGLE-A • Single-file runtime + PWA support</small>
 </div>
 <div class="row">
-
-
-
-
-<div class="map-block"><div class="pill" title="Current map">
+<div class="pill" title="Current map">
 <span class="muted">Map</span>
 <select aria-label="Map select" id="mapSelect"></select>
-</div><div class="map-actions"><button class="btn primary" id="mapsBtn">Maps</button><label class="btn" style="cursor:pointer;">
+</div>
+<button class="btn primary" id="mapsBtn">Maps</button>
+<button class="btn" id="exportBtn">Export</button>
+<label class="btn" style="cursor:pointer;">
           Import
           <input accept="application/json" id="importFile" style="display:none" type="file"/>
-</label><button class="btn" id="exportBtn">Export</button></div></div></div>
+</label>
+</div>
 </div>
 <div aria-label="Editor tabs" class="tabs" role="tablist">
 <button class="tab active" data-tab="terrain">Terrain</button>
@@ -160,7 +141,7 @@
 </section>
 <section class="panel" id="characters" role="tabpanel">
 <div class="sectionTitle">
-<div class="characters-header"><h3>Characters</h3><button class="btn" id="doneCharacterBtn">Done</button></div>
+<div class="characters-header"><h3>Characters</h3></div>
 <div class="row" style="width:100%; justify-content:space-between;">
 <div class="row">
 
@@ -171,7 +152,7 @@
 <span id="modeText" style="font-weight:900;">Select</span>
 </div>
 </div>
-<div class="character-controls"><button class="btn ok ok" id="addCharacterBtn">Add</button><button class="btn danger" id="deleteCharacterBtn">Delete</button><button class="btn" id="infoCharacterBtn">Info</button></div></div>
+</div>
 <div class="gridWrap">
 <div aria-label="Character grid" class="grid" id="characterGrid"></div>
 </div>
@@ -180,7 +161,7 @@
 <b>Place:</b> choose a character type/color, then tap empty cells.<br/>
 <b>Delete:</b> tap placed characters to remove.
       </div>
-</section>
+<div class="character-controls"><button class="btn ok" id="addCharacterBtn">Add</button><button class="btn danger" id="deleteCharacterBtn">Delete</button></div></section>
 <div class="footer">RPG DREAM • Phase C.6d-SINGLE-A</div>
 </div>
 <div aria-hidden="true" class="modal" id="terrainModal">
@@ -650,24 +631,6 @@
   // Fill placeholder phase in export filename
   // (static replacement for the template marker)
   // Not strictly necessary for functionality.
-  
-/* === C.6.e behavior patch === */
-const doneCharacterBtn = document.getElementById('doneCharacterBtn');
-const infoCharacterBtn = document.getElementById('infoCharacterBtn');
-
-if (doneCharacterBtn) {
-  doneCharacterBtn.addEventListener('click', () => {
-    setCharMode('select'); // exits sub-modes only
-  });
-}
-
-if (infoCharacterBtn) {
-  infoCharacterBtn.addEventListener('click', () => {
-    // require selected character
-    if (editIndex === null) return;
-    openCharInfo(editIndex);
-  });
-}
-</script>
+  </script>
 </body>
 </html>
