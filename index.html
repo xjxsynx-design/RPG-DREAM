@@ -5,34 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG DREAM • Single-File Editor</title>
 <style>
-/* ===============================
-   PHASE B — UX (Terrain Popup)
-   =============================== */
-:root {
-  --bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;
-  --text:#e6edf3;--muted:#9aa4af;--btn:#21262d;--btn-h:#2a313c;
-  --accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d;
-}
+:root{--bg:#0d1117;--panel:#161b22;--panel-soft:#1b2230;--edge:#0b0f14;--text:#e6edf3;--muted:#9aa4af;
+--btn:#21262d;--btn-h:#2a313c;--accent:#2f81f7;--accent-2:#1f6feb;--grid:#30363d}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system}
 header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;
-  background:linear-gradient(180deg,var(--panel),var(--panel-soft));border-bottom:1px solid var(--edge)}
+background:linear-gradient(180deg,var(--panel),var(--panel-soft));border-bottom:1px solid var(--edge)}
 .tabs{display:flex;gap:8px;margin:12px}
-.tab{background:var(--btn);border:1px solid var(--grid);color:var(--muted);
-  padding:10px 18px;border-radius:10px}
+.tab{background:var(--btn);border:1px solid var(--grid);color:var(--muted);padding:10px 18px;border-radius:10px}
 .tab.active{background:var(--accent);color:#fff;border-color:var(--accent-2)}
 section{display:none;padding:12px}
 section.active{display:block}
-h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9;letter-spacing:.04em}
+h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9}
 .grid{background:#0b0f14;border-radius:12px;display:grid;grid-template-columns:repeat(12,1fr);
-  grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
+grid-auto-rows:32px;gap:1px;border:1px solid var(--edge)}
 .cell{background:#161b22;border:1px solid var(--grid)}
 .cell.filled{background:var(--tile-color)}
 .btn{background:var(--btn);border:1px solid var(--grid);color:#fff;padding:8px 14px;border-radius:8px}
 .btn.primary{background:var(--accent);border-color:var(--accent-2)}
 .btn:hover{background:var(--btn-h)}
 .add-btn{margin:10px 0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
-  border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
+border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
 /* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}
 .modal.open{display:flex}
@@ -42,6 +35,7 @@ h3{margin:10px 0 6px;font-size:14px;color:#c9d1d9;letter-spacing:.04em}
 .swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .swatch{width:34px;height:34px;border-radius:8px;border:2px solid rgba(255,255,255,.25)}
 .swatch.active{outline:2px solid var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
 </style>
@@ -78,17 +72,21 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   <div class="modal-card">
     <div class="modal-header">
       <strong>Terrain Palette</strong>
-      <button class="btn" id="closeTerrain">Close</button>
+      <button class="btn" id="closeTerrain">✕</button>
     </div>
     <div style="margin-top:10px">
       <label>Biome:</label>
       <select id="biomeSelect" class="select"></select>
     </div>
     <div class="swatches" id="tileSwatches"></div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelTerrain">Cancel</button>
+      <button class="btn primary" id="selectTerrain">Select</button>
+    </div>
   </div>
 </div>
 
-<footer>RPG DREAM • Phase B</footer>
+<footer>RPG DREAM • Phase B.1</footer>
 
 <script>
 const biomes={
@@ -100,6 +98,7 @@ const biomes={
 };
 let currentBiome='plains';
 let currentTile=biomes[currentBiome][0];
+let pendingTile=currentTile;
 
 const tileBox=document.getElementById('currentTileBox');
 const modal=document.getElementById('terrainModal');
@@ -118,31 +117,35 @@ function renderSwatches(){
   swatches.innerHTML='';
   biomes[currentBiome].forEach(c=>{
     const s=document.createElement('div');
-    s.className='swatch'+(c===currentTile?' active':'');
+    s.className='swatch'+(c===pendingTile?' active':'');
     s.style.background=c;
-    s.onclick=()=>{currentTile=c;updateCurrent();renderSwatches()};
+    s.onclick=()=>{pendingTile=c;renderSwatches()};
     swatches.appendChild(s);
   });
 }
-function updateCurrent(){
-  tileBox.style.background=currentTile;
-}
+function updateCurrent(){ tileBox.style.background=currentTile; }
 
-document.getElementById('openTerrain').onclick=()=>{modal.classList.add('open')};
-document.getElementById('closeTerrain').onclick=()=>{modal.classList.remove('open')};
-biomeSelect.onchange=e=>{currentBiome=e.target.value;currentTile=biomes[currentBiome][0];renderSwatches();updateCurrent()};
-
-renderBiomeSelect();renderSwatches();updateCurrent();
+document.getElementById('openTerrain').onclick=()=>{
+  pendingTile=currentTile; modal.classList.add('open');
+  renderBiomeSelect(); renderSwatches();
+};
+document.getElementById('closeTerrain').onclick=()=>modal.classList.remove('open');
+document.getElementById('cancelTerrain').onclick=()=>modal.classList.remove('open');
+document.getElementById('selectTerrain').onclick=()=>{
+  currentTile=pendingTile; updateCurrent(); modal.classList.remove('open');
+};
+biomeSelect.onchange=e=>{currentBiome=e.target.value; pendingTile=biomes[currentBiome][0]; renderSwatches()};
 
 function renderGrid(id){
-  const g=document.getElementById(id);g.innerHTML='';
+  const g=document.getElementById(id); g.innerHTML='';
   for(let i=0;i<120;i++){
-    const c=document.createElement('div');c.className='cell';
-    c.onclick=()=>{c.classList.add('filled');c.style.setProperty('--tile-color',currentTile)};
+    const c=document.createElement('div'); c.className='cell';
+    c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)};
     g.appendChild(c);
   }
 }
-renderGrid('terrainGrid');renderGrid('collisionGrid');renderGrid('characterGrid');
+renderGrid('terrainGrid'); renderGrid('collisionGrid'); renderGrid('characterGrid');
+updateCurrent();
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
@@ -150,7 +153,6 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   document.getElementById(t.dataset.tab).classList.add('active');
 });
-
 document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
 document.getElementById('addCharacter').onclick=()=>alert('Character added (stub)');
 </script>
