@@ -68,6 +68,29 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   <div class="grid" id="characterGrid"></div>
 </section>
 
+
+<div class="modal" id="characterModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Character Palette</strong>
+      <button class="btn" id="closeCharacter">✕</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Type:</label>
+      <select id="characterType" class="select">
+        <option value="#9b59b6">NPC</option>
+        <option value="#3498db">Party</option>
+        <option value="#e74c3c">Enemy</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelCharacter">Cancel</button>
+      <button class="btn primary" id="selectCharacter">Select</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal" id="terrainModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -86,12 +109,13 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.3</footer>
+<footer>RPG DREAM • Phase C.5</footer>
 
 <script>
 
 // === Characters (C.3 Unlimited Instances) ===
 const characters = new Set();
+let selectedCharacterColor = '#9b59b6';
 let characterPlacementArmed = false;
 
 const biomes={
@@ -164,7 +188,7 @@ const characterGrid = document.getElementById('characterGrid');
     } else {
       characters.add(i);
       cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', '#9b59b6');
+      cell.style.setProperty('--tile-color', selectedCharacterColor);
     }
   };
 });
@@ -179,6 +203,26 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
 });
 document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
 document.getElementById('addCharacter').onclick = () => { characterPlacementArmed = !characterPlacementArmed; };
+
+// === Character Modal (C.5 UI-only) ===
+const characterModal = document.getElementById('characterModal');
+const characterTypeSelect = document.getElementById('characterType');
+
+document.getElementById('addCharacter').onclick = () => {
+  characterModal.classList.add('open');
+};
+
+document.getElementById('closeCharacter').onclick =
+document.getElementById('cancelCharacter').onclick = () => {
+  characterModal.classList.remove('open');
+};
+
+document.getElementById('selectCharacter').onclick = () => {
+  characterPlacementArmed = true;
+  selectedCharacterColor = characterTypeSelect.value;
+  characterModal.classList.remove('open');
+};
+
 </script>
 </body>
 </html>
