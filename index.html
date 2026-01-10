@@ -1,24 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RPG DREAM</title>
-  <link rel="stylesheet" href="style.css?v=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG DREAM</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <div class="top-tabs">
-      <button data-tab="terrain" class="tab active">Terrain</button>
-      <button data-tab="collision" class="tab">Collision</button>
-      <button data-tab="characters" class="tab">Characters</button>
-    </div>
 
-    <div id="panel"></div>
+<div id="app">
 
-    <div id="editor"></div>
+  <div class="topbar">
+    <button class="mode-btn active" data-mode="terrain">Terrain</button>
+    <button class="mode-btn" data-mode="collision">Collision</button>
+    <button class="mode-btn" data-mode="characters">Characters</button>
   </div>
 
-  <script src="app.js?v=1"></script>
+  <div id="terrainPanel" class="panel">
+    <div class="section">
+      <div class="label">Biome</div>
+      <div id="biomePalette" class="row"></div>
+    </div>
+
+    <div class="section">
+      <div class="label">Terrain</div>
+      <div id="tilePalette" class="row"></div>
+    </div>
+  </div>
+
+  <div id="charactersPanel" class="panel hidden">
+    <div class="panel-header">
+      <div class="label">Characters</div>
+      <button id="addCharacterBtn">+ Add Character</button>
+    </div>
+    <div id="characterList"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="label">Maps</div>
+      <button id="addMapBtn">+ Add</button>
+    </div>
+    <div id="mapList"></div>
+  </div>
+
+  <div class="panel editor">
+    <canvas id="mapCanvas"></canvas>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
