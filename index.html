@@ -38,9 +38,6 @@ border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .current{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted)}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-top:1px solid var(--edge)}
-
-.character-selected{outline:2px solid #f1c40f;outline-offset:-2px}
-
 </style>
 </head>
 <body>
@@ -67,32 +64,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
 
 <section id="characters">
   <h3>Characters</h3>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;"><button class="add-btn" id="addCharacter">+ Add Character</button><button id="eraseCharacter" class="btn">Erase Character</button></div>
+  <button class="add-btn" id="addCharacter">+ Add Character</button>
   <div class="grid" id="characterGrid"></div>
 </section>
-
-
-<div class="modal" id="characterModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <strong>Character Palette</strong>
-      <button class="btn" id="closeCharacter">✕</button>
-    </div>
-    <div style="margin-top:10px">
-      <label>Type:</label>
-      <select id="characterType" class="select">
-        <option value="#9b59b6">NPC</option>
-        <option value="#3498db">Party</option>
-        <option value="#e74c3c">Enemy</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" id="cancelCharacter">Cancel</button>
-      <button class="btn primary" id="selectCharacter">Select</button>
-    </div>
-  </div>
-</div>
-
 
 <div class="modal" id="terrainModal">
   <div class="modal-card">
@@ -112,37 +86,17 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:14px;border-t
   </div>
 </div>
 
-<footer>RPG DREAM • Phase C.6c.AUDITEDc.2</footer>
-
-<!-- Character Info Modal (C.6b) -->
-<div class="modal" id="characterInfoModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <strong>Character Info</strong>
-      <button class="btn" id="closeCharInfo">✕</button>
-    </div>
-    <div style="margin-top:10px">
-      <label>Name:</label>
-      <input id="charNameInput" class="select" placeholder="Enter name" />
-    </div>
-    <div class="modal-footer">
-      <button class="btn" id="cancelCharInfo">Cancel</button>
-      <button class="btn primary" id="saveCharInfo">Save</button>
-    </div>
-  </div>
-</div>
+<footer>RPG DREAM • Phase C.6c.4</footer>
 
 <script>
 
 // === Characters (C.3 Unlimited Instances) ===
 const characters = new Set();
-const characterIds = new Map();
-const characterNames = new Map();
-let characterIdCounter = 1;
-let selectedCharacterIndex = null;
-let characterEraseArmed = false;
 
-let selectedCharacterColor = '#9b59b6';
+
+// === Character Metadata (C.6c.4) ===
+const characterNames = new Map(); // index -> name
+let selectedCharacterIndex = null;
 let characterPlacementArmed = false;
 
 const biomes={
@@ -196,15 +150,29 @@ function renderGrid(id){
   const g=document.getElementById(id); g.innerHTML='';
   for(let i=0;i<120;i++){
     const c=document.createElement('div'); c.className='cell';
-    if(id!=='characterGrid'){
-      c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)};
-    }
+    if(id!=='characterGrid'){c.onclick=()=>{c.classList.add('filled'); c.style.setProperty('--tile-color',currentTile)}};
     g.appendChild(c);
   }
 }
-renderGrid('terrainGrid'); renderGrid('collisionGrid'); renderGrid('characterGrid');
+renderGrid('terrainGrid'); renderGrid('collisionGrid'); 
+renderGrid('characterGrid');
 
+// === Character Grid Override (C.3 Unlimited) ===
+const characterGrid = document.getElementById('characterGrid');
+[...characterGrid.children].forEach((cell, i) => {
+  cell.onclick = () => {
+    if (!characterPlacementArmed) return;
 
+    if (characters.has(i)) {
+      characters.delete(i);
+      cell.classList.remove('filled');
+    } else {
+      characters.add(i);
+      cell.classList.add('filled');
+      cell.style.setProperty('--tile-color', '#9b59b6');
+    }
+  };
+});
 
 updateCurrent();
 
@@ -215,40 +183,15 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.getElementById(t.dataset.tab).classList.add('active');
 });
 document.getElementById('addMap').onclick=()=>alert('Map added (stub)');
+document.getElementById('addCharacter').onclick = () => { characterPlacementArmed = !characterPlacementArmed; };
 
-
-// === Character Modal (C.5 UI-only) ===
-const characterModal = document.getElementById('characterModal');
-const characterTypeSelect = document.getElementById('characterType');
-
-document.getElementById('addCharacter').onclick = () => {
-  characterModal.classList.add('open');
-};
-
-document.getElementById('closeCharacter').onclick =
-document.getElementById('cancelCharacter').onclick = () => {
-  characterModal.classList.remove('open');
-};
-
-document.getElementById('selectCharacter').onclick = () => {
-  characterPlacementArmed = true;
-  // Selecting a character always exits erase mode
-  characterEraseArmed = false;
-  const eb = document.getElementById('eraseCharacter');
-  if (eb) eb.classList.remove('primary');
-  selectedCharacterColor = characterTypeSelect.value;
-  characterModal.classList.remove('open');
-};
-
-
-// === C.6b Character Selection & Name (guarded, additive) ===
+// === Character Info Modal Logic ===
 const charInfoModal = document.getElementById('characterInfoModal');
 const charNameInput = document.getElementById('charNameInput');
 
 function openCharInfoAt(index){
   selectedCharacterIndex = index;
-  const name = characterNames.get(index) || '';
-  charNameInput.value = name;
+  charNameInput.value = characterNames.get(index) || '';
   charInfoModal.classList.add('open');
 }
 
@@ -260,65 +203,31 @@ document.getElementById('closeCharInfo').onclick =
 document.getElementById('cancelCharInfo').onclick = closeCharInfo;
 
 document.getElementById('saveCharInfo').onclick = () => {
-  if(selectedCharacterIndex !== null){
+  if (selectedCharacterIndex !== null){
     characterNames.set(selectedCharacterIndex, charNameInput.value || '');
   }
   closeCharInfo();
 };
 
-
-// === C.6c Character Erase Mode ===
-const eraseBtn = document.getElementById('eraseCharacter');
-if (eraseBtn) eraseBtn.onclick = () => {
-  characterEraseArmed = !characterEraseArmed;
-  // Turning on erase disables placement
-  if (characterEraseArmed) characterPlacementArmed = false;
-  eraseBtn.classList.toggle('primary', characterEraseArmed);
-};
-
-// (eraseBtn may be null outside Characters section)
-
-// === C.6c.1 Authoritative Character Grid Dispatcher ===
-const characterGrid = document.getElementById('characterGrid');
-[...characterGrid.children].forEach((cell, i) => {
-  cell.onclick = () => {
-    // ERASE MODE
-    if (characterEraseArmed) {
-      if (characters.has(i)) {
-        characters.delete(i);
-        cell.classList.remove('filled','character-selected');
-      }
-      return;
-    }
-
-    // PLACE MODE
-    if (characterPlacementArmed) {
-      if (characters.has(i)) {
-        // no-op on filled when placing (prevents accidental delete)
-        return;
-      }
-      characters.add(i);
-      if (!characterIds.has(i)) {
-        characterIds.set(i, `char_${String(characterIdCounter++).padStart(4,'0')}`);
-      }
-      cell.classList.add('filled');
-      cell.style.setProperty('--tile-color', selectedCharacterColor);
-      return;
-    }
-
-    // SELECT MODE
-    document.querySelectorAll('#characterGrid .character-selected')
-      .forEach(el => el.classList.remove('character-selected'));
-    if (characters.has(i)) {
-      cell.classList.add('character-selected');
-      openCharInfoAt(i);
-    }
-  };
-});
-
 </script>
 
-
+<!-- Character Info Modal -->
+<div class="modal" id="characterInfoModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <strong>Character Info</strong>
+      <button class="btn" id="closeCharInfo">✕</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Name</label>
+      <input id="charNameInput" class="select" placeholder="Enter character name" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="cancelCharInfo">Cancel</button>
+      <button class="btn primary" id="saveCharInfo">Save</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
