@@ -34,7 +34,7 @@ button {
   margin-bottom:12px;
   font-size:16px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background: var(--primary);
   color:white;
 }
@@ -42,21 +42,41 @@ button.secondary {
   background: transparent;
   border:1px solid var(--primary);
 }
+button.option {
+  background: #1f163d;
+  border:1px solid #3a2b7a;
+}
+button.option.active {
+  background: var(--primary);
+}
 button:active {
   background: var(--primary-dark);
 }
 .card {
   background: var(--panel);
-  padding:16px;
-  border-radius:12px;
+  padding:20px;
+  border-radius:16px;
 }
 .hidden { display:none !important; }
-input, select {
+input {
   width:100%;
-  padding:12px;
-  margin-bottom:12px;
-  border-radius:6px;
+  padding:14px;
+  margin-bottom:14px;
+  border-radius:10px;
   border:none;
+}
+.section {
+  margin-bottom:18px;
+}
+.section label {
+  display:block;
+  margin-bottom:8px;
+  opacity:0.85;
+}
+.grid {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
 }
 </style>
 </head>
@@ -71,16 +91,34 @@ input, select {
 <div class="container hidden" id="newProject">
   <div class="card">
     <h2>New Project</h2>
+
     <input id="projectName" placeholder="Project Name"/>
-    <select id="viewType">
-      <option value="topdown">Top-Down</option>
-      <option value="angular">Angular</option>
-    </select>
-    <select id="gridPreset">
-      <option value="small">Small Grid</option>
-      <option value="medium">Medium Grid</option>
-      <option value="large">Large Grid</option>
-    </select>
+
+    <div class="section">
+      <label>View Type</label>
+      <button class="option active" data-view="topdown">Top View</button>
+      <button class="option" data-view="angular">Angular View</button>
+    </div>
+
+    <div class="section">
+      <label>Grid Preset</label>
+      <button class="option active" data-grid="small">Small Grid</button>
+      <button class="option" data-grid="medium">Medium Grid</button>
+      <button class="option" data-grid="large">Large Grid</button>
+    </div>
+
+    <div class="section">
+      <label>Tile Size</label>
+      <div class="grid">
+        <button class="option active" data-tile="32">32</button>
+        <button class="option" data-tile="48">48</button>
+        <button class="option" data-tile="64">64</button>
+        <button class="option" data-tile="16">16</button>
+        <button class="option" data-tile="96">96</button>
+        <button class="option" data-tile="128">128</button>
+      </div>
+    </div>
+
     <button id="btnCreate">Create</button>
     <button class="secondary" id="btnBackFromNew">Back</button>
   </div>
@@ -95,34 +133,65 @@ input, select {
 </div>
 
 <script>
-// Cache DOM safely (explicit, no globals)
 const boot = document.getElementById('boot');
 const newProject = document.getElementById('newProject');
 const loadProject = document.getElementById('loadProject');
 
-document.getElementById('btnNew').addEventListener('click', () => {
+let viewType = "topdown";
+let gridPreset = "small";
+let tileSize = 32;
+
+function activate(group, btn) {
+  group.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+document.getElementById('btnNew').onclick = () => {
   boot.classList.add('hidden');
   newProject.classList.remove('hidden');
-});
-
-document.getElementById('btnLoad').addEventListener('click', () => {
+};
+document.getElementById('btnLoad').onclick = () => {
   boot.classList.add('hidden');
   loadProject.classList.remove('hidden');
-});
-
-document.getElementById('btnBackFromNew').addEventListener('click', () => {
+};
+document.getElementById('btnBackFromNew').onclick = () => {
   newProject.classList.add('hidden');
   boot.classList.remove('hidden');
-});
-
-document.getElementById('btnBackFromLoad').addEventListener('click', () => {
+};
+document.getElementById('btnBackFromLoad').onclick = () => {
   loadProject.classList.add('hidden');
   boot.classList.remove('hidden');
+};
+
+document.querySelectorAll('[data-view]').forEach(btn => {
+  btn.onclick = () => {
+    viewType = btn.dataset.view;
+    activate(document.querySelectorAll('[data-view]'), btn);
+  };
 });
 
-document.getElementById('btnCreate').addEventListener('click', () => {
-  alert('Project creation wired (Phase 13B UI confirmed).');
+document.querySelectorAll('[data-grid]').forEach(btn => {
+  btn.onclick = () => {
+    gridPreset = btn.dataset.grid;
+    activate(document.querySelectorAll('[data-grid]'), btn);
+  };
 });
+
+document.querySelectorAll('[data-tile]').forEach(btn => {
+  btn.onclick = () => {
+    tileSize = btn.dataset.tile;
+    activate(document.querySelectorAll('[data-tile]'), btn);
+  };
+});
+
+document.getElementById('btnCreate').onclick = () => {
+  alert(
+    "Project Created (stub)\n" +
+    "View: " + viewType + "\n" +
+    "Grid: " + gridPreset + "\n" +
+    "Tile Size: " + tileSize
+  );
+};
 </script>
 
 </body>
