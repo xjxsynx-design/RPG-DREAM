@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RPG DREAM MANAGER</title>
+</head>
+<body>
+<script>
+function continueToEditor(project){
+  localStorage.setItem("rpgdream_active_project", JSON.stringify(project));
+  window.location.href = "../editor/index.html";
+}
+</script>
+<p>This file assumes Phase 13B Manager UI. Continue buttons now route to editor.</p>
+</body>
+</html>
