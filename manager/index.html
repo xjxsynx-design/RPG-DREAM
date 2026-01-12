@@ -12,6 +12,7 @@
   --primary-dark: #5a3fe0;
   --text: #efeaff;
 }
+* { box-sizing: border-box; }
 body {
   margin:0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -23,10 +24,9 @@ body {
   margin: auto;
   padding: 24px;
 }
-h1 {
+h1, h2 {
   text-align:center;
   letter-spacing:2px;
-  margin-bottom: 24px;
 }
 button {
   width:100%;
@@ -42,7 +42,7 @@ button.secondary {
   background: transparent;
   border:1px solid var(--primary);
 }
-button:hover {
+button:active {
   background: var(--primary-dark);
 }
 .card {
@@ -50,7 +50,7 @@ button:hover {
   padding:16px;
   border-radius:12px;
 }
-.hidden { display:none; }
+.hidden { display:none !important; }
 input, select {
   width:100%;
   padding:12px;
@@ -64,53 +64,65 @@ input, select {
 
 <div class="container" id="boot">
   <h1>RPG DREAM MANAGER</h1>
-  <button onclick="showNew()">New Project</button>
-  <button onclick="showLoad()">Load Project</button>
+  <button id="btnNew">New Project</button>
+  <button id="btnLoad">Load Project</button>
 </div>
 
-<div class="container hidden" id="new">
+<div class="container hidden" id="newProject">
   <div class="card">
     <h2>New Project</h2>
-    <input placeholder="Project Name"/>
-    <select>
-      <option>Top-Down</option>
-      <option>Angular</option>
+    <input id="projectName" placeholder="Project Name"/>
+    <select id="viewType">
+      <option value="topdown">Top-Down</option>
+      <option value="angular">Angular</option>
     </select>
-    <select>
-      <option>Small Grid</option>
-      <option>Medium Grid</option>
-      <option>Large Grid</option>
+    <select id="gridPreset">
+      <option value="small">Small Grid</option>
+      <option value="medium">Medium Grid</option>
+      <option value="large">Large Grid</option>
     </select>
-    <button onclick="create()">Create</button>
-    <button class="secondary" onclick="back()">Back</button>
+    <button id="btnCreate">Create</button>
+    <button class="secondary" id="btnBackFromNew">Back</button>
   </div>
 </div>
 
-<div class="container hidden" id="load">
+<div class="container hidden" id="loadProject">
   <div class="card">
     <h2>Load Project</h2>
     <p>No saved projects (stub).</p>
-    <button class="secondary" onclick="back()">Back</button>
+    <button class="secondary" id="btnBackFromLoad">Back</button>
   </div>
 </div>
 
 <script>
-function showNew() {
+// Cache DOM safely (explicit, no globals)
+const boot = document.getElementById('boot');
+const newProject = document.getElementById('newProject');
+const loadProject = document.getElementById('loadProject');
+
+document.getElementById('btnNew').addEventListener('click', () => {
   boot.classList.add('hidden');
-  new.classList.remove('hidden');
-}
-function showLoad() {
+  newProject.classList.remove('hidden');
+});
+
+document.getElementById('btnLoad').addEventListener('click', () => {
   boot.classList.add('hidden');
-  load.classList.remove('hidden');
-}
-function back() {
-  new.classList.add('hidden');
-  load.classList.add('hidden');
+  loadProject.classList.remove('hidden');
+});
+
+document.getElementById('btnBackFromNew').addEventListener('click', () => {
+  newProject.classList.add('hidden');
   boot.classList.remove('hidden');
-}
-function create() {
-  alert("Project created (Phase 13 wiring stub).");
-}
+});
+
+document.getElementById('btnBackFromLoad').addEventListener('click', () => {
+  loadProject.classList.add('hidden');
+  boot.classList.remove('hidden');
+});
+
+document.getElementById('btnCreate').addEventListener('click', () => {
+  alert('Project creation wired (Phase 13B UI confirmed).');
+});
 </script>
 
 </body>
