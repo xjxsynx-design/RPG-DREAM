@@ -5,24 +5,146 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RPG DREAM EDITOR</title>
 <style>
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:#0b0718;color:#efeaff;padding:24px}
-.card{background:#16102a;border:1px solid #3a2b7a;border-radius:14px;padding:16px;max-width:520px;margin:auto}
-pre{white-space:pre-wrap;word-break:break-word;background:#120b22;padding:12px;border-radius:10px;overflow:auto}
-a,button{color:#efeaff}
-button{width:100%;padding:14px;border-radius:12px;border:1px solid #7b5cff;background:transparent;margin-top:12px}
+:root{
+  --bg:#0b0718; --panel:#16102a; --stroke:#3a2b7a;
+  --primary:#7b5cff; --text:#efeaff; --muted:#b7b0e6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
+/* Top bar */
+.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:#120b22;border-bottom:1px solid var(--stroke);display:flex;align-items:center;gap:10px;padding:0 10px;z-index:5}
+.topbar .pill{padding:6px 10px;border-radius:999px;background:#1f163d;border:1px solid var(--stroke);font-size:12px}
+.topbar .spacer{flex:1}
+/* Side panels */
+.sidebar{position:fixed;top:44px;bottom:0;width:56px;background:#120b22;border-right:1px solid var(--stroke);z-index:4}
+.sidebar.right{right:0;left:auto;border-right:none;border-left:1px solid var(--stroke)}
+.sidebar .btn{display:flex;align-items:center;justify-content:center;height:56px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar .btn.active{background:#1f163d}
+/* Expandable panels */
+.panel{position:fixed;top:44px;bottom:0;width:240px;background:var(--panel);border-right:1px solid var(--stroke);transform:translateX(-100%);transition:transform .18s ease;z-index:3}
+.panel.right{right:56px;left:auto;border-right:none;border-left:1px solid var(--stroke);transform:translateX(100%)}
+.panel.open{transform:translateX(0)}
+.panel header{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid var(--stroke)}
+/* Canvas */
+.canvas-wrap{position:fixed;top:44px;left:56px;right:56px;bottom:0;overflow:hidden}
+canvas{background:#0e1320;touch-action:none}
+/* Footer hints */
+.hint{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Editor Stub</h2>
-    <p>This is a placeholder editor page for Phase 13B wiring.</p>
-    <p><strong>Last opened project:</strong></p>
-    <pre id="out">None</pre>
-    <button onclick="window.location.href='../manager/index.html'">Back to Manager</button>
-  </div>
+
+<div class="topbar">
+  <div class="pill">Tool: Pan</div>
+  <div class="pill">Layer: Terrain</div>
+  <div class="spacer"></div>
+  <div class="pill" id="zoomLabel">100%</div>
+  <div class="pill" onclick="back()">Manager</div>
+</div>
+
+<div class="sidebar">
+  <div class="btn active" onclick="setTool('pan')">🖐️</div>
+  <div class="btn" onclick="setTool('paint')">🎨</div>
+  <div class="btn" onclick="toggleLeft()">≡</div>
+</div>
+
+<div class="sidebar right">
+  <div class="btn" onclick="toggleRight()">🎨</div>
+</div>
+
+<div class="panel" id="leftPanel">
+  <header><strong>Tools</strong><span onclick="toggleLeft()">▾</span></header>
+  <div style="padding:10px;color:var(--muted)">Options (stub)</div>
+</div>
+
+<div class="panel right" id="rightPanel">
+  <header><strong>Palette</strong><span onclick="toggleRight()">▾</span></header>
+  <div style="padding:10px;color:var(--muted)">Tiles (stub)</div>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="c"></canvas>
+</div>
+
+<div class="hint">One finger: pan • Pinch: zoom • Double-tap: reset</div>
+
 <script>
-const p = localStorage.getItem('rpgdream_last_opened');
-document.getElementById('out').textContent = p ? JSON.stringify(JSON.parse(p), null, 2) : "None";
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let dpr=window.devicePixelRatio||1;
+let scale=1, minScale=0.5, maxScale=4;
+let offsetX=0, offsetY=0;
+let isPanning=false, lastX=0, lastY=0;
+let tool='pan';
+
+function resize(){
+  const w=canvas.parentElement.clientWidth;
+  const h=canvas.parentElement.clientHeight;
+  canvas.width=w*dpr; canvas.height=h*dpr;
+  canvas.style.width=w+'px'; canvas.style.height=h+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+window.addEventListener('resize',resize);
+
+function draw(){
+  ctx.save();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.translate(offsetX,offsetY);
+  ctx.scale(scale,scale);
+  // grid
+  const tile=32;
+  ctx.strokeStyle='rgba(255,255,255,.08)';
+  for(let x=-2000;x<2000;x+=tile){
+    ctx.beginPath(); ctx.moveTo(x,-2000); ctx.lineTo(x,2000); ctx.stroke();
+  }
+  for(let y=-2000;y<2000;y+=tile){
+    ctx.beginPath(); ctx.moveTo(-2000,y); ctx.lineTo(2000,y); ctx.stroke();
+  }
+  ctx.restore();
+  document.getElementById('zoomLabel').textContent=Math.round(scale*100)+'%';
+}
+
+canvas.addEventListener('pointerdown',e=>{
+  if(tool==='pan'){ isPanning=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); }
+});
+canvas.addEventListener('pointermove',e=>{
+  if(isPanning){
+    offsetX+=e.clientX-lastX;
+    offsetY+=e.clientY-lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    draw();
+  }
+});
+canvas.addEventListener('pointerup',()=>{ isPanning=false; });
+
+// pinch zoom
+let pointers=new Map();
+canvas.addEventListener('pointerdown',e=>{ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); });
+canvas.addEventListener('pointermove',e=>{
+  if(pointers.has(e.pointerId)){
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===2){
+      const [a,b]=[...pointers.values()];
+      const dist=Math.hypot(a.x-b.x,a.y-b.y);
+      if(!canvas._lastDist) canvas._lastDist=dist;
+      const delta=dist/canvas._lastDist;
+      scale=Math.min(maxScale,Math.max(minScale,scale*delta));
+      canvas._lastDist=dist;
+      draw();
+    }
+  }
+});
+canvas.addEventListener('pointerup',e=>{ pointers.delete(e.pointerId); canvas._lastDist=null; });
+
+canvas.addEventListener('dblclick',()=>{ scale=1; offsetX=0; offsetY=0; draw(); });
+
+function setTool(t){ tool=t; }
+function toggleLeft(){ document.getElementById('leftPanel').classList.toggle('open'); }
+function toggleRight(){ document.getElementById('rightPanel').classList.toggle('open'); }
+function back(){ window.location.href='../manager/index.html'; }
+
+resize();
 </script>
 </body>
 </html>
