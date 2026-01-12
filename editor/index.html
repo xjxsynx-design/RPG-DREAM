@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RPG DREAM EDITOR</title>
 <style>
-body{margin:0;background:#0b0718;color:#efeaff;font-family:sans-serif}
-#info{padding:12px;background:#16102a;border-bottom:1px solid #3a2b7a}
+body{margin:0;background:#0b0718;color:#efeaff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
+#top{padding:12px;background:#16102a;border-bottom:1px solid #3a2b7a}
 canvas{display:block}
 </style>
 </head>
 <body>
-<div id="info">Loading project…</div>
+<div id="top">Loading project…</div>
 <canvas id="canvas"></canvas>
+
 <script>
 const project = JSON.parse(localStorage.getItem("rpgdream_active_project"));
 if(!project){
   window.location.href = "../manager/index.html";
 }
-document.getElementById("info").innerText =
-  "Project: "+project.name+" | View: "+project.view+" | Grid: "+project.grid+" | Tile: "+project.tile+"px";
+
+document.getElementById("top").textContent =
+  `Project: ${project.name} | View: ${project.view} | Grid: ${project.grid} | Tile: ${project.tile}px`;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight-40;
+canvas.height = window.innerHeight - 48;
 
-const tileSize = Number(project.tile);
-ctx.strokeStyle = "rgba(255,255,255,0.1)";
-for(let x=0;x<canvas.width;x+=tileSize){
+const tile = Number(project.tile) || 32;
+ctx.strokeStyle = "rgba(255,255,255,0.15)";
+for(let x=0;x<canvas.width;x+=tile){
   ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();
 }
-for(let y=0;y<canvas.height;y+=tileSize){
+for(let y=0;y<canvas.height;y+=tile){
   ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();
 }
 </script>
