@@ -1,45 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RPG DREAM – Preview</title>
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0b0b14;
-  color: #e6e6ff;
-}
-header {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  background: #111122;
-}
-#canvas {
-  height: calc(100vh - 48px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #777;
-}
-.palette {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  background: #1a1a2e;
-  border-radius: 14px;
-  padding: 12px;
-  box-shadow: 0 0 20px rgba(140,90,255,.35);
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RPG DREAM MANAGER</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0e1320;
+      color: #e6e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+    button {
+      padding: 14px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #4f7cff;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #3c66e0;
+    }
+  </style>
 </head>
 <body>
-<header>RPG DREAM MANAGER → Editor Preview</header>
-<div id="canvas">Canvas Preview Area</div>
-<div class="palette">Floating Palette (Preview)</div>
+  <div class="container">
+    <h1>RPG DREAM MANAGER</h1>
+    <p>Phase 12 Vault Preview</p>
+    <button onclick="enter()">Enter Manager</button>
+  </div>
+
+  <script>
+    function enter() {
+      window.location.href = './manager/index.html';
+    }
+  </script>
 </body>
 </html>
