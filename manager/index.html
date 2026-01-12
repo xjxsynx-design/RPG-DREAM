@@ -111,7 +111,7 @@ function renderProjects(){
 function createProject(){
   const project={
     id:"p_"+Date.now(),
-    name:projectName.value,
+    name:projectName.value || "Untitled Project",
     view:view.value,
     grid:grid.value,
     tile:tile.value
@@ -119,7 +119,9 @@ function createProject(){
   const projects=getProjects();
   projects.unshift(project);
   saveProjects(projects);
-  closeNew();
+
+  // IMMEDIATE REDIRECT INTO EDITOR
+  openEditor(project);
 }
 
 function rename(id){
