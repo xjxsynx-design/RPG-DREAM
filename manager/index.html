@@ -1,12 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RPG DREAM MANAGER</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RPG DREAM MANAGER</title>
+<style>
+:root {
+  --bg: #0b0718;
+  --panel: #16102a;
+  --primary: #7b5cff;
+  --primary-dark: #5a3fe0;
+  --text: #efeaff;
+}
+body {
+  margin:0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 24px;
+}
+h1 {
+  text-align:center;
+  letter-spacing:2px;
+  margin-bottom: 24px;
+}
+button {
+  width:100%;
+  padding:16px;
+  margin-bottom:12px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background: var(--primary);
+  color:white;
+}
+button.secondary {
+  background: transparent;
+  border:1px solid var(--primary);
+}
+button:hover {
+  background: var(--primary-dark);
+}
+.card {
+  background: var(--panel);
+  padding:16px;
+  border-radius:12px;
+}
+.hidden { display:none; }
+input, select {
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:6px;
+  border:none;
+}
+</style>
 </head>
 <body>
-  <h2>RPG DREAM MANAGER</h2>
-  <p>This is the Manager shell. Phase 13 will extend this UI.</p>
+
+<div class="container" id="boot">
+  <h1>RPG DREAM MANAGER</h1>
+  <button onclick="showNew()">New Project</button>
+  <button onclick="showLoad()">Load Project</button>
+</div>
+
+<div class="container hidden" id="new">
+  <div class="card">
+    <h2>New Project</h2>
+    <input placeholder="Project Name"/>
+    <select>
+      <option>Top-Down</option>
+      <option>Angular</option>
+    </select>
+    <select>
+      <option>Small Grid</option>
+      <option>Medium Grid</option>
+      <option>Large Grid</option>
+    </select>
+    <button onclick="create()">Create</button>
+    <button class="secondary" onclick="back()">Back</button>
+  </div>
+</div>
+
+<div class="container hidden" id="load">
+  <div class="card">
+    <h2>Load Project</h2>
+    <p>No saved projects (stub).</p>
+    <button class="secondary" onclick="back()">Back</button>
+  </div>
+</div>
+
+<script>
+function showNew() {
+  boot.classList.add('hidden');
+  new.classList.remove('hidden');
+}
+function showLoad() {
+  boot.classList.add('hidden');
+  load.classList.remove('hidden');
+}
+function back() {
+  new.classList.add('hidden');
+  load.classList.add('hidden');
+  boot.classList.remove('hidden');
+}
+function create() {
+  alert("Project created (Phase 13 wiring stub).");
+}
+</script>
+
 </body>
 </html>
