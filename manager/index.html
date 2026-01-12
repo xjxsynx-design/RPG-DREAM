@@ -11,6 +11,7 @@
   --primary: #7b5cff;
   --primary-dark: #5a3fe0;
   --text: #efeaff;
+  --muted: #b7b0e6;
 }
 * { box-sizing: border-box; }
 body {
@@ -24,9 +25,10 @@ body {
   margin: auto;
   padding: 24px;
 }
-h1, h2 {
+h1 {
   text-align:center;
   letter-spacing:2px;
+  margin-bottom: 20px;
 }
 button {
   width:100%;
@@ -34,7 +36,7 @@ button {
   margin-bottom:12px;
   font-size:16px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   background: var(--primary);
   color:white;
 }
@@ -49,13 +51,15 @@ button.option {
 button.option.active {
   background: var(--primary);
 }
-button:active {
-  background: var(--primary-dark);
-}
 .card {
   background: var(--panel);
-  padding:20px;
-  border-radius:16px;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+.project-meta {
+  font-size:13px;
+  color: var(--muted);
 }
 .hidden { display:none !important; }
 input {
@@ -78,14 +82,26 @@ input {
   grid-template-columns: repeat(3, 1fr);
   gap:10px;
 }
+.footer {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(transparent, var(--bg) 40%);
+  padding-top: 16px;
+}
 </style>
 </head>
 <body>
 
 <div class="container" id="boot">
   <h1>RPG DREAM MANAGER</h1>
+
   <button id="btnNew">New Project</button>
-  <button id="btnLoad">Load Project</button>
+
+  <div id="recentContainer"></div>
+
+  <div class="footer">
+    <button class="secondary" id="btnLoad">Load Project</button>
+  </div>
 </div>
 
 <div class="container hidden" id="newProject">
@@ -124,22 +140,41 @@ input {
   </div>
 </div>
 
-<div class="container hidden" id="loadProject">
-  <div class="card">
-    <h2>Load Project</h2>
-    <p>No saved projects (stub).</p>
-    <button class="secondary" id="btnBackFromLoad">Back</button>
-  </div>
-</div>
-
 <script>
 const boot = document.getElementById('boot');
 const newProject = document.getElementById('newProject');
-const loadProject = document.getElementById('loadProject');
+const recentContainer = document.getElementById('recentContainer');
 
 let viewType = "topdown";
 let gridPreset = "small";
 let tileSize = 32;
+
+function getProjects() {
+  return JSON.parse(localStorage.getItem("rpgdream_projects") || "[]");
+}
+
+function saveProjects(projects) {
+  localStorage.setItem("rpgdream_projects", JSON.stringify(projects));
+}
+
+function renderRecent() {
+  const projects = getProjects();
+  recentContainer.innerHTML = "";
+
+  if (!projects.length) {
+    recentContainer.innerHTML = "<p class='project-meta'>No projects yet.</p>";
+    return;
+  }
+
+  projects.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<strong>${p.name}</strong>
+      <div class="project-meta">${p.view} • ${p.tile}px</div>`;
+    card.onclick = () => alert("Load project: " + p.name);
+    recentContainer.appendChild(card);
+  });
+}
 
 function activate(group, btn) {
   group.forEach(b => b.classList.remove('active'));
@@ -150,16 +185,9 @@ document.getElementById('btnNew').onclick = () => {
   boot.classList.add('hidden');
   newProject.classList.remove('hidden');
 };
-document.getElementById('btnLoad').onclick = () => {
-  boot.classList.add('hidden');
-  loadProject.classList.remove('hidden');
-};
+
 document.getElementById('btnBackFromNew').onclick = () => {
   newProject.classList.add('hidden');
-  boot.classList.remove('hidden');
-};
-document.getElementById('btnBackFromLoad').onclick = () => {
-  loadProject.classList.add('hidden');
   boot.classList.remove('hidden');
 };
 
@@ -185,13 +213,18 @@ document.querySelectorAll('[data-tile]').forEach(btn => {
 });
 
 document.getElementById('btnCreate').onclick = () => {
-  alert(
-    "Project Created (stub)\n" +
-    "View: " + viewType + "\n" +
-    "Grid: " + gridPreset + "\n" +
-    "Tile Size: " + tileSize
-  );
+  const name = document.getElementById('projectName').value.trim();
+  if (!name) return alert("Project name required");
+
+  const projects = getProjects();
+  projects.unshift({ name, view: viewType, grid: gridPreset, tile: tileSize });
+  saveProjects(projects.slice(0, 10));
+  renderRecent();
+  newProject.classList.add('hidden');
+  boot.classList.remove('hidden');
 };
+
+renderRecent();
 </script>
 
 </body>
