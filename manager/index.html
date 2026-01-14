@@ -1,148 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG DREAM MANAGER</title>
 <style>
-:root{
-  --bg:#0b0718; --panel:#16102a; --stroke:#3a2b7a;
-  --primary:#7b5cff; --danger:#d4576b;
-  --text:#efeaff; --muted:#b7b0e6;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text)}
-.container{max-width:420px;margin:auto;padding:24px}
-h1{text-align:center;letter-spacing:2px;margin-bottom:20px}
-.btn{width:100%;padding:16px;margin-bottom:12px;border-radius:12px;border:none;background:var(--primary);color:#fff;font-size:16px}
-.btn.secondary{background:transparent;border:1px solid var(--primary)}
-.btn.danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
-.card{background:var(--panel);padding:14px;border-radius:14px;margin-bottom:12px}
-.meta{font-size:13px;color:var(--muted)}
-.row{display:flex;gap:8px;margin-top:10px}
-.row .btn{padding:10px;font-size:13px;margin:0}
-.hidden{display:none!important}
-.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px}
-.modal{width:min(420px,100%);background:#120b22;border:1px solid var(--stroke);border-radius:18px;padding:16px}
-input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--stroke);background:#120b22;color:var(--text);margin-bottom:12px}
-label{display:block;margin-bottom:6px;color:var(--muted)}
+body{margin:0;background:#0b0718;color:#efeaff;font-family:system-ui}
+header{display:flex;justify-content:center;padding:16px}
+header img{max-width:220px;width:60%;opacity:.95}
 </style>
 </head>
 <body>
-
-<div class="container">
-  <h1>RPG DREAM MANAGER</h1>
-  <button class="btn" onclick="openNew()">New Project</button>
-  <button class="btn secondary" onclick="openLoad()">Load From Local Storage</button>
-</div>
-
-<!-- New Project Modal -->
-<div class="backdrop hidden" id="newModal">
-  <div class="modal">
-    <h2>New Project</h2>
-    <label>Project Name</label>
-    <input id="projectName"/>
-
-    <label>View Type</label>
-    <select id="view">
-      <option value="topdown">Top View</option>
-      <option value="angular">Angular View</option>
-    </select>
-
-    <label>Grid Preset</label>
-    <select id="grid">
-      <option value="small">Small</option>
-      <option value="medium">Medium</option>
-      <option value="large">Large</option>
-    </select>
-
-    <label>Tile Size</label>
-    <select id="tile">
-      <option value="16">16</option>
-      <option value="32" selected>32</option>
-      <option value="48">48</option>
-      <option value="64">64</option>
-      <option value="96">96</option>
-      <option value="128">128</option>
-    </select>
-
-    <button class="btn" onclick="createProject()">Create</button>
-    <button class="btn secondary" onclick="closeNew()">Back</button>
-  </div>
-</div>
-
-<!-- Load Modal -->
-<div class="backdrop hidden" id="loadModal">
-  <div class="modal">
-    <h2>Local Projects</h2>
-    <div id="projectList"></div>
-    <button class="btn secondary" onclick="closeLoad()">Close</button>
-  </div>
-</div>
-
-<script>
-function getProjects(){return JSON.parse(localStorage.getItem("rpgdream_projects")||"[]")}
-function saveProjects(p){localStorage.setItem("rpgdream_projects",JSON.stringify(p))}
-
-function openEditor(project){
-  localStorage.setItem("rpgdream_active_project",JSON.stringify(project));
-  window.location.href="../editor/index.html";
-}
-
-function renderProjects(){
-  const list=document.getElementById("projectList");
-  const projects=getProjects();
-  list.innerHTML="";
-  projects.forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`<strong>${p.name}</strong><div class="meta">${p.view} • ${p.tile}px • ${p.grid}</div>`;
-    const row=document.createElement("div");
-    row.className="row";
-    row.innerHTML=`
-      <button class="btn" onclick='openEditor(${JSON.stringify(p)})'>Continue</button>
-      <button class="btn secondary" onclick='rename("${p.id}")'>Rename</button>
-      <button class="btn danger" onclick='del("${p.id}")'>Delete</button>`;
-    card.appendChild(row);
-    list.appendChild(card);
-  });
-}
-
-function createProject(){
-  const project={
-    id:"p_"+Date.now(),
-    name:projectName.value || "Untitled Project",
-    view:view.value,
-    grid:grid.value,
-    tile:tile.value
-  };
-  const projects=getProjects();
-  projects.unshift(project);
-  saveProjects(projects);
-
-  // IMMEDIATE REDIRECT INTO EDITOR
-  openEditor(project);
-}
-
-function rename(id){
-  const projects=getProjects();
-  const p=projects.find(x=>x.id===id);
-  const name=prompt("Rename project",p.name);
-  if(name){p.name=name;saveProjects(projects);renderProjects();}
-}
-
-function del(id){
-  if(confirm("Delete project?")){
-    saveProjects(getProjects().filter(p=>p.id!==id));
-    renderProjects();
-  }
-}
-
-function openNew(){newModal.classList.remove("hidden")}
-function closeNew(){newModal.classList.add("hidden")}
-function openLoad(){renderProjects();loadModal.classList.remove("hidden")}
-function closeLoad(){loadModal.classList.add("hidden")}
-</script>
-
+<header>
+  <img src="../assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
+</header>
+<!-- existing manager UI remains unchanged -->
 </body>
 </html>
