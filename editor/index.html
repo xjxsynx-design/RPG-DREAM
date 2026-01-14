@@ -24,35 +24,29 @@ canvas{display:block;touch-action:none}
 
 <script>
 const project = JSON.parse(localStorage.getItem("rpgdream_active_project"));
-if(!project){
-  window.location.href="../manager/index.html";
-}
+if(!project){ window.location.href="../manager/index.html"; }
 
-const VIEW_MODES = { TOPDOWN:"topdown", ANGULAR:"angular" };
-const TOOLS = { PAN:"pan", PAINT:"paint", ERASE:"erase" };
+const VIEW_MODES={TOPDOWN:"topdown",ANGULAR:"angular"};
+const TOOLS={PAN:"pan",PAINT:"paint",ERASE:"erase"};
 
-const viewMode = project.view || VIEW_MODES.TOPDOWN;
-const tileSize = Number(project.tile) || 32;
+const viewMode=project.view||VIEW_MODES.TOPDOWN;
+const tileSize=Number(project.tile)||32;
 
-const status = document.getElementById("status");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const status=document.getElementById("status");
 
-let dpr = window.devicePixelRatio || 1;
-let scale = 1;
-let offsetX = 0;
-let offsetY = 0;
-let activeTool = TOOLS.PAN;
-
-// simple terrain layer
-const terrain = new Map();
+let dpr=window.devicePixelRatio||1;
+let scale=1, offsetX=0, offsetY=0;
+let activeTool=TOOLS.PAN;
+const terrain=new Map();
 
 function setTool(t){
-  activeTool = t;
-  panBtn.classList.toggle("active", t===TOOLS.PAN);
-  paintBtn.classList.toggle("active", t===TOOLS.PAINT);
-  eraseBtn.classList.toggle("active", t===TOOLS.ERASE);
-  status.textContent = "Active: " + t;
+  activeTool=t;
+  panBtn.classList.toggle("active",t===TOOLS.PAN);
+  paintBtn.classList.toggle("active",t===TOOLS.PAINT);
+  eraseBtn.classList.toggle("active",t===TOOLS.ERASE);
+  status.textContent="Active: "+t;
 }
 panBtn.onclick=()=>setTool(TOOLS.PAN);
 paintBtn.onclick=()=>setTool(TOOLS.PAINT);
@@ -60,47 +54,42 @@ eraseBtn.onclick=()=>setTool(TOOLS.ERASE);
 setTool(TOOLS.PAN);
 
 function resize(){
-  canvas.width = innerWidth * dpr;
-  canvas.height = (innerHeight - 42) * dpr;
-  canvas.style.width = innerWidth+"px";
-  canvas.style.height = (innerHeight - 42)+"px";
+  canvas.width=innerWidth*dpr;
+  canvas.height=(innerHeight-42)*dpr;
+  canvas.style.width=innerWidth+"px";
+  canvas.style.height=(innerHeight-42)+"px";
   ctx.setTransform(dpr,0,0,dpr,0,0);
   draw();
 }
-window.addEventListener("resize", resize);
+window.addEventListener("resize",resize);
 
 function gridToScreen(x,y){
   if(viewMode===VIEW_MODES.ANGULAR){
-    return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) };
+    return{x:(x-y)*(tileSize/2),y:(x+y)*(tileSize/4)};
   }
-  return { x:x*tileSize, y:y*tileSize };
+  return{x:x*tileSize,y:y*tileSize};
 }
-
 function screenToGrid(px,py){
-  px = (px-offsetX)/scale;
-  py = (py-offsetY)/scale;
+  px=(px-offsetX)/scale; py=(py-offsetY)/scale;
   if(viewMode===VIEW_MODES.ANGULAR){
-    const gx = Math.round((px/(tileSize/2) + py/(tileSize/4))/2);
-    const gy = Math.round((py/(tileSize/4) - px/(tileSize/2))/2);
-    return {x:gx,y:gy};
+    const gx=Math.round((px/(tileSize/2)+py/(tileSize/4))/2);
+    const gy=Math.round((py/(tileSize/4)-px/(tileSize/2))/2);
+    return{x:gx,y:gy};
   }
-  return { x:Math.floor(px/tileSize), y:Math.floor(py/tileSize) };
+  return{x:Math.floor(px/tileSize),y:Math.floor(py/tileSize)};
 }
 
 function drawGrid(){
   ctx.strokeStyle="rgba(255,255,255,.15)";
   if(viewMode===VIEW_MODES.ANGULAR){
-    for(let x=-30;x<=30;x++){
-      for(let y=-30;y<=30;y++){
-        const p=gridToScreen(x,y);
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y-tileSize/4);
-        ctx.lineTo(p.x+tileSize/2, p.y);
-        ctx.lineTo(p.x, p.y+tileSize/4);
-        ctx.lineTo(p.x-tileSize/2, p.y);
-        ctx.closePath();
-        ctx.stroke();
-      }
+    for(let x=-30;x<=30;x++)for(let y=-30;y<=30;y++){
+      const p=gridToScreen(x,y);
+      ctx.beginPath();
+      ctx.moveTo(p.x,p.y-tileSize/4);
+      ctx.lineTo(p.x+tileSize/2,p.y);
+      ctx.lineTo(p.x,p.y+tileSize/4);
+      ctx.lineTo(p.x-tileSize/2,p.y);
+      ctx.closePath(); ctx.stroke();
     }
   } else {
     for(let x=-2000;x<2000;x+=tileSize){
@@ -111,40 +100,34 @@ function drawGrid(){
     }
   }
 }
-
 function drawTiles(){
   ctx.fillStyle="#7b5cff";
   terrain.forEach((_,key)=>{
-    const [x,y]=key.split(",").map(Number);
+    const[x,y]=key.split(",").map(Number);
     const p=gridToScreen(x,y);
     if(viewMode===VIEW_MODES.ANGULAR){
       ctx.beginPath();
-      ctx.moveTo(p.x, p.y-tileSize/4);
-      ctx.lineTo(p.x+tileSize/2, p.y);
-      ctx.lineTo(p.x, p.y+tileSize/4);
-      ctx.lineTo(p.x-tileSize/2, p.y);
-      ctx.closePath();
-      ctx.fill();
-    } else {
-      ctx.fillRect(p.x,p.y,tileSize,tileSize);
-    }
+      ctx.moveTo(p.x,p.y-tileSize/4);
+      ctx.lineTo(p.x+tileSize/2,p.y);
+      ctx.lineTo(p.x,p.y+tileSize/4);
+      ctx.lineTo(p.x-tileSize/2,p.y);
+      ctx.closePath(); ctx.fill();
+    } else ctx.fillRect(p.x,p.y,tileSize,tileSize);
   });
 }
-
 function draw(){
   ctx.save();
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
-  drawGrid();
-  drawTiles();
+  drawGrid(); drawTiles();
   ctx.restore();
 }
 
-let isPanning=false, lastX=0, lastY=0;
+let isPanning=false,lastX=0,lastY=0;
 canvas.addEventListener("pointerdown",e=>{
   lastX=e.clientX; lastY=e.clientY;
-  if(activeTool===TOOLS.PAN){ isPanning=true; return; }
+  if(activeTool===TOOLS.PAN){isPanning=true; return;}
   const g=screenToGrid(e.clientX,e.clientY);
   const key=g.x+","+g.y;
   if(activeTool===TOOLS.PAINT){ terrain.set(key,true); }
@@ -153,12 +136,11 @@ canvas.addEventListener("pointerdown",e=>{
 });
 canvas.addEventListener("pointermove",e=>{
   if(!isPanning) return;
-  offsetX+=e.clientX-lastX;
-  offsetY+=e.clientY-lastY;
+  offsetX+=e.clientX-lastX; offsetY+=e.clientY-lastY;
   lastX=e.clientX; lastY=e.clientY;
   draw();
 });
-canvas.addEventListener("pointerup",()=>{ isPanning=false; });
+canvas.addEventListener("pointerup",()=>{isPanning=false;});
 
 resize();
 </script>
