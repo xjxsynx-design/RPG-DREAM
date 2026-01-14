@@ -86,6 +86,7 @@ button.secondary{
   align-items:center;
   justify-content:center;
   padding:16px;
+  z-index:10;
 }
 .modal{
   width:100%;
@@ -174,12 +175,10 @@ function getProjects(){
 function saveProjects(p){
   localStorage.setItem("rpgdream_projects",JSON.stringify(p));
 }
-
 function openEditor(project){
   localStorage.setItem("rpgdream_active_project",JSON.stringify(project));
   location.href="../editor/index.html";
 }
-
 function renderProjects(){
   const list=document.getElementById("projectList");
   list.innerHTML="";
@@ -228,10 +227,22 @@ function deleteProj(id){
   }
 }
 
-function openNew(){ newModal.classList.remove("hidden"); }
+function openNew(){
+  closeLoad();
+  newModal.classList.remove("hidden");
+}
 function closeNew(){ newModal.classList.add("hidden"); }
-function openLoad(){ renderProjects(); loadModal.classList.remove("hidden"); }
+function openLoad(){
+  closeNew();
+  renderProjects();
+  loadModal.classList.remove("hidden");
+}
 function closeLoad(){ loadModal.classList.add("hidden"); }
+
+window.addEventListener("load",()=>{
+  closeNew();
+  closeLoad();
+});
 </script>
 
 </body>
