@@ -1,15 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG DREAM</title>
 <style>
-body{margin:0;background:#0b0718;display:flex;align-items:center;justify-content:center;height:100vh}
-img{max-width:260px;width:70%;opacity:.95}
+body{
+  margin:0;
+  background:#0b0718;
+  color:#efeaff;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+.wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+}
+img{
+  max-width:260px;
+  width:70%;
+  opacity:.95;
+}
+button{
+  background:#7b5cff;
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  padding:14px 28px;
+  font-size:16px;
+}
 </style>
 </head>
 <body>
-  <img src="assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
+  <div class="wrapper">
+    <img src="assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
+    <button onclick="location.href='manager/index.html'">
+      Enter RPG FORGE
+    </button>
+  </div>
 </body>
 </html>
