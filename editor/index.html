@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RPG DREAM EDITOR</title>
 <style>
-:root{--bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;--text:#efeaff;--muted:#b7b0e6}
+:root{--bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;--text:#efeaff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
 #topbar{display:flex;align-items:center;gap:8px;padding:10px;background:var(--panel);border-bottom:1px solid var(--stroke)}
@@ -15,12 +15,10 @@ button.secondary{background:transparent;border:1px solid var(--primary)}
 button.active{outline:2px solid #fff}
 canvas{display:block;touch-action:none}
 #toolbar{display:flex;gap:8px;padding:8px;background:#120b22;border-bottom:1px solid var(--stroke)}
-.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;min-width:200px;z-index:10}
+.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;min-width:220px;z-index:10}
 .tool-modal.hidden{display:none}
 .tool-modal h4{margin:0 0 8px 0}
 .tool-modal .close{float:right;background:transparent;color:#fff}
-#floatSave{position:fixed;right:12px;bottom:12px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:8px;display:flex;gap:8px;align-items:center}
-#floatSave.hidden{display:none}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1b1340;border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;font-size:12px;display:none}
 </style>
 </head>
@@ -29,32 +27,26 @@ canvas{display:block;touch-action:none}
   <strong>Editor</strong>
   <div class="spacer"></div>
   <button id="saveBtn">Save</button>
-  <button id="toggleFloat" class="secondary">Floating Save</button>
 </div>
 <div id="toolbar">
   <button id="toolPaint">Paint</button>
   <button id="toolErase" class="secondary">Erase</button>
   <button id="toolPan" class="secondary">Pan</button>
+  <button id="toolRegion" class="secondary">Region</button>
 </div>
 <canvas id="canvas"></canvas>
 
-<div id="paintModal" class="tool-modal hidden">
+<div id="regionModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
-  <h4>Paint Tool</h4>
-</div>
-<div id="eraseModal" class="tool-modal hidden">
-  <button class="close" onclick="closeModals()">✕</button>
-  <h4>Erase Tool</h4>
-</div>
-<div id="panModal" class="tool-modal hidden">
-  <button class="close" onclick="closeModals()">✕</button>
-  <h4>Pan Tool</h4>
+  <h4>Regions</h4>
+  <div style="font-size:12px;opacity:.8">Active region:</div>
+  <select id="regionSelect"></select>
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <button id="newRegionBtn" class="secondary">+ New</button>
+    <button id="eraseRegionTileBtn" class="secondary">Erase Tile</button>
+  </div>
 </div>
 
-<div id="floatSave" class="hidden">
-  <button id="floatSaveBtn">Save</button>
-  <button class="secondary" onclick="floatSave.classList.add('hidden')">✕</button>
-</div>
 <div id="toast">Saved</div>
 
 <script>
@@ -71,6 +63,9 @@ const GRID_PRESETS={small:20, medium:40, large:80};
 const GRID_MAX=GRID_PRESETS[active.grid]||40;
 
 const terrain=new Map();
+const regions={};
+let activeRegionId=null;
+
 let currentTool="paint";
 let isPanning=false, panStart={x:0,y:0}, camStart={x:0,y:0};
 
@@ -85,17 +80,13 @@ function resize(){
 window.addEventListener("resize",resize);
 
 function gridToScreen(x,y){
-  if(viewMode==="angular"){
-    return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) };
-  }
+  if(viewMode==="angular"){ return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) }; }
   return { x:x*tileSize, y:y*tileSize };
 }
-
-// INVERSE mapping for input
 function screenToGrid(px,py){
   if(viewMode==="angular"){
-    const gx = Math.round((px/(tileSize/2) + py/(tileSize/4)) / 2);
-    const gy = Math.round((py/(tileSize/4) - px/(tileSize/2)) / 2);
+    const gx=Math.round((px/(tileSize/2)+py/(tileSize/4))/2);
+    const gy=Math.round((py/(tileSize/4)-px/(tileSize/2))/2);
     return {x:gx,y:gy};
   }
   return {x:Math.floor(px/tileSize),y:Math.floor(py/tileSize)};
@@ -106,6 +97,7 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
+
   ctx.strokeStyle="rgba(255,255,255,.15)";
   for(let x=-GRID_MAX;x<=GRID_MAX;x++)for(let y=-GRID_MAX;y<=GRID_MAX;y++){
     const p=gridToScreen(x,y);
@@ -118,6 +110,7 @@ function draw(){
       ctx.closePath(); ctx.stroke();
     } else ctx.strokeRect(p.x,p.y,tileSize,tileSize);
   }
+
   ctx.fillStyle="#7b5cff";
   terrain.forEach((_,k)=>{
     const [x,y]=k.split(",").map(Number);
@@ -131,6 +124,23 @@ function draw(){
       ctx.closePath(); ctx.fill();
     } else ctx.fillRect(p.x,p.y,tileSize,tileSize);
   });
+
+  Object.values(regions).forEach(r=>{
+    ctx.fillStyle="rgba(255,80,120,0.35)";
+    r.tiles.forEach(key=>{
+      const [x,y]=key.split(",").map(Number);
+      const p=gridToScreen(x,y);
+      if(viewMode==="angular"){
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y-tileSize/4);
+        ctx.lineTo(p.x+tileSize/2, p.y);
+        ctx.lineTo(p.x, p.y+tileSize/4);
+        ctx.lineTo(p.x-tileSize/2, p.y);
+        ctx.closePath(); ctx.fill();
+      } else ctx.fillRect(p.x,p.y,tileSize,tileSize);
+    });
+  });
+
   ctx.restore();
 }
 
@@ -140,17 +150,18 @@ canvas.addEventListener("pointerdown",e=>{
   const py=(e.clientY-rect.top-offsetY)/scale;
 
   if(currentTool==="pan"){
-    isPanning=true;
-    panStart={x:e.clientX,y:e.clientY};
-    camStart={x:offsetX,y:offsetY};
-    return;
+    isPanning=true; panStart={x:e.clientX,y:e.clientY}; camStart={x:offsetX,y:offsetY}; return;
   }
 
   const g=screenToGrid(px,py);
   if(g.x<-GRID_MAX||g.x>GRID_MAX||g.y<-GRID_MAX||g.y>GRID_MAX) return;
 
-  if(currentTool==="paint") terrain.set(g.x+","+g.y,true);
-  if(currentTool==="erase") terrain.delete(g.x+","+g.y);
+  const key=g.x+","+g.y;
+  if(currentTool==="paint") terrain.set(key,true);
+  if(currentTool==="erase") terrain.delete(key);
+  if(currentTool==="region" && activeRegionId){
+    regions[activeRegionId].tiles.add(key);
+  }
   draw();
 });
 
@@ -169,26 +180,51 @@ function setTool(t){
   currentTool=t;
   document.querySelectorAll('#toolbar button').forEach(b=>b.classList.remove('active'));
   closeModals();
-  if(t==="paint"){ toolPaint.classList.add('active'); paintModal.classList.remove('hidden'); }
-  if(t==="erase"){ toolErase.classList.add('active'); eraseModal.classList.remove('hidden'); }
-  if(t==="pan"){ toolPan.classList.add('active'); panModal.classList.remove('hidden'); }
+  if(t==="paint") toolPaint.classList.add('active');
+  if(t==="erase") toolErase.classList.add('active');
+  if(t==="pan") toolPan.classList.add('active');
+  if(t==="region"){ toolRegion.classList.add('active'); regionModal.classList.remove('hidden'); }
 }
 toolPaint.onclick=()=>setTool("paint");
 toolErase.onclick=()=>setTool("erase");
 toolPan.onclick=()=>setTool("pan");
+toolRegion.onclick=()=>setTool("region");
 setTool("paint");
+
+function refreshRegionSelect(){
+  regionSelect.innerHTML="";
+  Object.keys(regions).forEach(id=>{
+    const o=document.createElement("option");
+    o.value=id; o.textContent=id;
+    regionSelect.appendChild(o);
+  });
+  if(activeRegionId) regionSelect.value=activeRegionId;
+}
+
+newRegionBtn.onclick=()=>{
+  const id="region_"+String(Object.keys(regions).length+1).padStart(3,"0");
+  regions[id]={ id, type:"custom", tiles:new Set() };
+  activeRegionId=id;
+  refreshRegionSelect();
+};
+
+eraseRegionTileBtn.onclick=()=>{
+  if(!activeRegionId) return;
+  currentTool="regionErase";
+};
+
+regionSelect.onchange=e=>activeRegionId=e.target.value;
 
 function serialize(){
   const projects=JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
-  const payload={map:{terrain:Object.fromEntries(terrain)}};
+  const payload={ map:{ terrain:Object.fromEntries(terrain), regions:{} } };
+  Object.values(regions).forEach(r=>payload.map.regions[r.id]={ type:r.type, tiles:[...r.tiles] });
   const idx=projects.findIndex(p=>p.id===active.id);
   if(idx>=0) projects[idx].data=payload;
   localStorage.setItem("rpgdream_projects",JSON.stringify(projects));
 }
 function toast(){ toastEl.style.display="block"; setTimeout(()=>toastEl.style.display="none",900); }
 saveBtn.onclick=()=>{ serialize(); toast(); };
-floatSaveBtn.onclick=()=>{ serialize(); toast(); };
-toggleFloat.onclick=()=>{ floatSave.classList.toggle('hidden'); };
 const toastEl=document.getElementById('toast');
 
 resize(); draw();
