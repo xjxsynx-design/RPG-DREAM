@@ -5,37 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG DREAM MANAGER</title>
 <style>
-:root{
-  --bg:#0b0718;
-  --panel:#16102a;
-  --stroke:#3a2b7a;
-  --primary:#7b5cff;
-  --danger:#d4576b;
-  --text:#efeaff;
-  --muted:#b7b0e6;
-}
-*{box-sizing:border-box}
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
+  background:#0b0718;
+  color:#efeaff;
   font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
 }
+.hidden{display:none!important}
 header{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  text-align:center;
   padding:16px 16px 8px;
 }
 header img{
   max-width:220px;
   width:60%;
+  display:block;
+  margin:0 auto 8px;
 }
-header .title{
-  margin-top:8px;
+header .label{
   font-size:14px;
   letter-spacing:3px;
-  color:var(--muted);
+  color:#b7b0e6;
 }
 .container{
   max-width:420px;
@@ -51,21 +41,21 @@ button{
   border-radius:14px;
   border:none;
   font-size:15px;
-  background:var(--primary);
+  background:#7b5cff;
   color:#fff;
 }
 button.secondary{
   background:transparent;
-  border:1px solid var(--primary);
+  border:1px solid #7b5cff;
 }
 .card{
-  background:var(--panel);
+  background:#16102a;
   border-radius:14px;
   padding:12px;
 }
 .meta{
   font-size:13px;
-  color:var(--muted);
+  color:#b7b0e6;
 }
 .row{
   display:flex;
@@ -77,7 +67,6 @@ button.secondary{
   padding:10px;
   font-size:13px;
 }
-.hidden{display:none}
 .backdrop{
   position:fixed;
   inset:0;
@@ -86,28 +75,27 @@ button.secondary{
   align-items:center;
   justify-content:center;
   padding:16px;
-  z-index:10;
 }
 .modal{
   width:100%;
   max-width:420px;
   background:#120b22;
-  border:1px solid var(--stroke);
+  border:1px solid #3a2b7a;
   border-radius:18px;
   padding:16px;
 }
 label{
   font-size:13px;
-  color:var(--muted);
+  color:#b7b0e6;
 }
 input,select{
   width:100%;
   padding:12px;
   margin:8px 0 14px;
   border-radius:10px;
-  border:1px solid var(--stroke);
+  border:1px solid #3a2b7a;
   background:#120b22;
-  color:var(--text);
+  color:#efeaff;
 }
 </style>
 </head>
@@ -115,7 +103,7 @@ input,select{
 
 <header>
   <img src="../assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
-  <div class="title">MANAGER</div>
+  <div class="label">MANAGER</div>
 </header>
 
 <div class="container">
@@ -198,7 +186,6 @@ function renderProjects(){
     list.appendChild(card);
   });
 }
-
 function createProject(){
   const project={
     id:"p_"+Date.now(),
@@ -212,37 +199,22 @@ function createProject(){
   saveProjects(projects);
   openEditor(project);
 }
-
 function renameProj(id){
   const projects=getProjects();
   const p=projects.find(x=>x.id===id);
   const n=prompt("Rename project",p.name);
   if(n){p.name=n;saveProjects(projects);renderProjects();}
 }
-
 function deleteProj(id){
   if(confirm("Delete project?")){
     saveProjects(getProjects().filter(p=>p.id!==id));
     renderProjects();
   }
 }
-
-function openNew(){
-  closeLoad();
-  newModal.classList.remove("hidden");
-}
+function openNew(){ newModal.classList.remove("hidden"); }
 function closeNew(){ newModal.classList.add("hidden"); }
-function openLoad(){
-  closeNew();
-  renderProjects();
-  loadModal.classList.remove("hidden");
-}
+function openLoad(){ renderProjects(); loadModal.classList.remove("hidden"); }
 function closeLoad(){ loadModal.classList.add("hidden"); }
-
-window.addEventListener("load",()=>{
-  closeNew();
-  closeLoad();
-});
 </script>
 
 </body>
