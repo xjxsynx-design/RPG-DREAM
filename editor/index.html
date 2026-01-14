@@ -13,35 +13,50 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 button{background:var(--primary);border:none;border-radius:12px;color:#fff;padding:8px 12px;font-size:13px}
 button.secondary{background:transparent;border:1px solid var(--primary)}
 button.active{outline:2px solid #fff}
+select{background:#120b22;color:var(--text);border:1px solid var(--stroke);border-radius:10px;padding:6px}
 canvas{display:block;touch-action:none}
 #toolbar{display:flex;gap:8px;padding:8px;background:#120b22;border-bottom:1px solid var(--stroke)}
-.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;min-width:220px;z-index:10}
+.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;min-width:240px;z-index:10}
 .tool-modal.hidden{display:none}
 .tool-modal h4{margin:0 0 8px 0}
 .tool-modal .close{float:right;background:transparent;color:#fff}
+.badge{display:inline-block;padding:2px 6px;border-radius:8px;background:#3a2b7a;font-size:11px}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1b1340;border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;font-size:12px;display:none}
 </style>
 </head>
 <body>
 <div id="topbar">
   <strong>Editor</strong>
+  <span class="badge">Regions: Metadata</span>
   <div class="spacer"></div>
   <button id="saveBtn">Save</button>
 </div>
+
 <div id="toolbar">
   <button id="toolPaint">Paint</button>
   <button id="toolErase" class="secondary">Erase</button>
   <button id="toolPan" class="secondary">Pan</button>
   <button id="toolRegion" class="secondary">Region</button>
 </div>
+
 <canvas id="canvas"></canvas>
 
+<!-- Region modal -->
 <div id="regionModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
   <h4>Regions</h4>
-  <div style="font-size:12px;opacity:.8">Active region:</div>
+  <div style="font-size:12px;opacity:.8;margin-bottom:6px">Active region</div>
   <select id="regionSelect"></select>
-  <div style="margin-top:8px;display:flex;gap:8px">
+
+  <div style="margin-top:8px;font-size:12px;opacity:.8">Type</div>
+  <select id="regionTypeSelect">
+    <option value="custom">Custom</option>
+    <option value="battle">Battle</option>
+    <option value="boss">Boss</option>
+    <option value="safe">Safe</option>
+  </select>
+
+  <div style="margin-top:10px;display:flex;gap:8px">
     <button id="newRegionBtn" class="secondary">+ New</button>
     <button id="eraseRegionTileBtn" class="secondary">Erase Tile</button>
   </div>
@@ -62,9 +77,17 @@ const viewMode=active.view||"topdown";
 const GRID_PRESETS={small:20, medium:40, large:80};
 const GRID_MAX=GRID_PRESETS[active.grid]||40;
 
+// Data
 const terrain=new Map();
 const regions={};
 let activeRegionId=null;
+
+const REGION_COLORS={
+  custom:"rgba(255,80,120,0.35)",
+  battle:"rgba(255,120,60,0.35)",
+  boss:"rgba(200,60,60,0.45)",
+  safe:"rgba(80,200,120,0.30)"
+};
 
 let currentTool="paint";
 let isPanning=false, panStart={x:0,y:0}, camStart={x:0,y:0};
@@ -98,6 +121,7 @@ function draw(){
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
 
+  // grid
   ctx.strokeStyle="rgba(255,255,255,.15)";
   for(let x=-GRID_MAX;x<=GRID_MAX;x++)for(let y=-GRID_MAX;y<=GRID_MAX;y++){
     const p=gridToScreen(x,y);
@@ -111,6 +135,7 @@ function draw(){
     } else ctx.strokeRect(p.x,p.y,tileSize,tileSize);
   }
 
+  // terrain
   ctx.fillStyle="#7b5cff";
   terrain.forEach((_,k)=>{
     const [x,y]=k.split(",").map(Number);
@@ -125,8 +150,9 @@ function draw(){
     } else ctx.fillRect(p.x,p.y,tileSize,tileSize);
   });
 
+  // regions overlay with type-based color
   Object.values(regions).forEach(r=>{
-    ctx.fillStyle="rgba(255,80,120,0.35)";
+    ctx.fillStyle=REGION_COLORS[r.type] || REGION_COLORS.custom;
     r.tiles.forEach(key=>{
       const [x,y]=key.split(",").map(Number);
       const p=gridToScreen(x,y);
@@ -206,14 +232,24 @@ newRegionBtn.onclick=()=>{
   regions[id]={ id, type:"custom", tiles:new Set() };
   activeRegionId=id;
   refreshRegionSelect();
+  regionTypeSelect.value="custom";
+};
+
+regionSelect.onchange=e=>{
+  activeRegionId=e.target.value;
+  regionTypeSelect.value=regions[activeRegionId].type;
+};
+
+regionTypeSelect.onchange=e=>{
+  if(!activeRegionId) return;
+  regions[activeRegionId].type=e.target.value;
+  draw();
 };
 
 eraseRegionTileBtn.onclick=()=>{
   if(!activeRegionId) return;
   currentTool="regionErase";
 };
-
-regionSelect.onchange=e=>activeRegionId=e.target.value;
 
 function serialize(){
   const projects=JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
