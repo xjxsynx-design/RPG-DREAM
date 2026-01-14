@@ -41,7 +41,6 @@ canvas{display:block;touch-action:none}
 <div id="paintModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
   <h4>Paint Tool</h4>
-  <div>Layer: <strong>Terrain</strong></div>
 </div>
 <div id="eraseModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
@@ -50,7 +49,6 @@ canvas{display:block;touch-action:none}
 <div id="panModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
   <h4>Pan Tool</h4>
-  <div class="muted">Drag to pan</div>
 </div>
 
 <div id="floatSave" class="hidden">
@@ -87,8 +85,20 @@ function resize(){
 window.addEventListener("resize",resize);
 
 function gridToScreen(x,y){
-  if(viewMode==="angular"){ return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) }; }
+  if(viewMode==="angular"){
+    return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) };
+  }
   return { x:x*tileSize, y:y*tileSize };
+}
+
+// INVERSE mapping for input
+function screenToGrid(px,py){
+  if(viewMode==="angular"){
+    const gx = Math.round((px/(tileSize/2) + py/(tileSize/4)) / 2);
+    const gy = Math.round((py/(tileSize/4) - px/(tileSize/2)) / 2);
+    return {x:gx,y:gy};
+  }
+  return {x:Math.floor(px/tileSize),y:Math.floor(py/tileSize)};
 }
 
 function draw(){
@@ -136,11 +146,11 @@ canvas.addEventListener("pointerdown",e=>{
     return;
   }
 
-  let gx=Math.floor(px/tileSize), gy=Math.floor(py/tileSize);
-  if(gx<-GRID_MAX||gx>GRID_MAX||gy<-GRID_MAX||gy>GRID_MAX) return;
+  const g=screenToGrid(px,py);
+  if(g.x<-GRID_MAX||g.x>GRID_MAX||g.y<-GRID_MAX||g.y>GRID_MAX) return;
 
-  if(currentTool==="paint") terrain.set(gx+","+gy,true);
-  if(currentTool==="erase") terrain.delete(gx+","+gy);
+  if(currentTool==="paint") terrain.set(g.x+","+g.y,true);
+  if(currentTool==="erase") terrain.delete(g.x+","+g.y);
   draw();
 });
 
