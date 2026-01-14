@@ -5,29 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RPG DREAM EDITOR</title>
 <style>
-:root{--bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;--text:#efeaff}
+:root{
+  --bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;
+  --text:#efeaff;--white:#ffffff
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
-#topbar{display:flex;align-items:center;gap:8px;padding:10px;background:var(--panel);border-bottom:1px solid var(--stroke)}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
+#topbar{display:flex;align-items:center;gap:8px;padding:10px;
+  background:var(--panel);border-bottom:1px solid var(--stroke)}
 #topbar .spacer{flex:1}
-button{background:var(--primary);border:none;border-radius:12px;color:#fff;padding:8px 12px;font-size:13px}
+button{background:var(--primary);border:none;border-radius:12px;
+  color:#fff;padding:8px 12px;font-size:13px}
 button.secondary{background:transparent;border:1px solid var(--primary)}
 button.active{outline:2px solid #fff}
-select{background:#120b22;color:var(--text);border:1px solid var(--stroke);border-radius:10px;padding:6px}
+select{
+  background:#120b22;color:var(--white);
+  border:1px solid var(--stroke);border-radius:10px;padding:6px
+}
 canvas{display:block;touch-action:none}
-#toolbar{display:flex;gap:8px;padding:8px;background:#120b22;border-bottom:1px solid var(--stroke)}
-.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;min-width:240px;z-index:10}
+#toolbar{display:flex;gap:8px;padding:8px;background:#120b22;
+  border-bottom:1px solid var(--stroke)}
+.tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);
+  border:1px solid var(--stroke);border-radius:14px;padding:12px;
+  min-width:240px;z-index:10}
 .tool-modal.hidden{display:none}
 .tool-modal h4{margin:0 0 8px 0}
 .tool-modal .close{float:right;background:transparent;color:#fff}
-.badge{display:inline-block;padding:2px 6px;border-radius:8px;background:#3a2b7a;font-size:11px}
-#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1b1340;border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;font-size:12px;display:none}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+  background:#1b1340;border:1px solid var(--stroke);
+  border-radius:12px;padding:8px 12px;font-size:12px;display:none}
+#phaseLabel{
+  position:fixed;left:50%;bottom:6px;transform:translateX(-50%);
+  color:#7bffcc;font-weight:700;letter-spacing:.08em;
+  text-shadow:0 0 6px rgba(123,255,204,.6)
+}
 </style>
 </head>
 <body>
 <div id="topbar">
   <strong>Editor</strong>
-  <span class="badge">Regions: Metadata</span>
   <div class="spacer"></div>
   <button id="saveBtn">Save</button>
 </div>
@@ -47,7 +64,6 @@ canvas{display:block;touch-action:none}
   <h4>Regions</h4>
   <div style="font-size:12px;opacity:.8;margin-bottom:6px">Active region</div>
   <select id="regionSelect"></select>
-
   <div style="margin-top:8px;font-size:12px;opacity:.8">Type</div>
   <select id="regionTypeSelect">
     <option value="custom">Custom</option>
@@ -55,14 +71,13 @@ canvas{display:block;touch-action:none}
     <option value="boss">Boss</option>
     <option value="safe">Safe</option>
   </select>
-
   <div style="margin-top:10px;display:flex;gap:8px">
     <button id="newRegionBtn" class="secondary">+ New</button>
-    <button id="eraseRegionTileBtn" class="secondary">Erase Tile</button>
   </div>
 </div>
 
 <div id="toast">Saved</div>
+<div id="phaseLabel">PHASE 14D</div>
 
 <script>
 const active = JSON.parse(localStorage.getItem("rpgdream_active_project")||"null");
@@ -70,14 +85,16 @@ if(!active){ location.href="../manager/index.html"; }
 
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
-let dpr=window.devicePixelRatio||1, scale=1, offsetX=0, offsetY=0;
+let dpr=window.devicePixelRatio||1;
+let scale=1, offsetX=0, offsetY=0;
+const MIN_ZOOM=.5, MAX_ZOOM=2.5;
+
 const tileSize=Number(active.tile)||32;
 const viewMode=active.view||"topdown";
 
 const GRID_PRESETS={small:20, medium:40, large:80};
 const GRID_MAX=GRID_PRESETS[active.grid]||40;
 
-// Data
 const terrain=new Map();
 const regions={};
 let activeRegionId=null;
@@ -121,7 +138,6 @@ function draw(){
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
 
-  // grid
   ctx.strokeStyle="rgba(255,255,255,.15)";
   for(let x=-GRID_MAX;x<=GRID_MAX;x++)for(let y=-GRID_MAX;y<=GRID_MAX;y++){
     const p=gridToScreen(x,y);
@@ -135,7 +151,6 @@ function draw(){
     } else ctx.strokeRect(p.x,p.y,tileSize,tileSize);
   }
 
-  // terrain
   ctx.fillStyle="#7b5cff";
   terrain.forEach((_,k)=>{
     const [x,y]=k.split(",").map(Number);
@@ -150,9 +165,8 @@ function draw(){
     } else ctx.fillRect(p.x,p.y,tileSize,tileSize);
   });
 
-  // regions overlay with type-based color
   Object.values(regions).forEach(r=>{
-    ctx.fillStyle=REGION_COLORS[r.type] || REGION_COLORS.custom;
+    ctx.fillStyle=REGION_COLORS[r.type]||REGION_COLORS.custom;
     r.tiles.forEach(key=>{
       const [x,y]=key.split(",").map(Number);
       const p=gridToScreen(x,y);
@@ -170,27 +184,24 @@ function draw(){
   ctx.restore();
 }
 
+// ---- Interaction ----
 canvas.addEventListener("pointerdown",e=>{
   const rect=canvas.getBoundingClientRect();
   const px=(e.clientX-rect.left-offsetX)/scale;
   const py=(e.clientY-rect.top-offsetY)/scale;
 
   if(currentTool==="pan"){
-    isPanning=true; panStart={x:e.clientX,y:e.clientY}; camStart={x:offsetX,y:offsetY}; return;
+    isPanning=true; panStart={x:e.clientX,y:e.clientY};
+    camStart={x:offsetX,y:offsetY}; return;
   }
-
   const g=screenToGrid(px,py);
   if(g.x<-GRID_MAX||g.x>GRID_MAX||g.y<-GRID_MAX||g.y>GRID_MAX) return;
-
   const key=g.x+","+g.y;
   if(currentTool==="paint") terrain.set(key,true);
   if(currentTool==="erase") terrain.delete(key);
-  if(currentTool==="region" && activeRegionId){
-    regions[activeRegionId].tiles.add(key);
-  }
+  if(currentTool==="region" && activeRegionId) regions[activeRegionId].tiles.add(key);
   draw();
 });
-
 canvas.addEventListener("pointermove",e=>{
   if(currentTool==="pan" && isPanning){
     offsetX=camStart.x+(e.clientX-panStart.x);
@@ -201,6 +212,43 @@ canvas.addEventListener("pointermove",e=>{
 canvas.addEventListener("pointerup",()=>isPanning=false);
 canvas.addEventListener("pointerleave",()=>isPanning=false);
 
+// ---- Zoom (wheel + pinch) ----
+canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const delta = e.deltaY>0 ? .9 : 1.1;
+  zoomAt(e.clientX,e.clientY,delta);
+},{passive:false});
+
+let pinchDist=null;
+canvas.addEventListener("touchmove",e=>{
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    const d=Math.hypot(dx,dy);
+    if(pinchDist){
+      zoomAt(
+        (e.touches[0].clientX+e.touches[1].clientX)/2,
+        (e.touches[0].clientY+e.touches[1].clientY)/2,
+        d/pinchDist
+      );
+    }
+    pinchDist=d;
+  }
+},{passive:false});
+canvas.addEventListener("touchend",()=>pinchDist=null);
+
+function zoomAt(cx,cy,factor){
+  const newScale=Math.min(MAX_ZOOM,Math.max(MIN_ZOOM,scale*factor));
+  const rect=canvas.getBoundingClientRect();
+  const x=(cx-rect.left-offsetX)/scale;
+  const y=(cy-rect.top-offsetY)/scale;
+  offsetX -= x*(newScale-scale);
+  offsetY -= y*(newScale-scale);
+  scale=newScale;
+  draw();
+}
+
+// ---- Region UI ----
 function closeModals(){ document.querySelectorAll('.tool-modal').forEach(m=>m.classList.add('hidden')); }
 function setTool(t){
   currentTool=t;
@@ -226,41 +274,30 @@ function refreshRegionSelect(){
   });
   if(activeRegionId) regionSelect.value=activeRegionId;
 }
-
 newRegionBtn.onclick=()=>{
   const id="region_"+String(Object.keys(regions).length+1).padStart(3,"0");
-  regions[id]={ id, type:"custom", tiles:new Set() };
-  activeRegionId=id;
-  refreshRegionSelect();
-  regionTypeSelect.value="custom";
+  regions[id]={id,type:"custom",tiles:new Set()};
+  activeRegionId=id; refreshRegionSelect(); regionTypeSelect.value="custom";
 };
-
 regionSelect.onchange=e=>{
   activeRegionId=e.target.value;
   regionTypeSelect.value=regions[activeRegionId].type;
 };
-
 regionTypeSelect.onchange=e=>{
-  if(!activeRegionId) return;
-  regions[activeRegionId].type=e.target.value;
-  draw();
+  if(activeRegionId){ regions[activeRegionId].type=e.target.value; draw(); }
 };
 
-eraseRegionTileBtn.onclick=()=>{
-  if(!activeRegionId) return;
-  currentTool="regionErase";
-};
-
+// ---- Save ----
 function serialize(){
   const projects=JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
   const payload={ map:{ terrain:Object.fromEntries(terrain), regions:{} } };
-  Object.values(regions).forEach(r=>payload.map.regions[r.id]={ type:r.type, tiles:[...r.tiles] });
+  Object.values(regions).forEach(r=>payload.map.regions[r.id]={type:r.type,tiles:[...r.tiles]});
   const idx=projects.findIndex(p=>p.id===active.id);
   if(idx>=0) projects[idx].data=payload;
   localStorage.setItem("rpgdream_projects",JSON.stringify(projects));
 }
-function toast(){ toastEl.style.display="block"; setTimeout(()=>toastEl.style.display="none",900); }
 saveBtn.onclick=()=>{ serialize(); toast(); };
+function toast(){ toastEl.style.display="block"; setTimeout(()=>toastEl.style.display="none",900); }
 const toastEl=document.getElementById('toast');
 
 resize(); draw();
