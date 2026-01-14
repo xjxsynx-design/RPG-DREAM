@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RPG DREAM EDITOR</title>
 <style>
-:root{
-  --bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;--text:#efeaff;--muted:#b7b0e6;
-}
+:root{--bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;--text:#efeaff;--muted:#b7b0e6}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
 #topbar{display:flex;align-items:center;gap:8px;padding:10px;background:var(--panel);border-bottom:1px solid var(--stroke)}
@@ -52,7 +50,7 @@ canvas{display:block;touch-action:none}
 <div id="panModal" class="tool-modal hidden">
   <button class="close" onclick="closeModals()">✕</button>
   <h4>Pan Tool</h4>
-  <button class="secondary" onclick="resetCamera()">Reset Camera</button>
+  <div class="muted">Drag to pan</div>
 </div>
 
 <div id="floatSave" class="hidden">
@@ -70,7 +68,13 @@ const ctx=canvas.getContext("2d");
 let dpr=window.devicePixelRatio||1, scale=1, offsetX=0, offsetY=0;
 const tileSize=Number(active.tile)||32;
 const viewMode=active.view||"topdown";
+
+const GRID_PRESETS={small:20, medium:40, large:80};
+const GRID_MAX=GRID_PRESETS[active.grid]||40;
+
 const terrain=new Map();
+let currentTool="paint";
+let isPanning=false, panStart={x:0,y:0}, camStart={x:0,y:0};
 
 function resize(){
   canvas.width=innerWidth*dpr;
@@ -86,13 +90,14 @@ function gridToScreen(x,y){
   if(viewMode==="angular"){ return { x:(x-y)*(tileSize/2), y:(x+y)*(tileSize/4) }; }
   return { x:x*tileSize, y:y*tileSize };
 }
+
 function draw(){
   ctx.save();
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
   ctx.strokeStyle="rgba(255,255,255,.15)";
-  for(let x=-30;x<=30;x++)for(let y=-30;y<=30;y++){
+  for(let x=-GRID_MAX;x<=GRID_MAX;x++)for(let y=-GRID_MAX;y<=GRID_MAX;y++){
     const p=gridToScreen(x,y);
     if(viewMode==="angular"){
       ctx.beginPath();
@@ -119,17 +124,35 @@ function draw(){
   ctx.restore();
 }
 
-let currentTool="paint";
 canvas.addEventListener("pointerdown",e=>{
-  if(currentTool==="pan") return;
   const rect=canvas.getBoundingClientRect();
   const px=(e.clientX-rect.left-offsetX)/scale;
   const py=(e.clientY-rect.top-offsetY)/scale;
-  const gx=Math.floor(px/tileSize), gy=Math.floor(py/tileSize);
+
+  if(currentTool==="pan"){
+    isPanning=true;
+    panStart={x:e.clientX,y:e.clientY};
+    camStart={x:offsetX,y:offsetY};
+    return;
+  }
+
+  let gx=Math.floor(px/tileSize), gy=Math.floor(py/tileSize);
+  if(gx<-GRID_MAX||gx>GRID_MAX||gy<-GRID_MAX||gy>GRID_MAX) return;
+
   if(currentTool==="paint") terrain.set(gx+","+gy,true);
   if(currentTool==="erase") terrain.delete(gx+","+gy);
   draw();
 });
+
+canvas.addEventListener("pointermove",e=>{
+  if(currentTool==="pan" && isPanning){
+    offsetX=camStart.x+(e.clientX-panStart.x);
+    offsetY=camStart.y+(e.clientY-panStart.y);
+    draw();
+  }
+});
+canvas.addEventListener("pointerup",()=>isPanning=false);
+canvas.addEventListener("pointerleave",()=>isPanning=false);
 
 function closeModals(){ document.querySelectorAll('.tool-modal').forEach(m=>m.classList.add('hidden')); }
 function setTool(t){
@@ -152,10 +175,10 @@ function serialize(){
   if(idx>=0) projects[idx].data=payload;
   localStorage.setItem("rpgdream_projects",JSON.stringify(projects));
 }
+function toast(){ toastEl.style.display="block"; setTimeout(()=>toastEl.style.display="none",900); }
 saveBtn.onclick=()=>{ serialize(); toast(); };
 floatSaveBtn.onclick=()=>{ serialize(); toast(); };
 toggleFloat.onclick=()=>{ floatSave.classList.toggle('hidden'); };
-function toast(){ toastEl.style.display="block"; setTimeout(()=>toastEl.style.display="none",900); }
 const toastEl=document.getElementById('toast');
 
 resize(); draw();
