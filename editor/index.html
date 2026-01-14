@@ -6,25 +6,152 @@
 <title>RPG DREAM EDITOR</title>
 <style>
 body{margin:0;background:#0b0718;color:#efeaff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
-#top{padding:12px;background:#16102a;border-bottom:1px solid #3a2b7a}
-canvas{display:block}
+#top{padding:12px;background:#16102a;border-bottom:1px solid #3a2b7a;font-size:14px}
+canvas{display:block;touch-action:none}
 </style>
 </head>
 <body>
 <div id="top">Loading…</div>
 <canvas id="canvas"></canvas>
-<script>
-const project=JSON.parse(localStorage.getItem("rpgdream_active_project"));
-if(!project){window.location.href="../manager/index.html"}
 
-top.textContent=`Project: ${project.name} | ${project.view} | ${project.grid} | ${project.tile}px`;
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;canvas.height=innerHeight-48;
-const t=Number(project.tile)||32;
-ctx.strokeStyle="rgba(255,255,255,.15)";
-for(let x=0;x<canvas.width;x+=t){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}
-for(let y=0;y<canvas.height;y+=t){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
+<script>
+const project = JSON.parse(localStorage.getItem("rpgdream_active_project"));
+if(!project){
+  window.location.href = "../manager/index.html";
+}
+
+const VIEW_MODES = {
+  TOPDOWN: "topdown",
+  ANGULAR: "angular"
+};
+
+const viewMode = project.view || VIEW_MODES.TOPDOWN;
+const tileSize = Number(project.tile) || 32;
+
+const topBar = document.getElementById("top");
+topBar.textContent =
+  `Project: ${project.name} | View: ${viewMode} | Grid: ${project.grid} | Tile: ${tileSize}px`;
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let dpr = window.devicePixelRatio || 1;
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+
+function resize(){
+  canvas.width = innerWidth * dpr;
+  canvas.height = (innerHeight - 48) * dpr;
+  canvas.style.width = innerWidth + "px";
+  canvas.style.height = (innerHeight - 48) + "px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+window.addEventListener("resize", resize);
+
+function gridToScreen(x, y){
+  if(viewMode === VIEW_MODES.ANGULAR){
+    return {
+      x: (x - y) * (tileSize / 2),
+      y: (x + y) * (tileSize / 4)
+    };
+  }
+  return {
+    x: x * tileSize,
+    y: y * tileSize
+  };
+}
+
+function drawTopDownGrid(){
+  ctx.strokeStyle = "rgba(255,255,255,.15)";
+  for(let x=-2000;x<2000;x+=tileSize){
+    ctx.beginPath();ctx.moveTo(x,-2000);ctx.lineTo(x,2000);ctx.stroke();
+  }
+  for(let y=-2000;y<2000;y+=tileSize){
+    ctx.beginPath();ctx.moveTo(-2000,y);ctx.lineTo(2000,y);ctx.stroke();
+  }
+}
+
+function drawAngularGrid(){
+  ctx.strokeStyle = "rgba(255,255,255,.15)";
+  const range = 40;
+  for(let x=-range;x<=range;x++){
+    for(let y=-range;y<=range;y++){
+      const p = gridToScreen(x, y);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - tileSize/4);
+      ctx.lineTo(p.x + tileSize/2, p.y);
+      ctx.lineTo(p.x, p.y + tileSize/4);
+      ctx.lineTo(p.x - tileSize/2, p.y);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
+}
+
+function draw(){
+  ctx.save();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+
+  if(viewMode === VIEW_MODES.ANGULAR){
+    drawAngularGrid();
+  } else {
+    drawTopDownGrid();
+  }
+
+  ctx.restore();
+}
+
+let isPanning = false;
+let lastX = 0;
+let lastY = 0;
+
+canvas.addEventListener("pointerdown", e => {
+  isPanning = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener("pointermove", e => {
+  if(!isPanning) return;
+  offsetX += e.clientX - lastX;
+  offsetY += e.clientY - lastY;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  draw();
+});
+
+canvas.addEventListener("pointerup", () => {
+  isPanning = false;
+});
+
+let pointers = new Map();
+canvas.addEventListener("pointerdown", e => {
+  pointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+});
+canvas.addEventListener("pointermove", e => {
+  if(!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+  if(pointers.size === 2){
+    const [a,b] = [...pointers.values()];
+    const dist = Math.hypot(a.x-b.x,a.y-b.y);
+    if(!canvas._lastDist) canvas._lastDist = dist;
+    const delta = dist / canvas._lastDist;
+    scale = Math.max(0.4, Math.min(4, scale * delta));
+    canvas._lastDist = dist;
+    draw();
+  }
+});
+canvas.addEventListener("pointerup", e => {
+  pointers.delete(e.pointerId);
+  canvas._lastDist = null;
+});
+
+resize();
 </script>
 </body>
 </html>
