@@ -9,15 +9,16 @@ body{
   margin:0;
   background:#0b0718;
   color:#efeaff;
-  font-family: Chalkduster, cursive;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
 .hidden{display:none!important}
 header{
   text-align:center;
   padding:16px 16px 8px;
 }
 header img{
-  max-width:260px;
-  width:75%;
+  max-width:220px;
+  width:60%;
   display:block;
   margin:0 auto 8px;
 }
@@ -102,18 +103,16 @@ input,select{
 
 <header>
   <img src="../assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
-  <div class="label" style="font-family: Chalkduster, cursive;">
-  PHASE 14B.3
-</div>
+  <div class="label">MANAGER</div>
 </header>
 
-<div class="container" style="font-family: Chalkduster, cursive;" >
+<div class="container">
   <button onclick="openNew()">New Project</button>
   <button class="secondary" onclick="openLoad()">Load From Local Storage</button>
 </div>
 
 <!-- NEW PROJECT MODAL -->
-<div class="backdrop hidden" style="font-family: Chalkduster, cursive; id="newModal">
+<div class="backdrop hidden" id="newModal">
   <div class="modal">
     <h3>Create New Project</h3>
 
