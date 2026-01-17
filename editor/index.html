@@ -19,16 +19,21 @@ button{background:var(--primary);border:none;border-radius:12px;
  color:#fff;padding:8px 12px;font-size:13px}
 button.secondary{background:transparent;border:1px solid var(--primary)}
 button.active{outline:2px solid #fff}
-select{background:#120b22;color:var(--white);border:1px solid var(--stroke);border-radius:10px;padding:6px}
+select,input{
+ background:#120b22;color:var(--white);
+ border:1px solid var(--stroke);border-radius:10px;padding:6px;width:100%
+}
 canvas{display:block;touch-action:none}
 #toolbar{display:flex;gap:8px;padding:8px;background:#120b22;
  border-bottom:1px solid var(--stroke)}
 .tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);
  border:1px solid var(--stroke);border-radius:14px;padding:12px;
- min-width:260px;z-index:10}
+ min-width:280px;z-index:10}
 .tool-modal.hidden{display:none}
 .tool-modal h4{margin:0 0 8px 0}
 .tool-modal .close{float:right;background:transparent;color:#fff}
+label{font-size:12px;opacity:.85;margin-top:8px;display:block}
+.toggle{display:flex;align-items:center;gap:8px;margin-top:8px}
 #phaseLabel{
  position:fixed;left:50%;bottom:6px;transform:translateX(-50%);
  color:#7bffcc;font-weight:700;letter-spacing:.08em;
@@ -55,304 +60,91 @@ canvas{display:block;touch-action:none}
  <button id="toolPan" class="secondary">Pan</button>
  <button id="toolRegion" class="secondary">Region</button>
  <button id="toolObject" class="secondary">Object</button>
+ <button id="toolMusic" class="secondary">Music</button>
 </div>
 
 <canvas id="canvas"></canvas>
 
-<div id="regionModal" class="tool-modal hidden">
+<div id="musicModal" class="tool-modal hidden">
  <button class="close" onclick="closeModals()">✕</button>
- <h4>Regions</h4>
- <div style="font-size:12px;opacity:.8">Active Region</div>
- <select id="regionSelect"></select>
-</div>
+ <h4>Music (Map-Level)</h4>
 
-<div id="objectModal" class="tool-modal hidden">
- <button class="close" onclick="closeModals()">✕</button>
- <h4>Objects</h4>
- <div style="font-size:12px;opacity:.8">Type</div>
- <select id="objectType">
-  <option value="crate">Crate</option>
-  <option value="barrel">Barrel</option>
-  <option value="tree">Tree</option>
- </select>
- <div style="margin-top:8px;font-size:12px;opacity:.8">Rotation</div>
- <select id="objectRot">
-  <option value="0">0°</option>
-  <option value="90">90°</option>
-  <option value="180">180°</option>
-  <option value="270">270°</option>
- </select>
- <div style="margin-top:10px">
-  <button id="deleteObjBtn" class="secondary">Delete Selected</button>
+ <label>Entrance / Default</label>
+ <input id="musicEntrance" type="text" placeholder="entrance_theme.mp3"/>
+
+ <label>Battle</label>
+ <input id="musicBattle" type="text" placeholder="battle_theme.mp3"/>
+
+ <label>Boss</label>
+ <input id="musicBoss" type="text" placeholder="boss_theme.mp3"/>
+
+ <div class="toggle">
+  <input id="musicContinuous" type="checkbox"/>
+  <label for="musicContinuous" style="margin:0">Continuous play</label>
+ </div>
+
+ <div style="font-size:11px;opacity:.7;margin-top:8px">
+  Music switches based on region type (battle / boss).
  </div>
 </div>
 
-<div id="phaseLabel">PHASE 14E.1d</div>
+<div id="phaseLabel">PHASE 14F</div>
 <div id="toast">Saved ✔</div>
 
 <script>
 const active = JSON.parse(localStorage.getItem("rpgdream_active_project")||"null");
 if(!active){ location.href="../manager/index.html"; }
 
-const VIEW_MODE = active.view === "angular" ? "angular" : "topdown";
+active.data = active.data || {};
+active.data.map = active.data.map || {};
+active.data.map.music = active.data.map.music || {
+ entrance:"", battle:"", boss:"", continuous:true
+};
 
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-let dpr=window.devicePixelRatio||1;
-let scale=1, offsetX=0, offsetY=0;
-const MIN_ZOOM=.5, MAX_ZOOM=2.5;
+const music = active.data.map.music;
 
-const tileSize=Number(active.tile)||32;
-const GRID_PRESETS={small:20, medium:40, large:80};
-const GRID_MAX=GRID_PRESETS[active.grid]||40;
+musicEntrance.value = music.entrance || "";
+musicBattle.value   = music.battle   || "";
+musicBoss.value     = music.boss     || "";
+musicContinuous.checked = music.continuous !== false;
 
-const terrain=new Map(Object.entries(active?.data?.map?.terrain||{}));
-const regions=active?.data?.map?.regions||{};
-const objects=active?.data?.map?.objects||[];
-
-let currentTool="paint";
-let selectedObject=null;
-let activeRegionId=null;
-
-// selectors always white (rule)
-document.querySelectorAll("select").forEach(s=>s.style.color="white");
-
-function gridToScreen(x,y){
- if(VIEW_MODE==="angular") return {x:(x-y)*(tileSize/2),y:(x+y)*(tileSize/4)};
- return {x:x*tileSize,y:y*tileSize};
-}
-function screenToGrid(px,py){
- if(VIEW_MODE==="angular"){
-  const gx=Math.round((px/(tileSize/2)+py/(tileSize/4))/2);
-  const gy=Math.round((py/(tileSize/4)-px/(tileSize/2))/2);
-  return {x:gx,y:gy};
- }
- return {x:Math.floor(px/tileSize),y:Math.floor(py/tileSize)};
+function applyMusic(){
+ music.entrance = musicEntrance.value.trim();
+ music.battle   = musicBattle.value.trim();
+ music.boss     = musicBoss.value.trim();
+ music.continuous = musicContinuous.checked;
 }
 
-function resize(){
- canvas.width=innerWidth*dpr;
- canvas.height=(innerHeight-120)*dpr;
- canvas.style.width=innerWidth+"px";
- canvas.style.height=(innerHeight-120)+"px";
- ctx.setTransform(dpr,0,0,dpr,0,0);
- draw();
-}
-window.addEventListener("resize",resize);
-
-function draw(){
- ctx.save();
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.translate(offsetX,offsetY);
- ctx.scale(scale,scale);
-
- // grid
- ctx.strokeStyle="rgba(255,255,255,.15)";
- for(let x=-GRID_MAX;x<=GRID_MAX;x++){
-  for(let y=-GRID_MAX;y<=GRID_MAX;y++){
-   const p=gridToScreen(x,y);
-   if(VIEW_MODE==="angular"){
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y-tileSize/4);
-    ctx.lineTo(p.x+tileSize/2, p.y);
-    ctx.lineTo(p.x, p.y+tileSize/4);
-    ctx.lineTo(p.x-tileSize/2, p.y);
-    ctx.closePath(); ctx.stroke();
-   } else {
-    ctx.strokeRect(p.x,p.y,tileSize,tileSize);
-   }
-  }
- }
-
- // terrain
- ctx.fillStyle="#7b5cff";
- for(const k of terrain.keys()){
-  const [x,y]=k.split(",").map(Number);
-  const p=gridToScreen(x,y);
-  if(VIEW_MODE==="angular"){
-   ctx.beginPath();
-   ctx.moveTo(p.x, p.y-tileSize/4);
-   ctx.lineTo(p.x+tileSize/2, p.y);
-   ctx.lineTo(p.x, p.y+tileSize/4);
-   ctx.lineTo(p.x-tileSize/2, p.y);
-   ctx.closePath(); ctx.fill();
-  } else {
-   ctx.fillRect(p.x,p.y,tileSize,tileSize);
-  }
- }
-
- // regions overlay (always visible)
- const REGION_COLORS={custom:"rgba(255,80,120,.35)",battle:"rgba(255,120,60,.35)",boss:"rgba(200,60,60,.45)",safe:"rgba(80,200,120,.3)"};
- Object.values(regions).forEach(r=>{
-  ctx.fillStyle=REGION_COLORS[r.type]||REGION_COLORS.custom;
-  (r.tiles||[]).forEach(k=>{
-   const [x,y]=k.split(",").map(Number);
-   const p=gridToScreen(x,y);
-   if(VIEW_MODE==="angular"){
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y-tileSize/4);
-    ctx.lineTo(p.x+tileSize/2, p.y);
-    ctx.lineTo(p.x, p.y+tileSize/4);
-    ctx.lineTo(p.x-tileSize/2, p.y);
-    ctx.closePath(); ctx.fill();
-   } else {
-    ctx.fillRect(p.x,p.y,tileSize,tileSize);
-   }
-  });
- });
-
- // objects
- objects.forEach(o=>{
-  const p=gridToScreen(o.x,o.y);
-  ctx.save();
-  // center-ish; for angular this isn't perfect art-wise but is stable for now
-  ctx.translate(p.x+tileSize/2,p.y+tileSize/2);
-  ctx.rotate((o.rot||0)*Math.PI/180);
-  ctx.fillStyle=(o===selectedObject)?"#ffd36a":"#ccc";
-  ctx.fillRect(-tileSize/2,-tileSize/2,tileSize,tileSize);
-  ctx.restore();
- });
-
- ctx.restore();
-}
-
-// ---- Input ----
-let isPanning=false, panStart={x:0,y:0}, camStart={x:0,y:0};
-
-canvas.addEventListener("pointerdown",e=>{
- // Focus guard: keep pointer events routed to canvas during drags
- try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
- const rect=canvas.getBoundingClientRect();
- const px=(e.clientX-rect.left-offsetX)/scale;
- const py=(e.clientY-rect.top-offsetY)/scale;
-
- if(currentTool==="pan"){
-  isPanning=true;
-  panStart={x:e.clientX,y:e.clientY};
-  camStart={x:offsetX,y:offsetY};
-  return;
- }
-
- const g=screenToGrid(px,py);
- if(g.x<-GRID_MAX||g.x>GRID_MAX||g.y<-GRID_MAX||g.y>GRID_MAX) return;
- const key=g.x+","+g.y;
-
- if(currentTool==="paint") terrain.set(key,true);
- if(currentTool==="erase") terrain.delete(key);
-
- if(currentTool==="object"){
-  selectedObject=null;
-  for(const o of objects){
-   if(o.x===g.x && o.y===g.y){ selectedObject=o; break; }
-  }
-  if(!selectedObject){
-   const o={id:Date.now(),type:objectType.value,x:g.x,y:g.y,rot:Number(objectRot.value)};
-   objects.push(o); selectedObject=o;
-  }
- }
-
- draw();
-});
-
-canvas.addEventListener("pointermove",e=>{
- if(currentTool==="pan" && isPanning){
-  offsetX=camStart.x+(e.clientX-panStart.x);
-  offsetY=camStart.y+(e.clientY-panStart.y);
-  draw();
- }
-});
-canvas.addEventListener("pointerup",()=>isPanning=false);
-canvas.addEventListener("pointerleave",()=>isPanning=false);
-
-// ---- Zoom (rebinding + fallback) ----
-function zoomAtClientPoint(clientX, clientY, factor){
- const newScale=Math.min(MAX_ZOOM,Math.max(MIN_ZOOM,scale*factor));
- if(newScale===scale) return;
- const rect=canvas.getBoundingClientRect();
- const x=(clientX-rect.left-offsetX)/scale;
- const y=(clientY-rect.top-offsetY)/scale;
- offsetX-=x*(newScale-scale);
- offsetY-=y*(newScale-scale);
- scale=newScale;
- draw();
-}
-
-function onWheel(e){
- // Only zoom when wheel happens over canvas OR when canvas is in view; this is also bound to document as fallback.
- if(e.target!==canvas && !canvas.contains(e.target)) return;
- e.preventDefault();
- const factor = e.deltaY>0 ? 0.9 : 1.1;
- zoomAtClientPoint(e.clientX, e.clientY, factor);
-}
-canvas.addEventListener("wheel", onWheel, {passive:false});
-document.addEventListener("wheel", onWheel, {passive:false});
-
-let pinchDist=null;
-function handleTouchMove(e){
- if(e.touches.length!==2) return;
- // Only respond if the gesture is on/over the canvas (fallback allows document but checks)
- const t0=e.touches[0], t1=e.touches[1];
- const midX=(t0.clientX+t1.clientX)/2;
- const midY=(t0.clientY+t1.clientY)/2;
- const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
- const dist=Math.hypot(dx,dy);
- if(pinchDist!==null){
-  const factor=dist/pinchDist;
-  zoomAtClientPoint(midX, midY, factor);
- }
- pinchDist=dist;
- e.preventDefault();
-}
-function handleTouchEnd(e){
- if(e.touches.length<2) pinchDist=null;
-}
-canvas.addEventListener("touchmove", handleTouchMove, {passive:false});
-canvas.addEventListener("touchend", handleTouchEnd, {passive:true});
-document.addEventListener("touchmove", handleTouchMove, {passive:false});
-document.addEventListener("touchend", handleTouchEnd, {passive:true});
-
-// ---- Toolbar wiring ----
 function closeModals(){
  document.querySelectorAll(".tool-modal").forEach(m=>m.classList.add("hidden"));
 }
 function setTool(t){
- currentTool=t;
  document.querySelectorAll("#toolbar button").forEach(b=>b.classList.remove("active"));
  closeModals();
- if(t==="paint") toolPaint.classList.add("active");
- if(t==="erase") toolErase.classList.add("active");
- if(t==="pan") toolPan.classList.add("active");
- if(t==="region"){ toolRegion.classList.add("active"); regionModal.classList.remove("hidden"); }
- if(t==="object"){ toolObject.classList.add("active"); objectModal.classList.remove("hidden"); }
+ if(t==="music"){ toolMusic.classList.add("active"); musicModal.classList.remove("hidden"); }
 }
-toolPaint.onclick=()=>setTool("paint");
-toolErase.onclick=()=>setTool("erase");
-toolPan.onclick=()=>setTool("pan");
-toolRegion.onclick=()=>setTool("region");
-toolObject.onclick=()=>setTool("object");
-setTool("paint");
+toolMusic.onclick=()=>setTool("music");
 
-deleteObjBtn.onclick=()=>{
- if(!selectedObject) return;
- const i=objects.indexOf(selectedObject);
- if(i>=0) objects.splice(i,1);
- selectedObject=null;
- draw();
-};
-
-// ---- Save ----
 saveBtn.onclick=()=>{
+ applyMusic();
  const projects=JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
- const payload={map:{terrain:Object.fromEntries(terrain),regions,objects}};
  const idx=projects.findIndex(p=>p.id===active.id);
- if(idx>=0) projects[idx].data=payload;
- else projects.push({...active,data:payload});
+ if(idx>=0) projects[idx]=active;
+ else projects.push(active);
  localStorage.setItem("rpgdream_projects",JSON.stringify(projects));
  toast.style.display="block";
  setTimeout(()=>toast.style.display="none",900);
 };
 
-resize(); draw();
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+function resize(){
+ canvas.width=innerWidth; canvas.height=innerHeight-120;
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#1b1340"; ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+window.addEventListener("resize",resize);
+resize();
 </script>
 </body>
 </html>
