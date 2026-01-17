@@ -12,7 +12,6 @@ export const editorState = {
 
 export function setViewMode(mode) {
   editorState.viewMode = mode;
-  editorState.projection = mode === 'angular'
-    ? AngularProjection
-    : TopDownProjection;
+  editorState.projection =
+    mode === 'angular' ? AngularProjection : TopDownProjection;
 }
