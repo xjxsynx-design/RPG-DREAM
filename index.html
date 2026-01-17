@@ -1,47 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM</title>
-<style>
-body{
-  margin:0;
-  background:#0b0718;
-  color:#efeaff;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-.wrapper{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:24px;
-}
-img{
-  max-width:260px;
-  width:70%;
-  opacity:.95;
-}
-button{
-  background:#7b5cff;
-  border:none;
-  border-radius:14px;
-  color:#fff;
-  padding:14px 28px;
-  font-size:16px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>RPG DREAM – Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b0718;
+      color: #efeaff;
+    }
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    .views {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .views label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #7b5cff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #8f76ff;
+    }
+    #phase {
+      position: fixed;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #7bffcc;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrapper" style="font-family: Chalkduster, cursive;">
-    <img src="assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
-    <button onclick="location.href='manager/index.html'">
-      Enter RPG FORGE
-    </button>
+
+  <div class="container">
+    <h1>RPG DREAM MANAGER</h1>
+
+    <label for="projectName">Project Name</label>
+    <input id="projectName" type="text" placeholder="My RPG Project" />
+
+    <label for="gridSize">Grid Size</label>
+    <select id="gridSize">
+      <option value="16">16</option>
+      <option value="32" selected>32</option>
+      <option value="48">48</option>
+      <option value="64">64</option>
+    </select>
+
+    <label>View Mode</label>
+    <div class="views">
+      <label>
+        <input type="radio" name="view" value="top" checked />
+        Top Down
+      </label>
+      <label>
+        <input type="radio" name="view" value="angular" />
+        Angular
+      </label>
+    </div>
+
+    <button onclick="createProject()">Create Project</button>
   </div>
+
+  <div id="phase">MANAGER / PHASE 4.x CANONICAL</div>
+
+  <script>
+    function createProject() {
+      const name = document.getElementById("projectName").value || "Untitled Project";
+      const gridSize = parseInt(document.getElementById("gridSize").value, 10);
+      const viewMode = document.querySelector('input[name="view"]:checked').value;
+
+      const activeProject = {
+        id: Date.now(),
+        name,
+        data: {
+          editor: {
+            viewMode,
+            camera: { x: 0, y: 0, zoom: 1 },
+            grid: { size: gridSize }
+          },
+          layers: {
+            tiles: [],
+            regions: [],
+            objects: []
+          }
+        }
+      };
+
+      localStorage.setItem(
+        "rpgdream_active_project",
+        JSON.stringify(activeProject)
+      );
+
+      window.location.href = "./editor/index.html";
+    }
+  </script>
+
 </body>
 </html>
