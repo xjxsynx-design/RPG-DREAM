@@ -1,123 +1,33 @@
+<!-- index.html (AFTER — CANONICAL) -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RPG DREAM – Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0b0718;
-      color: #efeaff;
-    }
-    .container {
-      max-width: 420px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-      letter-spacing: 0.08em;
-    }
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-    }
-    input[type="text"], select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-    }
-    .views {
-      display: flex;
-      gap: 16px;
-      margin-top: 8px;
-    }
-    .views label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    button {
-      width: 100%;
-      margin-top: 24px;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      background: #7b5cff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover { background: #8f76ff; }
-    #phase {
-      position: fixed;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: #7bffcc;
-      opacity: 0.9;
-    }
-  </style>
+  <title>RPG DREAM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/styles.css" />
 </head>
-<body>
 
-  <div class="container">
-    <h1>RPG DREAM MANAGER</h1>
+<body class="landing">
 
-    <label for="projectName">Project Name</label>
-    <input id="projectName" type="text" placeholder="My RPG Project" />
+  <div class="landing-container">
+    <img src="./assets/rpg_dream_logo.png" alt="RPG DREAM Logo" class="logo" />
 
-    <label for="gridSize">Grid Size</label>
-    <select id="gridSize">
-      <option value="16">16</option>
-      <option value="32" selected>32</option>
-      <option value="48">48</option>
-      <option value="64">64</option>
-    </select>
-
-    <label>View Mode</label>
-    <div class="views">
-      <label><input type="radio" name="view" value="top" checked /> Top Down</label>
-      <label><input type="radio" name="view" value="angular" /> Angular</label>
-    </div>
-
-    <button onclick="createProject()">Create Project</button>
+    <button
+      class="primary-btn"
+      onclick="enterManager()"
+    >
+      Enter RPG Forge
+    </button>
   </div>
 
-  <div id="phase">MANAGER — CANONICAL ROOT (OPTION A)</div>
-
   <script>
-    function createProject() {
-      const name = document.getElementById("projectName").value || "Untitled Project";
-      const gridSize = parseInt(document.getElementById("gridSize").value, 10);
-      const viewMode = document.querySelector('input[name="view"]:checked').value;
-
-      const activeProject = {
-        id: Date.now(),
-        name,
-        data: {
-          editor: {
-            viewMode: viewMode,
-            camera: { x: 0, y: 0, zoom: 1 },
-            grid: { size: gridSize }
-          },
-          layers: {
-            tiles: [],
-            regions: [],
-            objects: []
-          }
-        }
-      };
-
-      localStorage.setItem("rpgdream_active_project", JSON.stringify(activeProject));
-      window.location.href = "./editor/index.html";
+    /* >>>>> BEGIN EDIT <<<<< */
+    function enterManager() {
+      window.location.href = "./manager/index.html";
     }
+    /* >>>>> END EDIT <<<<< */
   </script>
 
 </body>
