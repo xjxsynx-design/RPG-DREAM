@@ -1,11 +1,13 @@
+// engine/render/renderer.js
 import { editorState } from '../editorState.js';
-import { topDownProject } from './projections/topDown.js';
-import { angularProject } from './projections/angular.js';
 
-export function render(ctx, world) {
-  const project = editorState.viewMode === 'angular'
-    ? angularProject
-    : topDownProject;
+export function render(ctx, canvas) {
+  const { projection, camera, grid } = editorState;
 
-  project(ctx, world, editorState);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  projection.beginFrame(ctx, canvas, camera);
+  projection.drawGrid(ctx, grid, camera);
+  projection.endFrame(ctx);
 }
