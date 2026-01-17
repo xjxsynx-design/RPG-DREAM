@@ -1,30 +1,26 @@
 // editor/main.js
 import { editorState, setViewMode } from '../engine/editorState.js';
 import { render } from '../engine/render/renderer.js';
+import { saveProject, loadProject } from '../engine/persistence.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 120;
+  canvas.width = innerWidth;
+  canvas.height = innerHeight - 100;
 }
 window.addEventListener('resize', resize);
 resize();
 
-// Restore view mode from project if present
-const active = JSON.parse(localStorage.getItem('rpgdream_active_project')||'null');
-if(active?.data?.view){
-  setViewMode(active.data.view);
-}
+loadProject();
 
-// Simple loop
 function loop(){
   render(ctx, canvas);
   requestAnimationFrame(loop);
 }
 loop();
 
-// Expose switch for UI (temporary)
-window.setViewTop = ()=>setViewMode('top');
-window.setViewAngular = ()=>setViewMode('angular');
+window.setViewTop = ()=>{ setViewMode('top'); saveProject(); };
+window.setViewAngular = ()=>{ setViewMode('angular'); saveProject(); };
+window.saveNow = saveProject;
