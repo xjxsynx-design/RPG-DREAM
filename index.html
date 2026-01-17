@@ -19,14 +19,14 @@
     h1 {
       text-align: center;
       margin-bottom: 24px;
+      letter-spacing: 0.08em;
     }
     label {
       display: block;
       margin-top: 16px;
       margin-bottom: 6px;
     }
-    input[type="text"],
-    select {
+    input[type="text"], select {
       width: 100%;
       padding: 10px;
       border-radius: 6px;
@@ -47,22 +47,21 @@
       margin-top: 24px;
       padding: 14px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       background: #7b5cff;
       color: white;
       cursor: pointer;
     }
-    button:hover {
-      background: #8f76ff;
-    }
+    button:hover { background: #8f76ff; }
     #phase {
       position: fixed;
-      bottom: 6px;
+      bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 12px;
       color: #7bffcc;
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -84,20 +83,14 @@
 
     <label>View Mode</label>
     <div class="views">
-      <label>
-        <input type="radio" name="view" value="top" checked />
-        Top Down
-      </label>
-      <label>
-        <input type="radio" name="view" value="angular" />
-        Angular
-      </label>
+      <label><input type="radio" name="view" value="top" checked /> Top Down</label>
+      <label><input type="radio" name="view" value="angular" /> Angular</label>
     </div>
 
     <button onclick="createProject()">Create Project</button>
   </div>
 
-  <div id="phase">MANAGER / PHASE 4.x CANONICAL</div>
+  <div id="phase">MANAGER — CANONICAL ROOT (OPTION A)</div>
 
   <script>
     function createProject() {
@@ -110,7 +103,7 @@
         name,
         data: {
           editor: {
-            viewMode,
+            viewMode: viewMode,
             camera: { x: 0, y: 0, zoom: 1 },
             grid: { size: gridSize }
           },
@@ -122,11 +115,7 @@
         }
       };
 
-      localStorage.setItem(
-        "rpgdream_active_project",
-        JSON.stringify(activeProject)
-      );
-
+      localStorage.setItem("rpgdream_active_project", JSON.stringify(activeProject));
       window.location.href = "./editor/index.html";
     }
   </script>
