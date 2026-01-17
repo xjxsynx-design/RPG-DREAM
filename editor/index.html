@@ -7,7 +7,7 @@
 <style>
 :root{
  --bg:#0b0718;--panel:#16102a;--stroke:#3a2b7a;--primary:#7b5cff;
- --text:#efeaff;--white:#ffffff
+ --text:#efeaff;--white:#ffffff;--grid:#3a2b7a
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
@@ -16,16 +16,21 @@ body{margin:0;background:var(--bg);color:var(--text);
  background:var(--panel);border-bottom:1px solid var(--stroke)}
 #topbar .spacer{flex:1}
 button{background:var(--primary);border:none;border-radius:12px;
- color:#fff;padding:8px 12px;font-size:13px}
+ color:#fff;padding:8px 12px;font-size:13px;white-space:nowrap}
 button.secondary{background:transparent;border:1px solid var(--primary)}
 button.active{outline:2px solid #fff}
-select,input{
- background:#120b22;color:var(--white);
- border:1px solid var(--stroke);border-radius:10px;padding:6px;width:100%
+
+#toolbar{
+ display:flex;gap:8px;padding:8px;background:#120b22;
+ border-bottom:1px solid var(--stroke);
+ overflow-x:auto;white-space:nowrap
 }
+#toolbar::-webkit-scrollbar{height:6px}
+#toolbar::-webkit-scrollbar-thumb{background:#3a2b7a;border-radius:6px}
+#toolbar button{flex-shrink:0}
+
 canvas{display:block;touch-action:none}
-#toolbar{display:flex;gap:8px;padding:8px;background:#120b22;
- border-bottom:1px solid var(--stroke)}
+
 .tool-modal{position:fixed;right:12px;top:120px;background:var(--panel);
  border:1px solid var(--stroke);border-radius:14px;padding:12px;
  min-width:280px;z-index:10}
@@ -34,6 +39,7 @@ canvas{display:block;touch-action:none}
 .tool-modal .close{float:right;background:transparent;color:#fff}
 label{font-size:12px;opacity:.85;margin-top:8px;display:block}
 .toggle{display:flex;align-items:center;gap:8px;margin-top:8px}
+
 #phaseLabel{
  position:fixed;left:50%;bottom:6px;transform:translateX(-50%);
  color:#7bffcc;font-weight:700;letter-spacing:.08em;
@@ -55,7 +61,7 @@ label{font-size:12px;opacity:.85;margin-top:8px;display:block}
 </div>
 
 <div id="toolbar">
- <button id="toolPaint">Paint</button>
+ <button id="toolPaint" class="active">Paint</button>
  <button id="toolErase" class="secondary">Erase</button>
  <button id="toolPan" class="secondary">Pan</button>
  <button id="toolRegion" class="secondary">Region</button>
@@ -65,86 +71,149 @@ label{font-size:12px;opacity:.85;margin-top:8px;display:block}
 
 <canvas id="canvas"></canvas>
 
+<!-- Music Modal -->
 <div id="musicModal" class="tool-modal hidden">
  <button class="close" onclick="closeModals()">✕</button>
  <h4>Music (Map-Level)</h4>
-
  <label>Entrance / Default</label>
- <input id="musicEntrance" type="text" placeholder="entrance_theme.mp3"/>
-
+ <input id="musicEntrance" placeholder="entrance_theme.mp3"/>
  <label>Battle</label>
- <input id="musicBattle" type="text" placeholder="battle_theme.mp3"/>
-
+ <input id="musicBattle" placeholder="battle_theme.mp3"/>
  <label>Boss</label>
- <input id="musicBoss" type="text" placeholder="boss_theme.mp3"/>
-
+ <input id="musicBoss" placeholder="boss_theme.mp3"/>
  <div class="toggle">
   <input id="musicContinuous" type="checkbox"/>
   <label for="musicContinuous" style="margin:0">Continuous play</label>
  </div>
-
- <div style="font-size:11px;opacity:.7;margin-top:8px">
-  Music switches based on region type (battle / boss).
- </div>
 </div>
 
-<div id="phaseLabel">PHASE 14F</div>
+<div id="phaseLabel">PHASE 14F.1</div>
 <div id="toast">Saved ✔</div>
 
 <script>
+// ---- Active project ----
 const active = JSON.parse(localStorage.getItem("rpgdream_active_project")||"null");
 if(!active){ location.href="../manager/index.html"; }
 
 active.data = active.data || {};
+active.data.view = active.data.view || "top"; // 'top' or 'angular'
 active.data.map = active.data.map || {};
 active.data.map.music = active.data.map.music || {
  entrance:"", battle:"", boss:"", continuous:true
 };
 
-const music = active.data.map.music;
-
-musicEntrance.value = music.entrance || "";
-musicBattle.value   = music.battle   || "";
-musicBoss.value     = music.boss     || "";
-musicContinuous.checked = music.continuous !== false;
+// ---- Music bindings ----
+musicEntrance.value = active.data.map.music.entrance || "";
+musicBattle.value   = active.data.map.music.battle   || "";
+musicBoss.value     = active.data.map.music.boss     || "";
+musicContinuous.checked = active.data.map.music.continuous !== false;
 
 function applyMusic(){
- music.entrance = musicEntrance.value.trim();
- music.battle   = musicBattle.value.trim();
- music.boss     = musicBoss.value.trim();
- music.continuous = musicContinuous.checked;
+ active.data.map.music.entrance = musicEntrance.value.trim();
+ active.data.map.music.battle   = musicBattle.value.trim();
+ active.data.map.music.boss     = musicBoss.value.trim();
+ active.data.map.music.continuous = musicContinuous.checked;
 }
 
+// ---- Toolbar wiring ----
 function closeModals(){
  document.querySelectorAll(".tool-modal").forEach(m=>m.classList.add("hidden"));
 }
-function setTool(t){
+function setTool(btn, modal){
  document.querySelectorAll("#toolbar button").forEach(b=>b.classList.remove("active"));
  closeModals();
- if(t==="music"){ toolMusic.classList.add("active"); musicModal.classList.remove("hidden"); }
+ btn.classList.add("active");
+ if(modal) modal.classList.remove("hidden");
 }
-toolMusic.onclick=()=>setTool("music");
+toolMusic.onclick=()=>setTool(toolMusic, musicModal);
+toolPaint.onclick=()=>setTool(toolPaint);
+toolErase.onclick=()=>setTool(toolErase);
+toolPan.onclick=()=>setTool(toolPan);
+toolRegion.onclick=()=>setTool(toolRegion);
+toolObject.onclick=()=>setTool(toolObject);
 
+// ---- Save ----
 saveBtn.onclick=()=>{
  applyMusic();
  const projects=JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
  const idx=projects.findIndex(p=>p.id===active.id);
- if(idx>=0) projects[idx]=active;
- else projects.push(active);
+ if(idx>=0) projects[idx]=active; else projects.push(active);
  localStorage.setItem("rpgdream_projects",JSON.stringify(projects));
  toast.style.display="block";
  setTimeout(()=>toast.style.display="none",900);
 };
 
+// ---- Canvas + Grid Renderer ----
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
+
+let cam={x:0,y:0,zoom:1};
+const gridSize=32;
+
 function resize(){
- canvas.width=innerWidth; canvas.height=innerHeight-120;
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle="#1b1340"; ctx.fillRect(0,0,canvas.width,canvas.height);
+ canvas.width=innerWidth;
+ canvas.height=innerHeight-120;
 }
 window.addEventListener("resize",resize);
 resize();
+
+function drawTopDown(){
+ const step=gridSize*cam.zoom;
+ ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--grid');
+ ctx.lineWidth=1;
+ const startX = (-cam.x*cam.zoom)%step;
+ const startY = (-cam.y*cam.zoom)%step;
+ for(let x=startX;x<canvas.width;x+=step){
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+ }
+ for(let y=startY;y<canvas.height;y+=step){
+  ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+ }
+}
+
+function drawAngular(){
+ const step=gridSize*cam.zoom;
+ ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--grid');
+ ctx.lineWidth=1;
+ for(let y=-canvas.height;y<canvas.height*2;y+=step){
+  ctx.beginPath(); ctx.moveTo(-canvas.width,y+cam.y); ctx.lineTo(canvas.width*2,y+cam.y); ctx.stroke();
+ }
+ for(let y=-canvas.height;y<canvas.height*2;y+=step){
+  ctx.beginPath(); ctx.moveTo(-canvas.width,y-cam.y); ctx.lineTo(canvas.width*2,y-cam.y); ctx.stroke();
+ }
+}
+
+function render(){
+ ctx.setTransform(1,0,0,1,0,0);
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.translate(canvas.width/2,canvas.height/2);
+ ctx.scale(cam.zoom,cam.zoom);
+ ctx.translate(-canvas.width/2-cam.x,-canvas.height/2-cam.y);
+
+ if(active.data.view==="angular") drawAngular();
+ else drawTopDown();
+
+ requestAnimationFrame(render);
+}
+render();
+
+// ---- Zoom & Pan ----
+canvas.addEventListener("wheel",e=>{
+ e.preventDefault();
+ cam.zoom=Math.max(.25,Math.min(3,cam.zoom+(e.deltaY>0?-0.1:0.1)));
+},{passive:false});
+
+let panning=false,last={x:0,y:0};
+canvas.addEventListener("pointerdown",e=>{ if(toolPan.classList.contains("active")){panning=true; last={x:e.clientX,y:e.clientY}}});
+canvas.addEventListener("pointermove",e=>{
+ if(panning){
+  cam.x+=(last.x-e.clientX)/cam.zoom;
+  cam.y+=(last.y-e.clientY)/cam.zoom;
+  last={x:e.clientX,y:e.clientY};
+ }
+});
+canvas.addEventListener("pointerup",()=>panning=false);
+canvas.addEventListener("pointerleave",()=>panning=false);
 </script>
 </body>
 </html>
