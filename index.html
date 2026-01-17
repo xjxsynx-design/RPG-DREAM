@@ -1,34 +1,73 @@
-<!-- index.html (AFTER — CANONICAL) -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RPG DREAM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./assets/styles.css" />
+
+  <!-- Chalkduster font fallback -->
+  <style>
+    @font-face {
+      font-family: "Chalkduster";
+      src: local("Chalkduster");
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1b102b, #06030d);
+      color: #eae6ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    .landing {
+      text-align: center;
+    }
+
+    .landing img {
+      max-width: 320px;
+      width: 80%;
+      margin-bottom: 40px;
+    }
+
+    .enter-btn {
+      padding: 18px 40px;
+      font-size: 26px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #7b5cff, #9b7dff);
+      color: white;
+
+      /* >>>>> CHALKDUSTER APPLIED <<<<< */
+      font-family: "Chalkduster", "Comic Sans MS", system-ui;
+      letter-spacing: 1px;
+    }
+
+    .enter-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
 </head>
 
-<body class="landing">
+<body>
+  <div class="landing">
+    <img
+      src="assets/rpg_dream_logo.png"
+      alt="RPG DREAM Logo"
+    />
 
-  <div class="landing-container">
-    <img src="./assets/rpg_dream_logo.png" alt="RPG DREAM Logo" class="logo" />
+    <br />
 
     <button
-      class="primary-btn"
-      onclick="enterManager()"
+      class="enter-btn"
+      onclick="location.href='manager/index.html'"
     >
-      Enter RPG Forge
+      Enter RPG FORGE
     </button>
   </div>
-
-  <script>
-    /* >>>>> BEGIN EDIT <<<<< */
-    function enterManager() {
-      window.location.href = "./manager/index.html";
-    }
-    /* >>>>> END EDIT <<<<< */
-  </script>
-
 </body>
 </html>
