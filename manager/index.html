@@ -111,7 +111,6 @@ input,select{
   <button class="secondary" onclick="openLoad()">Load From Local Storage</button>
 </div>
 
-<!-- NEW PROJECT MODAL -->
 <div class="backdrop hidden" id="newModal">
   <div class="modal">
     <h3>Create New Project</h3>
@@ -119,9 +118,9 @@ input,select{
     <label>Project Name</label>
     <input id="projectName">
 
-    <label>View Type</label>
+    <label>Initial Map View Mode</label>
     <select id="view">
-      <option value="topdown">Top View</option>
+      <option value="top">Top View</option>
       <option value="angular">Angular View</option>
     </select>
 
@@ -147,7 +146,6 @@ input,select{
   </div>
 </div>
 
-<!-- LOAD PROJECT MODAL -->
 <div class="backdrop hidden" id="loadModal">
   <div class="modal">
     <h3>Local Projects</h3>
@@ -173,8 +171,9 @@ function renderProjects(){
   getProjects().forEach(p=>{
     const card=document.createElement("div");
     card.className="card";
+    const map=p.maps?.[0];
     card.innerHTML=`<strong>${p.name}</strong>
-      <div class="meta">${p.view} • ${p.tile}px • ${p.grid}</div>`;
+      <div class="meta">${map?.viewMode || "top"} • ${p.tile}px • ${p.grid}</div>`;
     const row=document.createElement("div");
     row.className="row";
     row.innerHTML=`
@@ -190,9 +189,13 @@ function createProject(){
   const project={
     id:"p_"+Date.now(),
     name:projectName.value||"Untitled Project",
-    view:view.value,
     grid:grid.value,
-    tile:tile.value
+    tile:tile.value,
+    maps:[{
+      id:"map_1",
+      name:"Map 1",
+      viewMode:view.value
+    }]
   };
   const projects=getProjects();
   projects.unshift(project);
