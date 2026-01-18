@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RPG DREAM</title>
 
-  <!-- Chalkduster font fallback -->
   <style>
-    @font-face {
-      font-family: "Chalkduster";
-      src: local("Chalkduster");
-    }
-
     body {
       margin: 0;
       height: 100vh;
@@ -34,34 +28,23 @@
     }
 
     .enter-btn {
-      padding: 18px 32px;
+      padding: 14px 32px;
       font-size: 22px;
-      border-radius: 14px;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
       background: linear-gradient(135deg, #7b5cff, #9b7dff);
       color: white;
-
-      /* >>>>> CHALKDUSTER APPLIED <<<<< */
       font-family: "Chalkduster", "Comic Sans MS", system-ui;
       letter-spacing: 1px;
-    }
-
-    .enter-btn:active {
-      transform: scale(0.98);
     }
   </style>
 </head>
 
 <body>
   <div class="landing">
-    <img
-      src="assets/rpg_dream_logo.png"
-      alt="RPG DREAM Logo"
-    />
-
+    <img src="assets/rpg_dream_logo.png" alt="RPG DREAM Logo" />
     <br />
-
     <button
       class="enter-btn"
       onclick="location.href='manager/index.html'"
