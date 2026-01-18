@@ -1,99 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RPG DREAM — Manager</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RPG DREAM — Manager</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: #0b0718;
-      color: #efeaff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-    }
+<style>
+/* ===============================
+   BASE
+=============================== */
+body {
+  margin: 0;
+  background: #0b0718;
+  color: #efeaff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
 
-    header {
-      text-align: center;
-      padding: 20px 16px 10px;
-    }
+.hidden { display: none !important; }
 
-    header img {
-      max-width: 220px;
-      width: 60%;
-      margin-bottom: 6px;
-    }
+/* ===============================
+   HEADER
+=============================== */
+header {
+  text-align: center;
+  padding: 20px 16px 10px;
+}
 
-    header .label {
-      font-size: 14px;
-      letter-spacing: 3px;
-      color: #b7b0e6;
-    }
+header img {
+  max-width: 220px;
+  width: 60%;
+  display: block;
+  margin: 0 auto 6px;
+}
 
-    .container {
-      max-width: 420px;
-      margin: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+header .label {
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #b7b0e6;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      font-size: 15px;
-      background: #7b5cff;
-      color: #fff;
-      cursor: pointer;
-    }
+/* ===============================
+   MAIN
+=============================== */
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-    button.secondary {
-      background: transparent;
-      border: 1px solid #7b5cff;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 15px;
+  background: #7b5cff;
+  color: #fff;
+  cursor: pointer;
+}
 
-    .hidden {
-      display: none !important;
-    }
+button.secondary {
+  background: transparent;
+  border: 1px solid #7b5cff;
+}
 
-    /* Modal */
-    .backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
+/* ===============================
+   MODALS
+=============================== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
 
-    .modal {
-      width: 100%;
-      max-width: 420px;
-      background: #120b22;
-      border: 1px solid #3a2b7a;
-      border-radius: 18px;
-      padding: 16px;
-    }
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: #120b22;
+  border: 1px solid #3a2b7a;
+  border-radius: 18px;
+  padding: 16px;
+}
 
-    label {
-      font-size: 13px;
-      color: #b7b0e6;
-    }
+label {
+  font-size: 13px;
+  color: #b7b0e6;
+}
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0 14px;
-      border-radius: 10px;
-      border: 1px solid #3a2b7a;
-      background: #120b22;
-      color: #efeaff;
-    }
-  </style>
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 14px;
+  border-radius: 10px;
+  border: 1px solid #3a2b7a;
+  background: #120b22;
+  color: #efeaff;
+}
+</style>
 </head>
 
 <body>
@@ -108,7 +118,9 @@
   <button class="secondary" onclick="openLoad()">Load From Local Storage</button>
 </div>
 
-<!-- NEW PROJECT MODAL -->
+<!-- ===============================
+     NEW PROJECT MODAL
+================================ -->
 <div class="backdrop hidden" id="newModal">
   <div class="modal">
     <h3>Create New Project</h3>
@@ -144,7 +156,9 @@
   </div>
 </div>
 
-<!-- LOAD PROJECT MODAL -->
+<!-- ===============================
+     LOAD PROJECT MODAL
+================================ -->
 <div class="backdrop hidden" id="loadModal">
   <div class="modal">
     <h3>Local Projects</h3>
@@ -154,9 +168,11 @@
 </div>
 
 <script>
-/* -------------------------
-   Storage Helpers
-------------------------- */
+/* =====================================================
+   RPG DREAM — MANAGER (CANONICAL)
+===================================================== */
+
+/* ---------- STORAGE ---------- */
 function getProjects() {
   return JSON.parse(localStorage.getItem("rpgdream_projects") || "[]");
 }
@@ -165,10 +181,8 @@ function saveProjects(projects) {
   localStorage.setItem("rpgdream_projects", JSON.stringify(projects));
 }
 
-/* -------------------------
-   Navigation
-------------------------- */
-function openEditor(project) {
+/* ---------- NAVIGATION ---------- */
+function goToEditor(project) {
   localStorage.setItem(
     "rpgdream_active_project",
     JSON.stringify(project)
@@ -176,27 +190,34 @@ function openEditor(project) {
   window.location.href = "../editor/index.html";
 }
 
-/* -------------------------
-   Project Creation
-------------------------- */
+/* ---------- CREATE PROJECT ---------- */
 function createProject() {
+  const name = projectName.value || "Untitled Project";
+  const view = viewMode.value;
+  const grid = gridPreset.value;
+  const tile = parseInt(tileSize.value, 10);
+
+  const mapId = "map_1";
+
   const project = {
     id: "p_" + Date.now(),
-    name: projectName.value || "Untitled Project",
-    tileSize: parseInt(tileSize.value, 10),
-    gridPreset: gridPreset.value,
+    name,
+    tileSize: tile,
+    gridPreset: grid,
     maps: [
       {
-        id: "map_1",
+        id: mapId,
         name: "Map 1",
-        viewMode: viewMode.value,   // ✅ MAP-LEVEL VIEW
-        tiles: [],
-        regions: [],
-        objects: []
+        viewMode: view,          // ✅ MAP-LEVEL VIEW
+        layers: {
+          tiles: [],
+          regions: [],
+          objects: []
+        }
       }
     ],
     editor: {
-      activeMapId: "map_1"
+      activeMapId: mapId
     }
   };
 
@@ -204,12 +225,31 @@ function createProject() {
   projects.unshift(project);
   saveProjects(projects);
 
-  openEditor(project);
+  goToEditor(project);
 }
 
-/* -------------------------
-   Load Projects
-------------------------- */
+/* ---------- LOAD PROJECT ---------- */
+function continueProject(projectId) {
+  const projects = getProjects();
+  const project = projects.find(p => p.id === projectId);
+
+  if (!project) {
+    alert("Project not found.");
+    return;
+  }
+
+  if (
+    !project.editor ||
+    !project.editor.activeMapId ||
+    !project.maps.find(m => m.id === project.editor.activeMapId)
+  ) {
+    project.editor = { activeMapId: project.maps[0].id };
+  }
+
+  goToEditor(project);
+}
+
+/* ---------- RENDER PROJECT LIST ---------- */
 function renderProjects() {
   const list = document.getElementById("projectList");
   list.innerHTML = "";
@@ -227,32 +267,21 @@ function renderProjects() {
     );
 
     const div = document.createElement("div");
-    div.style.marginBottom = "12px";
+    div.style.marginBottom = "14px";
 
-    const title = document.createElement("strong");
-    title.textContent = project.name;
-
-    const meta = document.createElement("div");
-    meta.innerHTML = `<small>${map.viewMode} view</small>`;
-
-    const btn = document.createElement("button");
-    btn.textContent = "Continue";
-    btn.onclick = () => openEditor(project); // ✅ SAFE
-
-    div.appendChild(title);
-    div.appendChild(document.createElement("br"));
-    div.appendChild(meta);
-    div.appendChild(document.createElement("br"));
-    div.appendChild(document.createElement("br"));
-    div.appendChild(btn);
+    div.innerHTML = `
+      <strong>${project.name}</strong><br/>
+      <small>${map.viewMode} view</small><br/><br/>
+      <button onclick="continueProject('${project.id}')">
+        Continue
+      </button>
+    `;
 
     list.appendChild(div);
   });
 }
 
-/* -------------------------
-   Modals
-------------------------- */
+/* ---------- MODALS ---------- */
 function openNew() {
   newModal.classList.remove("hidden");
 }
