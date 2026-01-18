@@ -1,108 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG DREAM MANAGER</title>
-<style>
-body{
-  margin:0;
-  background:#0b0718;
-  color:#efeaff;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-}
-.hidden{display:none!important}
-header{
-  text-align:center;
-  padding:16px 16px 8px;
-}
-header img{
-  max-width:220px;
-  width:60%;
-  display:block;
-  margin:0 auto 8px;
-}
-header .label{
-  font-size:14px;
-  letter-spacing:3px;
-  color:#b7b0e6;
-}
-.container{
-  max-width:420px;
-  margin:auto;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-button{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  font-size:15px;
-  background:#7b5cff;
-  color:#fff;
-}
-button.secondary{
-  background:transparent;
-  border:1px solid #7b5cff;
-}
-.card{
-  background:#16102a;
-  border-radius:14px;
-  padding:12px;
-}
-.meta{
-  font-size:13px;
-  color:#b7b0e6;
-}
-.row{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
-.row button{
-  flex:1;
-  padding:10px;
-  font-size:13px;
-}
-.backdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-}
-.modal{
-  width:100%;
-  max-width:420px;
-  background:#120b22;
-  border:1px solid #3a2b7a;
-  border-radius:18px;
-  padding:16px;
-}
-label{
-  font-size:13px;
-  color:#b7b0e6;
-}
-input,select{
-  width:100%;
-  padding:12px;
-  margin:8px 0 14px;
-  border-radius:10px;
-  border:1px solid #3a2b7a;
-  background:#120b22;
-  color:#efeaff;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG DREAM — Manager</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b0718;
+      color: #efeaff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 16px 10px;
+    }
+
+    header img {
+      max-width: 220px;
+      width: 60%;
+      margin-bottom: 6px;
+    }
+
+    header .label {
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: #b7b0e6;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 15px;
+      background: #7b5cff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid #7b5cff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Modal */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background: #120b22;
+      border: 1px solid #3a2b7a;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #b7b0e6;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 14px;
+      border-radius: 10px;
+      border: 1px solid #3a2b7a;
+      background: #120b22;
+      color: #efeaff;
+    }
+  </style>
 </head>
+
 <body>
 
 <header>
-  <img src="../assets/rpg_dream_logo.png" alt="RPG DREAM Logo">
+  <img src="../assets/rpg_dream_logo.png" alt="RPG DREAM Logo" />
   <div class="label">MANAGER</div>
 </header>
 
@@ -111,28 +108,29 @@ input,select{
   <button class="secondary" onclick="openLoad()">Load From Local Storage</button>
 </div>
 
+<!-- NEW PROJECT MODAL -->
 <div class="backdrop hidden" id="newModal">
   <div class="modal">
     <h3>Create New Project</h3>
 
     <label>Project Name</label>
-    <input id="projectName">
+    <input id="projectName" placeholder="My RPG Project" />
 
-    <label>Initial Map View Mode</label>
-    <select id="view">
-      <option value="top">Top View</option>
-      <option value="angular">Angular View</option>
+    <label>Initial Map View</label>
+    <select id="viewMode">
+      <option value="top">Top Down</option>
+      <option value="angular">Angular</option>
     </select>
 
     <label>Grid Preset</label>
-    <select id="grid">
+    <select id="gridPreset">
       <option value="small">Small</option>
-      <option value="medium">Medium</option>
+      <option value="medium" selected>Medium</option>
       <option value="large">Large</option>
     </select>
 
     <label>Tile Size</label>
-    <select id="tile">
+    <select id="tileSize">
       <option>16</option>
       <option selected>32</option>
       <option>48</option>
@@ -141,11 +139,12 @@ input,select{
       <option>128</option>
     </select>
 
-    <button onclick="createProject()">Create</button>
+    <button onclick="createProject()">Create Project</button>
     <button class="secondary" onclick="closeNew()">Cancel</button>
   </div>
 </div>
 
+<!-- LOAD PROJECT MODAL -->
 <div class="backdrop hidden" id="loadModal">
   <div class="modal">
     <h3>Local Projects</h3>
@@ -155,69 +154,100 @@ input,select{
 </div>
 
 <script>
-function getProjects(){
-  return JSON.parse(localStorage.getItem("rpgdream_projects")||"[]");
+/* -------------------------
+   Storage Helpers
+------------------------- */
+function getProjects() {
+  return JSON.parse(localStorage.getItem("rpgdream_projects") || "[]");
 }
-function saveProjects(p){
-  localStorage.setItem("rpgdream_projects",JSON.stringify(p));
+
+function saveProjects(projects) {
+  localStorage.setItem("rpgdream_projects", JSON.stringify(projects));
 }
-function openEditor(project){
-  localStorage.setItem("rpgdream_active_project",JSON.stringify(project));
-  location.href="../editor/index.html";
+
+/* -------------------------
+   Navigation
+------------------------- */
+function openEditor(project) {
+  localStorage.setItem(
+    "rpgdream_active_project",
+    JSON.stringify(project)
+  );
+  window.location.href = "../editor/index.html";
 }
-function renderProjects(){
-  const list=document.getElementById("projectList");
-  list.innerHTML="";
-  getProjects().forEach(p=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const map=p.maps?.[0];
-    card.innerHTML=`<strong>${p.name}</strong>
-      <div class="meta">${map?.viewMode || "top"} • ${p.tile}px • ${p.grid}</div>`;
-    const row=document.createElement("div");
-    row.className="row";
-    row.innerHTML=`
-      <button onclick='openEditor(${JSON.stringify(p)})'>Continue</button>
-      <button class="secondary" onclick='renameProj("${p.id}")'>Rename</button>
-      <button class="secondary" onclick='deleteProj("${p.id}")'>Delete</button>
-    `;
-    card.appendChild(row);
-    list.appendChild(card);
-  });
-}
-function createProject(){
-  const project={
-    id:"p_"+Date.now(),
-    name:projectName.value||"Untitled Project",
-    grid:grid.value,
-    tile:tile.value,
-    maps:[{
-      id:"map_1",
-      name:"Map 1",
-      viewMode:view.value
-    }]
+
+/* -------------------------
+   Project Creation
+------------------------- */
+function createProject() {
+  const project = {
+    id: "p_" + Date.now(),
+    name: projectName.value || "Untitled Project",
+    tileSize: parseInt(tileSize.value, 10),
+    gridPreset: gridPreset.value,
+    maps: [
+      {
+        id: "map_1",
+        name: "Map 1",
+        viewMode: viewMode.value,   // ✅ MAP-LEVEL VIEW
+        tiles: [],
+        regions: [],
+        objects: []
+      }
+    ],
+    editor: {
+      activeMapId: "map_1"
+    }
   };
-  const projects=getProjects();
+
+  const projects = getProjects();
   projects.unshift(project);
   saveProjects(projects);
+
   openEditor(project);
 }
-function renameProj(id){
-  const projects=getProjects();
-  const p=projects.find(x=>x.id===id);
-  const n=prompt("Rename project",p.name);
-  if(n){p.name=n;saveProjects(projects);renderProjects();}
+
+/* -------------------------
+   Load Projects
+------------------------- */
+function renderProjects() {
+  const list = document.getElementById("projectList");
+  list.innerHTML = "";
+
+  getProjects().forEach(project => {
+    const map = project.maps.find(
+      m => m.id === project.editor.activeMapId
+    );
+
+    const div = document.createElement("div");
+    div.style.marginBottom = "12px";
+
+    div.innerHTML = `
+      <strong>${project.name}</strong><br/>
+      <small>${map.viewMode} view</small><br/><br/>
+      <button onclick='openEditor(${JSON.stringify(project)})'>Continue</button>
+    `;
+
+    list.appendChild(div);
+  });
 }
-function deleteProj(id){
-  if(confirm("Delete project?")){
-    saveProjects(getProjects().filter(p=>p.id!==id));
-    renderProjects();
-  }
+
+/* -------------------------
+   Modals
+------------------------- */
+function openNew() {
+  newModal.classList.remove("hidden");
 }
-function openNew(){ newModal.classList.remove("hidden"); }
-function closeNew(){ newModal.classList.add("hidden"); }
-function openLoad(){ renderProjects(); loadModal.classList.remove("hidden"); }
-function closeLoad(){ loadModal.classList.add("hidden"); }
+function closeNew() {
+  newModal.classList.add("hidden");
+}
+function openLoad() {
+  renderProjects();
+  loadModal.classList.remove("hidden");
+}
+function closeLoad() {
+  loadModal.classList.add("hidden");
+}
 </script>
 
 </body>
