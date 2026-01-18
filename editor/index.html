@@ -1,24 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>RPG DREAM Editor</title>
-<style>
-body{margin:0;background:#0b0718;color:#efeaff}
-#toolbar{padding:8px;background:#16102a}
-button{margin-right:6px}
-canvas{display:block}
-#phase{position:fixed;bottom:6px;left:50%;transform:translateX(-50%);color:#7bffcc}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG DREAM — Editor</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b0718;
+      color: #efeaff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      overflow: hidden;
+    }
+
+    #topbar {
+      height: 48px;
+      background: #120b22;
+      border-bottom: 1px solid #3a2b7a;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 14px;
+    }
+
+    #canvasWrap {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
+    }
+
+    canvas {
+      background: #1b1433;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
 </head>
+
 <body>
-<div id="toolbar">
-  <button onclick="setViewTop()">Top</button>
-  <button onclick="setViewAngular()">Angular</button>
-  <button onclick="saveNow()">Save</button>
+
+<div id="topbar">
+  <span id="projectLabel"></span>
 </div>
-<canvas id="canvas"></canvas>
-<div id="phase">RENDERER PARITY — STEP 4</div>
-<script type="module" src="./main.js"></script>
+
+<div id="canvasWrap">
+  <canvas id="editorCanvas" width="800" height="600"></canvas>
+</div>
+
+<script>
+/* =============================
+   EDITOR BOOTSTRAP (AUTHORITATIVE)
+============================= */
+
+// 1. Load active project
+const project = JSON.parse(
+  localStorage.getItem("rpgdream_active_project")
+);
+
+// Safety: no project → back to manager
+if (!project) {
+  window.location.href = "../manager/index.html";
+}
+
+// 2. Resolve active map
+const activeMap = project.maps.find(
+  m => m.id === project.editor.activeMapId
+);
+
+// Safety: malformed project
+if (!activeMap) {
+  alert("Active map missing.");
+  window.location.href = "../manager/index.html";
+}
+
+// 3. UI label
+document.getElementById("projectLabel").textContent =
+  `${project.name} — ${activeMap.name} (${activeMap.viewMode})`;
+
+// 4. Canvas setup
+const canvas = document.getElementById("editorCanvas");
+const ctx = canvas.getContext("2d");
+
+/* =============================
+   RENDERER SELECTION
+============================= */
+
+function initTopDownGrid() {
+  canvas.width = 800;
+  canvas.height = 600;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const size = 32;
+  ctx.strokeStyle = "#3a2b7a";
+
+  for (let x = 0; x <= canvas.width; x += size) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+
+  for (let y = 0; y <= canvas.height; y += size) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
+function initAngularGrid() {
+  canvas.width = 900;
+  canvas.height = 600;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const size = 32;
+  ctx.strokeStyle = "#3a2b7a";
+
+  for (let x = -canvas.height; x < canvas.width; x += size) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + canvas.height, canvas.height);
+    ctx.stroke();
+  }
+
+  for (let x = 0; x < canvas.width + canvas.height; x += size) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x - canvas.height, canvas.height);
+    ctx.stroke();
+  }
+}
+
+/* =============================
+   INIT (SINGLE SOURCE OF TRUTH)
+============================= */
+
+if (activeMap.viewMode === "angular") {
+  initAngularGrid();
+} else {
+  initTopDownGrid();
+}
+</script>
+
 </body>
 </html>
