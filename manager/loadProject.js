@@ -1,19 +1,38 @@
-// manager/loadProject.js
-// Ensures editor viewMode persists when loading from Manager
+/* ================================
+   LOAD PROJECT — CANONICAL FLOW
+================================ */
 
-export function loadProjectToEditor(project) {
-  const active = {
-    id: project.id,
-    name: project.name,
-    data: {
-      ...project.data,
-      editor: {
-        ...(project.data?.editor || {}),
-        viewMode: project.data?.editor?.viewMode || project.data?.view || 'top'
-      }
-    }
-  };
+function loadProject(projectId) {
+  const projects =
+    JSON.parse(
+      localStorage.getItem("rpgdream_projects") || "[]"
+    );
 
-  localStorage.setItem('rpgdream_active_project', JSON.stringify(active));
-  window.location.href = '/editor/index.html';
+  const project =
+    projects.find(p => p.id === projectId);
+
+  if (!project) {
+    alert("Project not found.");
+    return;
+  }
+
+  /* >>> GUARANTEE ACTIVE MAP <<< */
+  if (
+    !project.editor ||
+    !project.editor.activeMapId ||
+    !project.maps.find(
+      m => m.id === project.editor.activeMapId
+    )
+  ) {
+    project.editor = {
+      activeMapId: project.maps[0].id
+    };
+  }
+
+  localStorage.setItem(
+    "rpgdream_active_project",
+    JSON.stringify(project)
+  );
+
+  window.location.href = "../editor/index.html";
 }
